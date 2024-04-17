@@ -1,23 +1,21 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
-import hwr.oop.chess.application.figures.FigureColor;
 
 import java.util.ArrayList;
 
 public class Board {
-    private static ArrayList<Figure> figures;
-   // private Figure[][] board = new Figure[8][8];
-    public Board(ArrayList<Figure> figures){
-        Board.figures = figures;
-    }
+    private Board() {};
+
+    private static ArrayList<Figure> figures = new ArrayList<>();
+
     public static void setFigures(ArrayList<Figure> figures) {
         Board.figures = figures;
     }
 
     public static Figure getFigureOnField(Position position) {
         for (Figure figure : figures) {
-          if (figure.getPosition() == position && !figure.isCaptured()) {
+          if (figure.position().isEqualTo(position)) {
             return figure;
           }
         }
@@ -29,16 +27,16 @@ public class Board {
     }
 
 
-    public static void moveFigure(Position from, Position to) throws Exception {
+    public static void moveFigure(Position from, Position to) {
         Figure figure = Board.getFigureOnField(from);
         if(figure == null) {
-            throw new Exception("On this field there is no Figure!");
+            throw new RuntimeException("On this field there is no Figure!");
         }
 
         if(!figure.canMoveTo(to)) {
-            throw new Exception("The Figure can't move there!");
+            throw new RuntimeException("The Figure can't move there!");
         }
 
-        figure.setPosition(to);
+        figure.moveTo(to);
     }
 }

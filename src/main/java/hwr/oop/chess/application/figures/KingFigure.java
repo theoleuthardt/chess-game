@@ -3,59 +3,46 @@ package hwr.oop.chess.application.figures;
 import hwr.oop.chess.application.Position;
 
 public class KingFigure implements Figure {
-    Position startPosition = null;
-    Position currentPosition = null;
-    FigureType type = null;
-    FigureColor color = null;
+    private Position currentPosition = null;
+    private static final FigureType type = FigureType.KING;
+    private final FigureColor color;
 
     public KingFigure(FigureColor color, Position position) {
-        this.type = FigureType.KING;
         this.color = color;
-        this.startPosition = position;
         this.currentPosition = position;
     }
 
 
-    @Override
-    public boolean canMoveTo(Position newPosition) {
+    public boolean canMoveTo(Position to) {
+        Position from = this.currentPosition;
 
-        return true;
+        // this move is not allowed as it does not obey the rules.
+        return false;
     }
 
-    @Override
-    public void moveTo(Position newPosition) {
-        if(canMoveTo(newPosition)) {
-            this.currentPosition = newPosition;
-        }
-    }
-
-    @Override
     public boolean isOnField(Position field) {
-        return this.currentPosition == field;
+        return this.currentPosition.isEqualTo(field);
     }
 
-    @Override
     public boolean isCaptured() {
         return this.currentPosition == null;
     }
 
-    @Override
-    public Position getPosition() {
+    public void moveTo(Position position) {
+        if(canMoveTo(position)) {
+            this.currentPosition = position;
+        }
+    }
+
+    public Position position() {
         return this.currentPosition;
     }
 
-    @Override
-    public void setPosition(Position position) {
-        this.currentPosition = position;
-    }
-
-    @Override
-    public FigureColor getColor() {
+    public FigureColor color() {
         return this.color;
     }
 
-    @Override
-    public FigureType getType() {
-        return this.type;
+    public FigureType type() {
+        return type;
     }
 }

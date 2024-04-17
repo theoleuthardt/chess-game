@@ -44,7 +44,7 @@ public class ChessGame {
             list.add(new PawnFigure(FigureColor.BLACK, new Position(x, 7)));
         }
 
-        Board board = new Board(list);
+        Board.setFigures(list);
 
     }
 }

@@ -18,7 +18,7 @@ public class FenNotation {
         this.fullmoveNumber = fullmoveNumber;
     }
 
-    // getter and setter
+    // getter와 setter 메소드
     public String getPosition() {
         return this.position;
     }

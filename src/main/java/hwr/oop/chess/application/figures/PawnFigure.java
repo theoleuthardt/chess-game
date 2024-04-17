@@ -6,8 +6,8 @@ import hwr.oop.chess.application.Position;
 public class PawnFigure implements Figure {
   private Position startPosition = null;
   private Position currentPosition = null;
-  private final FigureType type = FigureType.PAWN;
-  private FigureColor color = null;
+  private static final FigureType type = FigureType.PAWN;
+  private final FigureColor color;
 
   public PawnFigure(FigureColor color, Position position) {
     this.color = color;
@@ -15,42 +15,41 @@ public class PawnFigure implements Figure {
     this.currentPosition = position;
   }
 
-  @Override
-  public boolean canMoveTo(Position newPosition) {
-    Position oldPosition = this.currentPosition;
-    boolean isFieldBlocked = Board.isFigureOnField(newPosition);
+  public boolean canMoveTo(Position to) {
+    Position from = this.currentPosition;
 
-    int moveDirection = 1;
-    if(this.color == FigureColor.BLACK) {
-      moveDirection = -1;
-    }
+    // white figures move from bottom up (increasing y position)
+    // black figures move from top down (decreasing y position)
+    int oneField = (this.color == FigureColor.BLACK) ? -1 : 1;
+    int twoFields = oneField * 2;
 
     // Move one field straight up/down if the way is free
-    if (!isFieldBlocked
-        && (oldPosition.x() == newPosition.x())
-        && (oldPosition.y() + moveDirection) == newPosition.y()) {
+    boolean isToFieldBlocked = Board.isFigureOnField(to);
+    if (!isToFieldBlocked
+        && (from.x() == to.x())
+        && (from.y() + oneField) == to.y()) {
       return true;
     }
 
     // Moving two fields from the start position if both fields are free
-//    boolean isFieldInFrontOfPawnBlocked =
-    if (!isFieldBlocked // field to move to is free
-        && !Board.isFigureOnField(new Position(oldPosition.x(), oldPosition.y() + moveDirection)) // field between current and final field
+    boolean isFieldInFrontOfPawnBlocked = Board.isFigureOnField(new Position(from.x(), from.y() + oneField));
+    if (!isToFieldBlocked
+        && !isFieldInFrontOfPawnBlocked
 
-        && (startPosition == oldPosition)
-        && (oldPosition.x()      == newPosition.x())
-        && (oldPosition.y() + 2 * moveDirection) == newPosition.y()) {
+        && (startPosition == from)
+        && (from.x()      == to.x())
+        && (from.y() + twoFields) == to.y()) {
       return true;
     }
 
     // Move one field diagonally if the opponent is there
-    Figure opponent = Board.getFigureOnField(newPosition);
-    if (isFieldBlocked // check if a different figure is on the new field
+    Figure opponent = Board.getFigureOnField(to);
+    if (isToFieldBlocked // check if a different figure is on the new field
         && opponent != null
-        && (opponent.getColor() == FigureColor.WHITE)
-        && (Math.abs(oldPosition.x() - newPosition.x()) == 1)
-        && (oldPosition.y() + moveDirection) == newPosition.y()) {
-      opponent.setPosition(null); // catch opponent figure
+        && (opponent.color() == FigureColor.WHITE)
+        && (Math.abs(from.x() - to.x()) == 1)
+        && (from.y() + oneField) == to.y()) {
+      opponent.moveTo(null); // catch opponent figure
       return true;
     }
 
@@ -58,40 +57,29 @@ public class PawnFigure implements Figure {
     return false;
   }
 
-  @Override
-  public void moveTo(Position newPosition) {
-   if(canMoveTo(newPosition)) {
-     this.currentPosition = newPosition;
-   }
-  }
-
-  @Override
   public boolean isOnField(Position field) {
-    return this.currentPosition == field;
+    return this.currentPosition.isEqualTo(field);
   }
 
-  @Override
   public boolean isCaptured() {
     return this.currentPosition == null;
   }
 
-  @Override
-  public Position getPosition() {
+  public void moveTo(Position position) {
+    if(canMoveTo(position)) {
+      this.currentPosition = position;
+    }
+  }
+
+  public Position position() {
     return this.currentPosition;
   }
 
-  @Override
-  public void setPosition(Position position) {
-    this.currentPosition = position;
-  }
-
-  @Override
-  public FigureColor getColor() {
+  public FigureColor color() {
     return this.color;
   }
 
-  @Override
-  public FigureType getType() {
-    return this.type;
+  public FigureType type() {
+    return type;
   }
 }
