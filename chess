@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# shellcheck disable=SC2068
+java -cp target/chess-game-0.1.0.jar hwr.oop.application.ChessGame $@
