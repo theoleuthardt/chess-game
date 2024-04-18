@@ -3,14 +3,15 @@ package hwr.oop.chess.application.figures;
 import hwr.oop.chess.application.Position;
 
 public class QueenFigure implements Figure {
+    private Position startPosition = null;
     private Position currentPosition = null;
     private static final FigureType type = FigureType.QUEEN;
     private final FigureColor color;
 
-    public QueenFigure(FigureColor color) {
-        //  Position position = new Position(x,y);
-        //  this.startPosition = position;
-        //  this.currentPosition = position;
+    public QueenFigure(FigureColor color, int x, int y) {
+        Position position = new Position(x,y);
+        this.startPosition = position;
+        this.currentPosition = position;
         this.color = color;
     }
 

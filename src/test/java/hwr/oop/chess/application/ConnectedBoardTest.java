@@ -60,7 +60,7 @@ public class ConnectedBoardTest {
         Cell currentCell = board.getStartingCell();
         while (currentCell != null) {
             Figure figure = currentCell.getFigure();
-            if (currentCell.getRow() == 0 || currentCell.getRow() == 1 || currentCell.getRow() == 6 || currentCell.getRow() == 7) {
+            if (currentCell.getRow() == 1 || currentCell.getRow() == 2 || currentCell.getRow() == 6 || currentCell.getRow() == 8) {
                 assertNotNull(figure, "Figure is not placed on cell (" + currentCell.getRow() + ", " + currentCell.getCol() + ")");
             } else {
                 assertNull(figure, "Figure should not be placed on cell (" + currentCell.getRow() + ", " + currentCell.getCol() + ")");

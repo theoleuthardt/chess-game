@@ -3,14 +3,15 @@ package hwr.oop.chess.application.figures;
 import hwr.oop.chess.application.Position;
 
 public class KingFigure implements Figure {
+    private Position startPosition = null;
     private Position currentPosition = null;
     private static final FigureType type = FigureType.KING;
     private final FigureColor color;
 
-    public KingFigure(FigureColor color) {
-        //  Position position = new Position(x,y);
-        //  this.startPosition = position;
-        //  this.currentPosition = position;
+    public KingFigure(FigureColor color, int x, int y) {
+        Position position = new Position(x,y);
+        this.startPosition = position;
+        this.currentPosition = position;
         this.color = color;
     }
 

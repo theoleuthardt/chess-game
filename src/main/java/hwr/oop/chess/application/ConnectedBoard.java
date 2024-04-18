@@ -9,6 +9,8 @@ import hwr.oop.chess.application.figures.KingFigure;
 import hwr.oop.chess.application.figures.KnightFigure;
 import hwr.oop.chess.application.figures.BishopFigure;
 
+import java.util.function.Consumer;
+
 public class ConnectedBoard {
     private Cell startingCell;
 
@@ -19,32 +21,32 @@ public class ConnectedBoard {
     private void initializeBoard() {
         System.out.println("initializeBoard");
         // Create the first cell and store it in startingCell
-        startingCell = new Cell(0, 0);
+        startingCell = new Cell(1, 1);
         Cell previousCell = startingCell;
         Cell previousRowStart = startingCell;
         Cell previousRowCell = startingCell;
 
         // Create and connect cells for each row and column of the board
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-//                System.out.print(row + "" + col + ", ");
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+               // System.out.print(row + "" + col + ", ");
                 // Skip the first cell since it's already created
-                if (row == 0 && col == 0) {
+                if (row == 1 && col == 1) {
                     continue;
                 }
-                if (col == 0) {
+                if (col == 1) {
                     previousRowCell = previousRowStart;
                 }
                 // Create a new cell
                 Cell currentCell = new Cell(row, col);
                 // Connect the cell to the previous cell
                 connectCells(previousCell, currentCell);
-                if (row != 0) {
+                if (row != 1) {
                     connectCells(currentCell, previousRowCell);
-                    if (col != 0) {
+                    if (col != 1) {
                         connectCells(currentCell, previousRowCell.getLeftCell());
                     }
-                    if (col != 7) {
+                    if (col != 8) {
                         connectCells(currentCell, previousRowCell.getRightCell());
                     } else {
                         previousRowStart = previousRowStart.getTopCell();
@@ -55,7 +57,7 @@ public class ConnectedBoard {
                 previousCell = currentCell;
                 previousRowCell = previousRowCell.getRightCell();
             }
-//            System.out.println("  :" + row + "Row");
+           // System.out.println("  :" + row + "Row");
         }
 
         // Set up the initial chess positions
@@ -99,12 +101,12 @@ public class ConnectedBoard {
             currentCell.setBottomLeftCell(nextCell);
             nextCell.setTopRightCell(currentCell);
         } else if (currentCell.getRow() > nextCell.getRow() && currentCell.getCol() < nextCell.getCol()) {
-            if (currentCell.getRow() != 7) { // Exclude bottom right connection for the last row (row 7)
+            if (currentCell.getRow() != 8) { // Exclude bottom right connection for the last row (row 8)
                 currentCell.setTopRightCell(nextCell);
                 nextCell.setBottomLeftCell(currentCell);
             }
         } else if (currentCell.getRow() > nextCell.getRow() && currentCell.getCol() > nextCell.getCol()) {
-            if (currentCell.getRow() != 7) { // Exclude bottom left connection for the last row (row 7)
+            if (currentCell.getRow() != 8) { // Exclude bottom left connection for the last row (row 8)
                 currentCell.setTopLeftCell(nextCell);
                 nextCell.setBottomRightCell(currentCell);
             }
@@ -121,35 +123,35 @@ public class ConnectedBoard {
         Cell rowStartCell = this.getStartingCell();  // Starting cell of the current row
         while (currentCell != null) {
             // Set up white figures
-            if (currentCell.getRow() == 0) {
-                placeFigure(new RookFigure(FigureColor.WHITE), 0, 0);
-                placeFigure(new KnightFigure(FigureColor.WHITE), 0, 1);
-                placeFigure(new BishopFigure(FigureColor.WHITE), 0, 2);
-                placeFigure(new QueenFigure(FigureColor.WHITE), 0, 3);
-                placeFigure(new KingFigure(FigureColor.WHITE), 0, 4);
-                placeFigure(new BishopFigure(FigureColor.WHITE), 0, 5);
-                placeFigure(new KnightFigure(FigureColor.WHITE), 0, 6);
-                placeFigure(new RookFigure(FigureColor.WHITE), 0, 7);
-            }
             if (currentCell.getRow() == 1) {
-                placeFigure(new PawnFigure(FigureColor.WHITE), 1, currentCell.getCol());
+                placeFigure(new RookFigure(FigureColor.WHITE,1, 1));
+                placeFigure(new KnightFigure(FigureColor.WHITE, 1, 2));
+                placeFigure(new BishopFigure(FigureColor.WHITE, 1,3));
+                placeFigure(new QueenFigure(FigureColor.WHITE,1,4));
+                placeFigure(new KingFigure(FigureColor.WHITE,1,5));
+                placeFigure(new BishopFigure(FigureColor.WHITE,1,6));
+                placeFigure(new KnightFigure(FigureColor.WHITE,1,7));
+                placeFigure(new RookFigure(FigureColor.WHITE,1,8));
+            }
+            if (currentCell.getRow() == 2) {
+                placeFigure(new PawnFigure(FigureColor.WHITE, 2, currentCell.getCol()));
             }
 
             // Set up black figures
-            if (currentCell.getRow() == 6) {
-                placeFigure(new PawnFigure(FigureColor.BLACK), 6, currentCell.getCol());
-            }
             if (currentCell.getRow() == 7) {
-                placeFigure(new RookFigure(FigureColor.BLACK), 7, 0);
-                placeFigure(new KnightFigure(FigureColor.BLACK), 7, 1);
-                placeFigure(new BishopFigure(FigureColor.BLACK), 7, 2);
-                placeFigure(new QueenFigure(FigureColor.BLACK), 7, 3);
-                placeFigure(new KingFigure(FigureColor.BLACK), 7, 4);
-                placeFigure(new BishopFigure(FigureColor.BLACK), 7, 5);
-                placeFigure(new KnightFigure(FigureColor.BLACK), 7, 6);
-                placeFigure(new RookFigure(FigureColor.BLACK), 7, 7);
+                placeFigure(new PawnFigure(FigureColor.BLACK,7, currentCell.getCol()));
             }
-            if (currentCell.getCol() < 7) {
+            if (currentCell.getRow() == 8) {
+                placeFigure(new RookFigure(FigureColor.BLACK, 8,1));
+                placeFigure(new KnightFigure(FigureColor.BLACK, 8,2));
+                placeFigure(new BishopFigure(FigureColor.BLACK, 8,3));
+                placeFigure(new QueenFigure(FigureColor.BLACK,8,4));
+                placeFigure(new KingFigure(FigureColor.BLACK, 8,5));
+                placeFigure(new BishopFigure(FigureColor.BLACK, 8, 6));
+                placeFigure(new KnightFigure(FigureColor.BLACK,8,7));
+                placeFigure(new RookFigure(FigureColor.BLACK,8,8));
+            }
+            if (currentCell.getCol() < 8) {
                 // Move to the next cell in the current row
                 currentCell = currentCell.getRightCell();
             } else {
@@ -160,8 +162,8 @@ public class ConnectedBoard {
         }
     }
 
-    private void placeFigure(Figure figure, int row, int col) {
-        Cell cell = findCell(row, col);
+    private void placeFigure(Figure figure) {
+        Cell cell = findCell(figure.position().x(), figure.position().y());
         if (cell != null) {
             cell.setFigure(figure);
         }
@@ -175,7 +177,7 @@ public class ConnectedBoard {
                 return currentCell;
             }
 
-            if (currentCell.getCol() < 7) {
+            if (currentCell.getCol() < 8) {
                 // Move to the next cell in the current row
                 currentCell = currentCell.getRightCell();
             } else {
@@ -199,7 +201,7 @@ public class ConnectedBoard {
                 System.out.print("- "); // Empty cell symbol
             }
 
-            if (currentCell.getCol() < 7) {
+            if (currentCell.getCol() < 8) {
                 // Move to the next cell in the current row
                 currentCell = currentCell.getRightCell();
             } else {

@@ -3,14 +3,15 @@ package hwr.oop.chess.application.figures;
 import hwr.oop.chess.application.Position;
 
 public class BishopFigure implements Figure {
+    private Position startPosition = null;
     private Position currentPosition = null;
     private static final FigureType type = FigureType.BISHOP;
     private final FigureColor color;
 
-    public BishopFigure(FigureColor color) {
-        //  Position position = new Position(x,y);
-        //  this.startPosition = position;
-        //  this.currentPosition = position;
+    public BishopFigure(FigureColor color, int x, int y) {
+        Position position = new Position(x,y);
+        this.startPosition = position;
+        this.currentPosition = position;
         this.color = color;
     }
 
