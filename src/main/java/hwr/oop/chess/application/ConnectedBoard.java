@@ -20,38 +20,46 @@ public class ConnectedBoard {
         System.out.println("initializeBoard");
         // Create the first cell and store it in startingCell
         startingCell = new Cell(0, 0);
-        Cell currentCell = startingCell;
+        Cell previousCell = startingCell;
         Cell previousRowStart = startingCell;
-        Cell currentRowStart = startingCell;
+//        Cell currentRowStart = startingCell;
         Cell previousRowCell = startingCell;
         // Create and connect cells for each row and column of the board
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                System.out.println(row + ", " + col);
+                System.out.print(row + col + ", ");
 
                 // Skip the first cell since it's already created
                 if (row == 0 && col == 0) {
                     continue;
                 }
-
                 if (col == 0) {
-                    previousRowStart = currentRowStart;
                     previousRowCell = previousRowStart;
-                    currentRowStart = currentCell;
+                }
+                // Create a new cell
+                Cell currentCell = new Cell(row, col);
+                // Connect the cell to the previous cell
+                connectCells(previousCell, currentCell);
+                if (row != 0) {
+                    connectCells(currentCell, previousRowCell);
+                    if (col != 0) {
+                        connectCells(currentCell, previousRowCell.getLeftCell());
+                    }
+                    if (col != 7) {
+                        connectCells(currentCell, previousRowCell.getRightCell());
+                    }
                 }
 
-                // Create a new cell
-                Cell nextCell = new Cell(row, col);
-                // Connect the cell to the previous cell
-                connectCells(currentCell, nextCell);
-                connectCells(currentCell, previousRowCell);
-                connectCells(currentCell, previousRowCell.getLeftCell());
-                connectCells(currentCell, previousRowCell.getRightCell());
-
                 // Set the next cell as the current cell
-                currentCell = nextCell;
+                previousCell = currentCell;
                 previousRowCell = previousRowCell.getRightCell();
+
+                if (col == 7) {
+                    previousRowStart = previousRowStart.getTopCell();
+                }
             }
+            System.out.println("  :" + row + "Row");
+
         }
 
         // Set up the initial chess positions
@@ -74,23 +82,28 @@ public class ConnectedBoard {
         // Connect vertically
         if (currentCell.getCol() == nextCell.getCol()) {
             // Connect vertically
-            if (currentCell.getRow() < nextCell.getRow()) {
+            if (currentCell.getRow() > nextCell.getRow()) {
                 currentCell.setBottomCell(nextCell);
                 nextCell.setTopCell(currentCell);
-            } else if (currentCell.getRow() > nextCell.getRow()) {
+            } else if (currentCell.getRow() < nextCell.getRow()) {
                 currentCell.setTopCell(nextCell);
                 nextCell.setBottomCell(currentCell);
             }
         }
 
         // Connect diagonally
-        if (currentCell.getRow() < 7 && currentCell.getCol() < 7) {
+        if (currentCell.getRow() < nextCell.getRow() && currentCell.getCol() < nextCell.getCol()) {
             currentCell.setBottomRightCell(nextCell);
             nextCell.setTopLeftCell(currentCell);
-        }
-        if (currentCell.getRow() < 7 && currentCell.getCol() > 0) {
+        } else if (currentCell.getRow() < nextCell.getRow() && currentCell.getCol() > nextCell.getCol()) {
             currentCell.setBottomLeftCell(nextCell);
             nextCell.setTopRightCell(currentCell);
+        } else if (currentCell.getRow() > nextCell.getRow() && currentCell.getCol() < nextCell.getCol()) {
+            currentCell.setTopRightCell(nextCell);
+            nextCell.setBottomLeftCell(currentCell);
+        } else if (currentCell.getRow() > nextCell.getRow() && currentCell.getCol() > nextCell.getCol()) {
+            currentCell.setTopLeftCell(nextCell);
+            nextCell.setBottomRightCell(currentCell);
         }
     }
 
