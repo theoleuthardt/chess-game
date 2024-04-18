@@ -15,4 +15,6 @@ public interface Figure {
   Position position();
   FigureColor color();
   FigureType type();
+
+  char getSymbol();
 }

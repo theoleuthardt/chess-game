@@ -9,11 +9,13 @@ public class PawnFigure implements Figure {
   private static final FigureType type = FigureType.PAWN;
   private final FigureColor color;
 
-  public PawnFigure(FigureColor color, Position position) {
+public PawnFigure(FigureColor color) {
+  //  Position position = new Position(x,y);
+  //  this.startPosition = position;
+  //  this.currentPosition = position;
     this.color = color;
-    this.startPosition = position;
-    this.currentPosition = position;
-  }
+  }  
+  
 
   public boolean canMoveTo(Position to) {
     Position from = this.currentPosition;
@@ -81,5 +83,13 @@ public class PawnFigure implements Figure {
 
   public FigureType type() {
     return type;
+  }
+
+  public char getSymbol(){
+    if(this.color == FigureColor.WHITE){
+      return 'P';
+    }else{
+      return 'p';
+    }
   }
 }

@@ -7,9 +7,11 @@ public class KnightFigure implements Figure {
     private static final FigureType type = FigureType.KNIGHT;
     private final FigureColor color;
 
-    public KnightFigure(FigureColor color, Position position) {
+    public KnightFigure(FigureColor color) {
+        //  Position position = new Position(x,y);
+        //  this.startPosition = position;
+        //  this.currentPosition = position;
         this.color = color;
-        this.currentPosition = position;
     }
 
 
@@ -45,5 +47,12 @@ public class KnightFigure implements Figure {
 
     public FigureType type() {
         return type;
+    }
+    public char getSymbol(){
+        if(this.color == FigureColor.WHITE){
+            return 'N';
+        }else{
+            return 'n';
+        }
     }
 }

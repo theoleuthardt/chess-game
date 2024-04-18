@@ -7,9 +7,11 @@ public class QueenFigure implements Figure {
     private static final FigureType type = FigureType.QUEEN;
     private final FigureColor color;
 
-    public QueenFigure(FigureColor color, Position position) {
+    public QueenFigure(FigureColor color) {
+        //  Position position = new Position(x,y);
+        //  this.startPosition = position;
+        //  this.currentPosition = position;
         this.color = color;
-        this.currentPosition = position;
     }
 
     public boolean canMoveTo(Position to) {
@@ -43,5 +45,13 @@ public class QueenFigure implements Figure {
 
     public FigureType type() {
         return type;
+    }
+
+    public char getSymbol(){
+        if(this.color == FigureColor.WHITE){
+            return 'Q';
+        }else{
+            return 'q';
+        }
     }
 }

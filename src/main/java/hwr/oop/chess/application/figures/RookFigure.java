@@ -7,9 +7,11 @@ public class RookFigure implements Figure {
     private static final FigureType type = FigureType.ROOK;
     private final FigureColor color;
 
-    public RookFigure(FigureColor color, Position position) {
+    public RookFigure(FigureColor color) {
+        //  Position position = new Position(x,y);
+        //  this.startPosition = position;
+        //  this.currentPosition = position;
         this.color = color;
-        this.currentPosition = position;
     }
 
 
@@ -44,5 +46,13 @@ public class RookFigure implements Figure {
 
     public FigureType type() {
         return type;
+    }
+
+    public char getSymbol(){
+        if(this.color == FigureColor.WHITE){
+            return 'R';
+        }else{
+            return 'r';
+        }
     }
 }
