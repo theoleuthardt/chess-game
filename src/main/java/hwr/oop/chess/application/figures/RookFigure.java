@@ -32,9 +32,9 @@ public class RookFigure implements Figure {
     }
 
     public void moveTo(Position position) {
-        if(canMoveTo(position)) {
+//        if(canMoveTo(position)) {
             this.currentPosition = position;
-        }
+//        }
     }
 
     public Position position() {

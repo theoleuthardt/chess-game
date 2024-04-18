@@ -169,7 +169,7 @@ public class ConnectedBoard {
         }
     }
 
-    private Cell findCell(int row, int col) {
+    public Cell findCell(int row, int col) {
         Cell currentCell = this.getStartingCell();
         Cell rowStartCell = this.getStartingCell();  // Starting cell of the current row
         while (currentCell != null) {
@@ -211,5 +211,17 @@ public class ConnectedBoard {
                 System.out.println();
             }
         }
+    }
+
+    // Method to move a piece on the board
+    public void moveFigure(int startRow, int startCol, int endRow, int endCol) {
+        // Get the piece at the start position
+        Cell prevCell = this.findCell(startRow, startCol);
+        Cell nextCell = this.findCell(endRow, endCol);
+
+        Figure figure = prevCell.getFigure();
+        // Move the piece to the end position
+        prevCell.setFigure(null); // Remove the piece from the start position
+        nextCell.setFigure(figure);   // Place the piece at the end position
     }
 }

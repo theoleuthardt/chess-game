@@ -1,6 +1,7 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
+import hwr.oop.chess.application.figures.FigureColor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -72,6 +73,15 @@ public class ConnectedBoardTest {
                 currentCell = currentCell.getBottomCell();
             }
         }
+        board.printBoard();
+    }
+
+    @Test
+    public void moveRook() {
+        Cell cell = board.findCell(8,8);
+        Figure figure = cell.getFigure();
+        figure.moveTo(new Position(5,5));
+
         board.printBoard();
     }
 }
