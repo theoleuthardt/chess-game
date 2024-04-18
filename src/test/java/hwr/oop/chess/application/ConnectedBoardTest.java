@@ -23,10 +23,7 @@ public class ConnectedBoardTest {
             Cell rowStartCell = currentCell; // Starting cell of the current row
 
             while (currentCell != null) {
-                System.out.println(currentCell.getBottomCell());
-
-                System.out.println(currentCell.getRow() + ", " + currentCell.getCol());
-
+//                System.out.print(currentCell.getRow() + "" + currentCell.getCol() + ", ");
                 // Check right cell
                 if (currentCell.getRightCell() != null) {
                     assertEquals(currentCell, currentCell.getRightCell().getLeftCell(), "Right cell is not correctly connected");
@@ -47,9 +44,10 @@ public class ConnectedBoardTest {
                 // Move to the next cell in the current row
                 currentCell = currentCell.getRightCell();
             }
+//            System.out.println();
 
             // Move to the next row
-            currentCell = rowStartCell.getBottomCell();
+            currentCell = rowStartCell.getTopCell();
         }
 
         // Print message if all tests pass in yellow color
@@ -74,6 +72,6 @@ public class ConnectedBoardTest {
                 currentCell = currentCell.getBottomCell();
             }
         }
-//        board.printBoard();
+        board.printBoard();
     }
 }
