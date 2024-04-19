@@ -5,16 +5,23 @@ import hwr.oop.chess.application.Position;
 public interface Figure {
 
 
-  boolean canMoveTo(Position newPosition);
+    boolean canMoveTo(Position position);
 
-  boolean isOnField(Position field);
-  // void capture();
-  // boolean isCaptured();
+    boolean isOnField(int x, int y);
+    // void capture();
+    // boolean isCaptured();
 
-  void moveTo(Position position);
-  Position position();
-  FigureColor color();
-  FigureType type();
+    void moveTo(int x, int y);
 
-  char getSymbol();
+    boolean isCaptured();
+
+    void setPosition(Position position);
+
+    char getSymbol();
+
+    public Position getPosition();
+
+    public FigureColor getColor();
+
+    public FigureType getType();
 }

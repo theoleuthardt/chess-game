@@ -9,49 +9,62 @@ public class QueenFigure implements Figure {
     private final FigureColor color;
 
     public QueenFigure(FigureColor color, int x, int y) {
-        Position position = new Position(x,y);
+        Position position = new Position(x, y);
         this.startPosition = position;
         this.currentPosition = position;
         this.color = color;
     }
 
-    public boolean canMoveTo(Position to) {
+    public boolean canMoveTo(int x, int y) {
+        Position to = new Position(x, y);
         Position from = this.currentPosition;
 
         // this move is not allowed as it does not obey the rules.
         return false;
     }
 
-    public boolean isOnField(Position field) {
-        return this.currentPosition.isEqualTo(field);
-    }
-
     public boolean isCaptured() {
         return this.currentPosition == null;
     }
 
-    public void moveTo(Position position) {
-        if(canMoveTo(position)) {
+    @Override
+    public void setPosition(Position position) {
+
+    }
+
+    @Override
+    public boolean canMoveTo(Position position) {
+        return false;
+    }
+
+    @Override
+    public boolean isOnField(int x, int y) {
+        return false;
+    }
+
+    public void moveTo(int x, int y) {
+        Position position = new Position(x, y);
+        if (canMoveTo(position)) {
             this.currentPosition = position;
         }
     }
 
-    public Position position() {
+    public Position getPosition() {
         return this.currentPosition;
     }
 
-    public FigureColor color() {
+    public FigureColor getColor() {
         return this.color;
     }
 
-    public FigureType type() {
+    public FigureType getType() {
         return type;
     }
 
-    public char getSymbol(){
-        if(this.color == FigureColor.WHITE){
+    public char getSymbol() {
+        if (this.color == FigureColor.WHITE) {
             return 'Q';
-        }else{
+        } else {
             return 'q';
         }
     }

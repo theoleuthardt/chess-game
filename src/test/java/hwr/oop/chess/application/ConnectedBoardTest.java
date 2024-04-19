@@ -1,7 +1,7 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
-import hwr.oop.chess.application.figures.FigureColor;
+import hwr.oop.chess.application.figures.FigureType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -77,11 +77,23 @@ public class ConnectedBoardTest {
     }
 
     @Test
-    public void moveRook() {
-        Cell cell = board.findCell(8,8);
-        Figure figure = cell.getFigure();
-        figure.moveTo(new Position(5,5));
+    public void testMoveFigure() {
+        // Check move
+        this.moveFigureAndCheck(1, 8, 4, 6);
+        this.moveFigureAndCheck(8, 8, 5, 5);
+        this.moveFigureAndCheck(8, 1, 3, 7);
+        this.moveFigureAndCheck(5, 5, 6, 1);
+        this.moveFigureAndCheck(1, 1, 3, 2);
 
+    }
+
+    private void moveFigureAndCheck(int startCol, int startRow, int endCol, int endRow) {
         board.printBoard();
+
+        Figure prevFigure = board.findCell(startRow, startRow).getFigure();
+        FigureType prevFigureType = prevFigure.getType();
+        board.moveFigure(startRow, startCol, endRow, endCol);
+        FigureType nextFigure = board.findCell(endRow, endCol).getFigure().getType();
+        assertEquals(prevFigureType, nextFigure, "Figure moves incorrect");
     }
 }

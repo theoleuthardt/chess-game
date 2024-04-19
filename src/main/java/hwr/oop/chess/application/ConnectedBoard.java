@@ -9,8 +9,6 @@ import hwr.oop.chess.application.figures.KingFigure;
 import hwr.oop.chess.application.figures.KnightFigure;
 import hwr.oop.chess.application.figures.BishopFigure;
 
-import java.util.function.Consumer;
-
 public class ConnectedBoard {
     private Cell startingCell;
 
@@ -29,7 +27,7 @@ public class ConnectedBoard {
         // Create and connect cells for each row and column of the board
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
-               // System.out.print(row + "" + col + ", ");
+                // System.out.print(row + "" + col + ", ");
                 // Skip the first cell since it's already created
                 if (row == 1 && col == 1) {
                     continue;
@@ -57,7 +55,7 @@ public class ConnectedBoard {
                 previousCell = currentCell;
                 previousRowCell = previousRowCell.getRightCell();
             }
-           // System.out.println("  :" + row + "Row");
+            // System.out.println("  :" + row + "Row");
         }
 
         // Set up the initial chess positions
@@ -124,32 +122,32 @@ public class ConnectedBoard {
         while (currentCell != null) {
             // Set up white figures
             if (currentCell.getRow() == 1) {
-                placeFigure(new RookFigure(FigureColor.WHITE,1, 1));
-                placeFigure(new KnightFigure(FigureColor.WHITE, 1, 2));
-                placeFigure(new BishopFigure(FigureColor.WHITE, 1,3));
-                placeFigure(new QueenFigure(FigureColor.WHITE,1,4));
-                placeFigure(new KingFigure(FigureColor.WHITE,1,5));
-                placeFigure(new BishopFigure(FigureColor.WHITE,1,6));
-                placeFigure(new KnightFigure(FigureColor.WHITE,1,7));
-                placeFigure(new RookFigure(FigureColor.WHITE,1,8));
+                placeFigure(new RookFigure(FigureColor.WHITE, 1, 1));
+                placeFigure(new KnightFigure(FigureColor.WHITE, 2, 1));
+                placeFigure(new BishopFigure(FigureColor.WHITE, 3, 1));
+                placeFigure(new QueenFigure(FigureColor.WHITE, 4, 4));
+                placeFigure(new KingFigure(FigureColor.WHITE, 5, 1));
+                placeFigure(new BishopFigure(FigureColor.WHITE, 6, 1));
+                placeFigure(new KnightFigure(FigureColor.WHITE, 7, 1));
+                placeFigure(new RookFigure(FigureColor.WHITE, 8, 1));
             }
             if (currentCell.getRow() == 2) {
-                placeFigure(new PawnFigure(FigureColor.WHITE, 2, currentCell.getCol()));
+                placeFigure(new PawnFigure(FigureColor.WHITE, currentCell.getCol(), 2));
             }
 
             // Set up black figures
             if (currentCell.getRow() == 7) {
-                placeFigure(new PawnFigure(FigureColor.BLACK,7, currentCell.getCol()));
+                placeFigure(new PawnFigure(FigureColor.BLACK, currentCell.getCol(), 7));
             }
             if (currentCell.getRow() == 8) {
-                placeFigure(new RookFigure(FigureColor.BLACK, 8,1));
-                placeFigure(new KnightFigure(FigureColor.BLACK, 8,2));
-                placeFigure(new BishopFigure(FigureColor.BLACK, 8,3));
-                placeFigure(new QueenFigure(FigureColor.BLACK,8,4));
-                placeFigure(new KingFigure(FigureColor.BLACK, 8,5));
-                placeFigure(new BishopFigure(FigureColor.BLACK, 8, 6));
-                placeFigure(new KnightFigure(FigureColor.BLACK,8,7));
-                placeFigure(new RookFigure(FigureColor.BLACK,8,8));
+                placeFigure(new RookFigure(FigureColor.BLACK, 1, 8));
+                placeFigure(new KnightFigure(FigureColor.BLACK, 2, 8));
+                placeFigure(new BishopFigure(FigureColor.BLACK, 3, 8));
+                placeFigure(new QueenFigure(FigureColor.BLACK, 4, 8));
+                placeFigure(new KingFigure(FigureColor.BLACK, 5, 8));
+                placeFigure(new BishopFigure(FigureColor.BLACK, 6, 8));
+                placeFigure(new KnightFigure(FigureColor.BLACK, 7, 8));
+                placeFigure(new RookFigure(FigureColor.BLACK, 8, 8));
             }
             if (currentCell.getCol() < 8) {
                 // Move to the next cell in the current row
@@ -163,13 +161,13 @@ public class ConnectedBoard {
     }
 
     private void placeFigure(Figure figure) {
-        Cell cell = findCell(figure.position().x(), figure.position().y());
+        Cell cell = findCell(figure.getPosition().x(), figure.getPosition().y());
         if (cell != null) {
             cell.setFigure(figure);
         }
     }
 
-    public Cell findCell(int row, int col) {
+    public Cell findCell(int col, int row) {
         Cell currentCell = this.getStartingCell();
         Cell rowStartCell = this.getStartingCell();  // Starting cell of the current row
         while (currentCell != null) {
@@ -191,7 +189,12 @@ public class ConnectedBoard {
 
     public void printBoard() {
         Cell currentCell = this.getStartingCell();
-        Cell rowStartCell = this.getStartingCell();  // Starting cell of the current row
+        while (currentCell.getTopCell() != null) {
+            currentCell = currentCell.getTopCell();
+        }
+        Cell rowStartCell = currentCell;
+
+        // Starting cell of the current row
         while (currentCell != null) {
             Figure figure = currentCell.getFigure();
             // Print figure if it exists, otherwise print empty cell
@@ -206,20 +209,22 @@ public class ConnectedBoard {
                 currentCell = currentCell.getRightCell();
             } else {
                 // Move to the next row
-                rowStartCell = rowStartCell.getTopCell();
+                rowStartCell = rowStartCell.getBottomCell();
                 currentCell = rowStartCell;
                 System.out.println();
             }
         }
+        System.out.println();
     }
 
     // Method to move a piece on the board
-    public void moveFigure(int startRow, int startCol, int endRow, int endCol) {
+    public void moveFigure(int startCol, int startRow, int endCol, int endRow) {
         // Get the piece at the start position
-        Cell prevCell = this.findCell(startRow, startCol);
-        Cell nextCell = this.findCell(endRow, endCol);
+        Cell prevCell = this.findCell(startCol, startRow);
+        Cell nextCell = this.findCell(endCol, endRow);
 
         Figure figure = prevCell.getFigure();
+        figure.moveTo(endRow, endCol);
         // Move the piece to the end position
         prevCell.setFigure(null); // Remove the piece from the start position
         nextCell.setFigure(figure);   // Place the piece at the end position

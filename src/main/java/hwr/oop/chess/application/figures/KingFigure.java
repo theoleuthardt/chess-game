@@ -9,7 +9,7 @@ public class KingFigure implements Figure {
     private final FigureColor color;
 
     public KingFigure(FigureColor color, int x, int y) {
-        Position position = new Position(x,y);
+        Position position = new Position(x, y);
         this.startPosition = position;
         this.currentPosition = position;
         this.color = color;
@@ -23,36 +23,43 @@ public class KingFigure implements Figure {
         return false;
     }
 
-    public boolean isOnField(Position field) {
-        return this.currentPosition.isEqualTo(field);
+    @Override
+    public boolean isOnField(int x, int y) {
+        return false;
     }
 
     public boolean isCaptured() {
         return this.currentPosition == null;
     }
 
-    public void moveTo(Position position) {
-        if(canMoveTo(position)) {
+    @Override
+    public void setPosition(Position position) {
+
+    }
+
+    public void moveTo(int x, int y) {
+        Position position = new Position(x, y);
+        if (canMoveTo(position)) {
             this.currentPosition = position;
         }
     }
 
-    public Position position() {
+    public Position getPosition() {
         return this.currentPosition;
     }
 
-    public FigureColor color() {
+    public FigureColor getColor() {
         return this.color;
     }
 
-    public FigureType type() {
+    public FigureType getType() {
         return type;
     }
 
-    public char getSymbol(){
-        if(this.color == FigureColor.WHITE){
+    public char getSymbol() {
+        if (this.color == FigureColor.WHITE) {
             return 'K';
-        }else{
+        } else {
             return 'k';
         }
     }

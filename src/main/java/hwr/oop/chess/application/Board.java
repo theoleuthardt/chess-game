@@ -15,7 +15,7 @@ public class Board {
 
     public static Figure getFigureOnField(Position position) {
         for (Figure figure : figures) {
-          if (figure.position().isEqualTo(position)) {
+          if (figure.getPosition().isEqualTo(position)) {
             return figure;
           }
         }
@@ -37,6 +37,6 @@ public class Board {
             throw new RuntimeException("The Figure can't move there!");
         }
 
-        figure.moveTo(to);
+//        figure.moveTo(to);
     }
 }

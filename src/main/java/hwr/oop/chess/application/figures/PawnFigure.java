@@ -14,8 +14,7 @@ public PawnFigure(FigureColor color, int x, int y) {
     this.startPosition = position;
     this.currentPosition = position;
     this.color = color;
-  }  
-  
+  }
 
   public boolean canMoveTo(Position to) {
     Position from = this.currentPosition;
@@ -48,10 +47,10 @@ public PawnFigure(FigureColor color, int x, int y) {
     Figure opponent = Board.getFigureOnField(to);
     if (isToFieldBlocked // check if a different figure is on the new field
         && opponent != null
-        && (opponent.color() == FigureColor.WHITE)
+        && (opponent.getColor() == FigureColor.WHITE)
         && (Math.abs(from.x() - to.x()) == 1)
         && (from.y() + oneField) == to.y()) {
-      opponent.moveTo(null); // catch opponent figure
+      opponent.moveTo(-1,-1); // catch opponent figure
       return true;
     }
 
@@ -59,7 +58,8 @@ public PawnFigure(FigureColor color, int x, int y) {
     return false;
   }
 
-  public boolean isOnField(Position field) {
+  public boolean isOnField(int x, int y) {
+    Position field = new Position(x, y);
     return this.currentPosition.isEqualTo(field);
   }
 
@@ -67,21 +67,26 @@ public PawnFigure(FigureColor color, int x, int y) {
     return this.currentPosition == null;
   }
 
-  public void moveTo(Position position) {
+  public void moveTo(int x, int y) {
+    Position position = new Position(x, y);
     if(canMoveTo(position)) {
-      this.currentPosition = position;
+      this.setPosition(position);
     }
   }
 
-  public Position position() {
+  public void setPosition(Position position) {
+    this.currentPosition = position;
+  }
+
+  public Position getPosition() {
     return this.currentPosition;
   }
 
-  public FigureColor color() {
+  public FigureColor getColor() {
     return this.color;
   }
 
-  public FigureType type() {
+  public FigureType getType() {
     return type;
   }
 

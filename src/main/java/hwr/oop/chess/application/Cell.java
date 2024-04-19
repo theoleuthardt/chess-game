@@ -18,7 +18,7 @@ public class Cell {
     private int row;
     private int col;
 
-    public Cell(int row, int col) {
+    public Cell(int x, int y) {
         this.row = row;
         this.col = col;
         this.figure = null;
