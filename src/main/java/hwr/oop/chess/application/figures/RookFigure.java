@@ -1,6 +1,7 @@
 package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Board;
+import hwr.oop.chess.application.ConnectedBoard;
 import hwr.oop.chess.application.Position;
 
 import java.util.Objects;
@@ -19,17 +20,16 @@ public class RookFigure implements Figure {
         this.currentPosition = position;
     }
 
-    @Override
-    public boolean canMoveTo(Position newPosition) {
+    public boolean canMoveTo(ConnectedBoard board, Position newPosition) {
         // #Todo Write Castling
         Position oldPosition = this.currentPosition;
         Figure otherFigure = Board.getFigureOnField(newPosition);
-        boolean isOtherFigureOnRoad = this.checkOtherFigureOnRoad(oldPosition, newPosition);
+        boolean isOtherFigureOnRoad = this.checkOtherFigureOnRoad(board, oldPosition, newPosition);
 
         if (!isOtherFigureOnRoad) {
             if (otherFigure == null
-                    && oldPosition.x() == newPosition.x()
-                    && oldPosition.y() == newPosition.y()) {
+                    && (oldPosition.x() == newPosition.x()
+                    || oldPosition.y() == newPosition.y())) {
                 return true;
             } else {
                 return Objects.requireNonNull(otherFigure).getColor() == this.getColor();
@@ -39,10 +39,9 @@ public class RookFigure implements Figure {
         }
     }
 
-    @Override
-    public void moveTo(int x, int y) {
+    public void moveTo(ConnectedBoard board, int x, int y) {
         Position position = new Position(x, y);
-        if (canMoveTo(position)) {
+        if (canMoveTo(board, position)) {
             setPosition(position);
         }
     }
@@ -86,7 +85,7 @@ public class RookFigure implements Figure {
         }
     }
 
-    private boolean checkOtherFigureOnRoad(Position currentPosition, Position newPosition) {
+    private boolean checkOtherFigureOnRoad(ConnectedBoard board, Position currentPosition, Position newPosition) {
         int x = currentPosition.x();
         int y = currentPosition.y();
 
