@@ -232,6 +232,7 @@ public class Board {
 
         if (prevFigure.canMoveTo(prevPosition, nextPosition)) {
             // Move the piece to the end position
+            // prevFigure.setPosition(nextPosition); // #TODO delete
             nextPosition.setFigure(prevFigure);   // Place the piece at the end position
             prevPosition.setFigure(null); // Remove the piece from the start position
         } else {
