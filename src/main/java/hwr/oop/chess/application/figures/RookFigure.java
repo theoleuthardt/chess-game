@@ -25,41 +25,50 @@ public class RookFigure implements Figure {
         Position current = currentRook.getTopPosition();
 
         //If there is no figure or if it's a different color, the piece can move
-        while (current != null && (current.getFigure() == null ||
-                (current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()))) {
+        while (current != null && current.getFigure() == null) {
             list.add(current);
             current = current.getTopPosition();
+        }
+        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
+            list.add(current);
         }
 
         // Check below
         current = currentRook.getBottomPosition();
-        while (current != null && (current.getFigure() == null ||
-                (current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()))) {
+        while (current != null && current.getFigure() == null) {
             list.add(current);
             current = current.getBottomPosition();
+        }
+        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
+            list.add(current);
         }
 
         // Check the right
         current = currentRook.getRightPosition();
-        while (current != null && (current.getFigure() == null ||
-                (current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()))) {
+        while (current != null && current.getFigure() == null) {
             list.add(current);
             current = current.getRightPosition();
+        }
+        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
+            list.add(current);
         }
 
         // Check the left
         current = currentRook.getLeftPosition();
-        while (current != null && (current.getFigure() == null ||
-                (current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()))) {
+        while (current != null && current.getFigure() == null) {
             list.add(current);
             current = current.getLeftPosition();
         }
-
+        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
+            list.add(current);
+        }
+        System.out.println("availablePosition" + list.toArray().length);
         return list;
     }
 
     public boolean canMoveTo(Position prevPosition, Position nextPosition) {
         ArrayList<Position> availablePosition = getAvailablePosition(prevPosition);
+        System.out.println("canMove: " + availablePosition.contains(nextPosition));
         return availablePosition.contains(nextPosition);
     }
 

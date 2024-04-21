@@ -19,7 +19,7 @@ public class Board {
     }
 
     private void initializeBoard() {
-        System.out.println("initializeBoard");
+        System.out.println("\u001B[32minitialize Board\u001B[0m");
         // Create the first position and store it in startingPosition
         startingPosition = new Position(1, 1);
         Position previousPosition = startingPosition;
@@ -134,12 +134,12 @@ public class Board {
                 placeFigure(new RookFigure(FigureColor.WHITE, 8, 1));
             }
             if (currentPosition.y() == 2) {
-                placeFigure(new PawnFigure(FigureColor.WHITE, currentPosition.x(), 2));
+            //    placeFigure(new PawnFigure(FigureColor.WHITE, currentPosition.x(), 2));
             }
 
             // Set up black figures
             if (currentPosition.y() == 7) {
-                placeFigure(new PawnFigure(FigureColor.BLACK, currentPosition.x(), 7));
+            //    placeFigure(new PawnFigure(FigureColor.BLACK, currentPosition.x(), 7));
             }
             if (currentPosition.y() == 8) {
                 placeFigure(new RookFigure(FigureColor.BLACK, 1, 8));
@@ -226,13 +226,17 @@ public class Board {
         Position nextPosition = findPosition(endCol, endRow);
 
         assert prevPosition != null;
+        assert nextPosition != null;
+
         Figure prevFigure = prevPosition.getFigure();
 
-        prevFigure.moveTo(prevPosition, nextPosition);
-        // Move the piece to the end position
-        prevPosition.setFigure(null); // Remove the piece from the start position
-        assert nextPosition != null;
-        nextPosition.setFigure(prevFigure);   // Place the piece at the end position
+        if (prevFigure.canMoveTo(prevPosition, nextPosition)) {
+            // Move the piece to the end position
+            nextPosition.setFigure(prevFigure);   // Place the piece at the end position
+            prevPosition.setFigure(null); // Remove the piece from the start position
+        } else {
+            System.out.println("This Move invalid.");
+        }
     }
 
     public static Figure getFigureOnField(int x, int y) {
