@@ -2,6 +2,8 @@ package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Position;
 
+import java.util.ArrayList;
+
 public class KnightFigure implements Figure {
     private Position startPosition = null;
     private Position currentPosition = null;
@@ -15,17 +17,24 @@ public class KnightFigure implements Figure {
         this.color = color;
     }
 
+    @Override
+    public ArrayList<Position> getAvailablePosition(Position currentRook) {
+        return null;
+    }
 
-    public boolean canMoveTo(Position to) {
-        Position from = this.currentPosition;
-
-        // this move is not allowed as it does not obey the rules.
+    @Override
+    public boolean canMoveTo(Position prevPosition, Position nextPosition) {
         return false;
     }
 
     @Override
     public boolean isOnField(int x, int y) {
         return false;
+    }
+
+    @Override
+    public void moveTo(int x, int y) {
+
     }
 
     public boolean isCaptured() {
@@ -37,11 +46,9 @@ public class KnightFigure implements Figure {
 
     }
 
-    public void moveTo(int x, int y) {
-        Position position = new Position(x, y);
-        if (canMoveTo(position)) {
-            this.currentPosition = position;
-        }
+    @Override
+    public void moveTo(Position prevPosition, Position nextPosition) {
+
     }
 
     public Position getPosition() {

@@ -12,6 +12,12 @@ import hwr.oop.chess.application.figures.BishopFigure;
 import java.util.ArrayList;
 
 public class ChessGame {
+    private Board board;
+
+    public ChessGame() {
+        board = new Board();
+        board.printBoard();
+    }
 //    void startNewGame() {
 //        ArrayList<Figure> list = new ArrayList<>();
 //

@@ -2,6 +2,8 @@ package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Position;
 
+import java.util.ArrayList;
+
 public class BishopFigure implements Figure {
     private Position startPosition = null;
     private Position currentPosition = null;
@@ -24,6 +26,16 @@ public class BishopFigure implements Figure {
     }
 
     @Override
+    public ArrayList<Position> getAvailablePosition(Position currentRook) {
+        return null;
+    }
+
+    @Override
+    public boolean canMoveTo(Position prevPosition, Position nextPosition) {
+        return false;
+    }
+
+    @Override
     public boolean isOnField(int x, int y) {
         return false;
     }
@@ -42,6 +54,11 @@ public class BishopFigure implements Figure {
         if (canMoveTo(position)) {
             this.currentPosition = position;
         }
+    }
+
+    @Override
+    public void moveTo(Position prevPosition, Position nextPosition) {
+
     }
 
     public Position getPosition() {

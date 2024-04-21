@@ -2,6 +2,8 @@ package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Position;
 
+import java.util.ArrayList;
+
 public class QueenFigure implements Figure {
     private Position startPosition = null;
     private Position currentPosition = null;
@@ -33,7 +35,12 @@ public class QueenFigure implements Figure {
     }
 
     @Override
-    public boolean canMoveTo(Position position) {
+    public ArrayList<Position> getAvailablePosition(Position currentRook) {
+        return null;
+    }
+
+    @Override
+    public boolean canMoveTo(Position prevPosition, Position nextPosition) {
         return false;
     }
 
@@ -42,11 +49,14 @@ public class QueenFigure implements Figure {
         return false;
     }
 
+    @Override
     public void moveTo(int x, int y) {
-        Position position = new Position(x, y);
-        if (canMoveTo(position)) {
-            this.currentPosition = position;
-        }
+
+    }
+
+    @Override
+    public void moveTo(Position prevPosition, Position nextPosition) {
+
     }
 
     public Position getPosition() {
