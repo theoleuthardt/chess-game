@@ -2,73 +2,47 @@ package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Position;
 
-import java.util.ArrayList;
-
 public class KingFigure implements Figure {
-    private Position startPosition = null;
     private Position currentPosition = null;
     private static final FigureType type = FigureType.KING;
     private final FigureColor color;
 
-    public KingFigure(FigureColor color, int x, int y) {
-        Position position = new Position(x, y);
-        this.startPosition = position;
-        this.currentPosition = position;
+    public KingFigure(FigureColor color, Position position) {
         this.color = color;
+        this.currentPosition = position;
     }
 
 
-    @Override
-    public ArrayList<Position> getAvailablePosition(Position currentRook) {
-        return null;
-    }
+    public boolean canMoveTo(Position to) {
+        Position from = this.currentPosition;
 
-    @Override
-    public boolean canMoveTo(Position prevPosition, Position nextPosition) {
+        // this move is not allowed as it does not obey the rules.
         return false;
     }
 
-    @Override
-    public boolean isOnField(int x, int y) {
-        return false;
-    }
-
-    @Override
-    public void moveTo(int x, int y) {
-
+    public boolean isOnField(Position field) {
+        return this.currentPosition.isEqualTo(field);
     }
 
     public boolean isCaptured() {
         return this.currentPosition == null;
     }
 
-    @Override
-    public void setPosition(Position position) {
-
+    public void moveTo(Position position) {
+        if(canMoveTo(position)) {
+            this.currentPosition = position;
+        }
     }
 
-    @Override
-    public void moveTo(Position prevPosition, Position nextPosition) {
-
-    }
-
-    public Position getPosition() {
+    public Position position() {
         return this.currentPosition;
     }
 
-    public FigureColor getColor() {
+    public FigureColor color() {
         return this.color;
     }
 
-    public FigureType getType() {
+    public FigureType type() {
         return type;
-    }
-
-    public char getSymbol() {
-        if (this.color == FigureColor.WHITE) {
-            return 'K';
-        } else {
-            return 'k';
-        }
     }
 }

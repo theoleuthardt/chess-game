@@ -2,123 +2,47 @@ package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Position;
 
-import java.util.ArrayList;
-
 public class RookFigure implements Figure {
-    Position startPosition = null;
-    Position currentPosition = null;
-    FigureType type = null;
-    FigureColor color = null;
+    private Position currentPosition = null;
+    private static final FigureType type = FigureType.ROOK;
+    private final FigureColor color;
 
-    public RookFigure(FigureColor color, int x, int y) {
-        Position position = new Position(x, y);
-        this.type = FigureType.ROOK;
+    public RookFigure(FigureColor color, Position position) {
         this.color = color;
-        this.startPosition = position;
         this.currentPosition = position;
     }
 
-    public ArrayList<Position> getAvailablePosition(Position currentRook) {
-        ArrayList<Position> list = new ArrayList<>();
 
-        // Check above
-        Position current = currentRook.getTopPosition();
+    public boolean canMoveTo(Position to) {
+        Position from = this.currentPosition;
 
-        //If there is no figure or if it's a different color, the piece can move
-        while (current != null && current.getFigure() == null) {
-            list.add(current);
-            current = current.getTopPosition();
-        }
-        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
-            list.add(current);
-        }
-
-        // Check below
-        current = currentRook.getBottomPosition();
-        while (current != null && current.getFigure() == null) {
-            list.add(current);
-            current = current.getBottomPosition();
-        }
-        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
-            list.add(current);
-        }
-
-        // Check the right
-        current = currentRook.getRightPosition();
-        while (current != null && current.getFigure() == null) {
-            list.add(current);
-            current = current.getRightPosition();
-        }
-        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
-            list.add(current);
-        }
-
-        // Check the left
-        current = currentRook.getLeftPosition();
-        while (current != null && current.getFigure() == null) {
-            list.add(current);
-            current = current.getLeftPosition();
-        }
-        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
-            list.add(current);
-        }
-        System.out.println("availablePosition" + list.toArray().length);
-        return list;
+        // this move is not allowed as it does not obey the rules.
+        return false;
     }
 
-    public boolean canMoveTo(Position prevPosition, Position nextPosition) {
-        ArrayList<Position> availablePosition = getAvailablePosition(prevPosition);
-        System.out.println("canMove: " + availablePosition.contains(nextPosition));
-        return availablePosition.contains(nextPosition);
+    public boolean isOnField(Position field) {
+        return this.currentPosition.isEqualTo(field);
     }
 
-    public void moveTo(Position prevPosition, Position nextPosition) {
-        if (canMoveTo(prevPosition, nextPosition)) {
-            setPosition(nextPosition);
-        }
-    }
-
-    @Override
-    public boolean isOnField(int x, int y) {
-        Position field = new Position(x, y);
-        return this.currentPosition != null && this.currentPosition.equals(field);
-    }
-
-    @Override
-    public void moveTo(int x, int y) {
-        // TODO Delete
-    }
-
-    @Override
     public boolean isCaptured() {
-        return this.currentPosition != null;
+        return this.currentPosition == null;
     }
 
-    @Override
-    public void setPosition(Position position) {
-        this.currentPosition = position;
+    public void moveTo(Position position) {
+        if(canMoveTo(position)) {
+            this.currentPosition = position;
+        }
     }
 
-    @Override
-    public Position getPosition() {
+    public Position position() {
         return this.currentPosition;
     }
 
-    @Override
-    public FigureColor getColor() {
+    public FigureColor color() {
         return this.color;
     }
 
-    @Override
-    public FigureType getType() {
-        return this.type;
-    }
-
-    public char getSymbol() {
-        if (this.color == FigureColor.WHITE) {
-            return 'R';
-        } else {
-            return 'r';
-        }
+    public FigureType type() {
+        return type;
     }
 }

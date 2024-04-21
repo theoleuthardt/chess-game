@@ -3,19 +3,16 @@ package hwr.oop.chess.application.figures;
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Position;
 
-import java.util.ArrayList;
-
 public class PawnFigure implements Figure {
   private Position startPosition = null;
   private Position currentPosition = null;
   private static final FigureType type = FigureType.PAWN;
   private final FigureColor color;
 
-public PawnFigure(FigureColor color, int x, int y) {
-    Position position = new Position(x,y);
+  public PawnFigure(FigureColor color, Position position) {
+    this.color = color;
     this.startPosition = position;
     this.currentPosition = position;
-    this.color = color;
   }
 
   public boolean canMoveTo(Position to) {
@@ -27,7 +24,7 @@ public PawnFigure(FigureColor color, int x, int y) {
     int twoFields = oneField * 2;
 
     // Move one field straight up/down if the way is free
-    boolean isToFieldBlocked = Board.isFigureOnField(to.x(), to.y());
+    boolean isToFieldBlocked = Board.isFigureOnField(to);
     if (!isToFieldBlocked
         && (from.x() == to.x())
         && (from.y() + oneField) == to.y()) {
@@ -35,7 +32,7 @@ public PawnFigure(FigureColor color, int x, int y) {
     }
 
     // Moving two fields from the start position if both fields are free
-    boolean isFieldInFrontOfPawnBlocked = Board.isFigureOnField(from.x(), from.y() + oneField);
+    boolean isFieldInFrontOfPawnBlocked = Board.isFigureOnField(new Position(from.x(), from.y() + oneField));
     if (!isToFieldBlocked
         && !isFieldInFrontOfPawnBlocked
 
@@ -46,13 +43,13 @@ public PawnFigure(FigureColor color, int x, int y) {
     }
 
     // Move one field diagonally if the opponent is there
-    Figure opponent = Board.getFigureOnField(to.x(), to.y());
+    Figure opponent = Board.getFigureOnField(to);
     if (isToFieldBlocked // check if a different figure is on the new field
         && opponent != null
-        && (opponent.getColor() == FigureColor.WHITE)
+        && (opponent.color() == FigureColor.WHITE)
         && (Math.abs(from.x() - to.x()) == 1)
         && (from.y() + oneField) == to.y()) {
-      opponent.moveTo(-1,-1); // catch opponent figure
+      opponent.moveTo(null); // catch opponent figure
       return true;
     }
 
@@ -60,18 +57,7 @@ public PawnFigure(FigureColor color, int x, int y) {
     return false;
   }
 
-  @Override
-  public ArrayList<Position> getAvailablePosition(Position currentRook) {
-    return null;
-  }
-
-  @Override
-  public boolean canMoveTo(Position prevPosition, Position nextPosition) {
-    return true;
-  }
-
-  public boolean isOnField(int x, int y) {
-    Position field = new Position(x, y);
+  public boolean isOnField(Position field) {
     return this.currentPosition.isEqualTo(field);
   }
 
@@ -79,39 +65,21 @@ public PawnFigure(FigureColor color, int x, int y) {
     return this.currentPosition == null;
   }
 
-  public void moveTo(int x, int y) {
-    Position position = new Position(x, y);
+  public void moveTo(Position position) {
     if(canMoveTo(position)) {
-      this.setPosition(position);
+      this.currentPosition = position;
     }
   }
 
-  @Override
-  public void moveTo(Position prevPosition, Position nextPosition) {
-
-  }
-
-  public void setPosition(Position position) {
-    this.currentPosition = position;
-  }
-
-  public Position getPosition() {
+  public Position position() {
     return this.currentPosition;
   }
 
-  public FigureColor getColor() {
+  public FigureColor color() {
     return this.color;
   }
 
-  public FigureType getType() {
+  public FigureType type() {
     return type;
-  }
-
-  public char getSymbol(){
-    if(this.color == FigureColor.WHITE){
-      return 'P';
-    }else{
-      return 'p';
-    }
   }
 }
