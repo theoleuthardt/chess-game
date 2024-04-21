@@ -9,19 +9,24 @@ import hwr.oop.chess.application.figures.KingFigure;
 import hwr.oop.chess.application.figures.KnightFigure;
 import hwr.oop.chess.application.figures.BishopFigure;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Board {
+    public static ArrayList<Figure> figures;
     private static Position startingPosition;
 
     public Board() {
         initializeBoard();
     }
-
+    public static void addFigure(Figure figure) {
+       figures.add(figure);
+    }
     private void initializeBoard() {
         System.out.println("\u001B[32minitialize Board\u001B[0m");
         // Create the first position and store it in startingPosition
         startingPosition = new Position(1, 1);
+        figures = new ArrayList<>();
         Position previousPosition = startingPosition;
         Position previousRowStart = startingPosition;
         Position previousRowPosition = startingPosition;
@@ -134,12 +139,12 @@ public class Board {
                 placeFigure(new RookFigure(FigureColor.WHITE, 8, 1));
             }
             if (currentPosition.y() == 2) {
-            //    placeFigure(new PawnFigure(FigureColor.WHITE, currentPosition.x(), 2));
+               placeFigure(new PawnFigure(FigureColor.WHITE, currentPosition.x(), 2));
             }
 
             // Set up black figures
             if (currentPosition.y() == 7) {
-            //    placeFigure(new PawnFigure(FigureColor.BLACK, currentPosition.x(), 7));
+              placeFigure(new PawnFigure(FigureColor.BLACK, currentPosition.x(), 7));
             }
             if (currentPosition.y() == 8) {
                 placeFigure(new RookFigure(FigureColor.BLACK, 1, 8));
@@ -166,6 +171,7 @@ public class Board {
         Position position = findPosition(figure.getPosition().x(), figure.getPosition().y());
         if (position != null) {
             position.setFigure(figure);
+            addFigure(figure);
         }
     }
 

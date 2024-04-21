@@ -18,6 +18,7 @@ public class RookFigure implements Figure {
         this.currentPosition = position;
     }
 
+
     public ArrayList<Position> getAvailablePosition(Position currentRook) {
         ArrayList<Position> list = new ArrayList<>();
 

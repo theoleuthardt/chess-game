@@ -5,14 +5,15 @@ import org.junit.jupiter.api.Test;
 import hwr.oop.chess.application.Position;
 
 class FigureTest {
-//  @Test
-//  void createPawn() {
-//    Position position = new Position('b', 2);
-//    PawnFigure pawn = new PawnFigure(FigureColor.BLACK, 2,2);
-//    Assertions.assertThat(pawn.color()).isEqualTo(FigureColor.BLACK);
-//    Assertions.assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
-//    Assertions.assertThat(pawn.position()).isEqualTo(position);
-//  }
+  @Test
+  void createPawn() {
+    Position position = new Position(2, 2);
+    PawnFigure pawn = new PawnFigure(FigureColor.BLACK, 2,2);
+    Assertions.assertThat(pawn.getColor()).isEqualTo(FigureColor.BLACK);
+    Assertions.assertThat(pawn.getType()).isEqualTo(FigureType.PAWN);
+    Assertions.assertThat(pawn.getPosition().x()).isEqualTo(position.x());
+    Assertions.assertThat(pawn.getPosition().y()).isEqualTo(position.y());
+  }
 //
 //  @Test
 //  void movePawn_oneFieldCorrectDirection() {
@@ -21,9 +22,9 @@ class FigureTest {
 //
 //    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, 2,2);
 //    Assertions.assertThat(pawn.canMoveTo(to)).isTrue();
-//    Assertions.assertThat(pawn.position()).isEqualTo(from);
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(from);
 //    pawn.moveTo(4,3);
-//    Assertions.assertThat(pawn.position()).isEqualTo(to);
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(to);
 //  }
 //
 //  @Test
@@ -33,9 +34,9 @@ class FigureTest {
 //
 //    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, 2,2);
 //    Assertions.assertThat(pawn.canMoveTo(to)).isFalse();
-//    Assertions.assertThat(pawn.position()).isEqualTo(from);
-//    pawn.moveTo(to);
-//    Assertions.assertThat(pawn.position()).isEqualTo(from);
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(from);
+//    pawn.moveTo(to.x(), to.y());
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(from);
 //  }
 //
 //  @Test
@@ -45,9 +46,9 @@ class FigureTest {
 //
 //    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, 2,2);
 //    Assertions.assertThat(pawn.canMoveTo(to)).isFalse();
-//    Assertions.assertThat(pawn.position()).isEqualTo(from);
-//    pawn.moveTo(to);
-//    Assertions.assertThat(pawn.position()).isEqualTo(from);
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(from);
+//    pawn.moveTo(to.x(), to.y());
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(from);
 //  }
 //
 //  @Test
@@ -57,9 +58,9 @@ class FigureTest {
 //
 //    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, 4,2);
 //    Assertions.assertThat(pawn.canMoveTo(to)).isTrue();
-//    Assertions.assertThat(pawn.position()).isEqualTo(from);
-//    pawn.moveTo(to);
-//    Assertions.assertThat(pawn.position()).isEqualTo(to);
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(from);
+//    pawn.moveTo(to.x(), to.y());
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(to);
 //  }
 //
 //
@@ -71,11 +72,11 @@ class FigureTest {
 //
 //    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, 4,2);
 //    Assertions.assertThat(pawn.canMoveTo(to)).isTrue();
-//    pawn.moveTo(to);
+//    pawn.moveTo(to.x(), to.y());
 //
 //    Assertions.assertThat(pawn.canMoveTo(then)).isFalse();
-//    pawn.moveTo(then);
-//    Assertions.assertThat(pawn.position()).isEqualTo(to);
+//    pawn.moveTo(then.x(), then.y());
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(to);
 //  }
 //
 //  @Test
@@ -85,8 +86,8 @@ class FigureTest {
 //
 //    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, 2,2);
 //    Assertions.assertThat(pawn.canMoveTo(to)).isFalse();
-//    Assertions.assertThat(pawn.position()).isEqualTo(from);
-//    pawn.moveTo(to);
-//    Assertions.assertThat(pawn.position()).isEqualTo(from);
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(from);
+//    pawn.moveTo(to.x(), to.y());
+//    Assertions.assertThat(pawn.getPosition()).isEqualTo(from);
 //  }
 }
