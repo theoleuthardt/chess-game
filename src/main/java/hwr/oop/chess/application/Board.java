@@ -253,4 +253,16 @@ public class Board {
     public static boolean isFigureOnField(int x, int y) {
         return getFigureOnField(x, y) != null;
     }
+    public static Figure getFigureOnField(Position position) {
+        for (Figure figure : figures) {
+            if (figure.getPosition().isEqualTo(position)) {
+                return figure;
+            }
+        }
+        return null;
+    }
+
+    public static boolean isFigureOnField(Position position) {
+        return Board.getFigureOnField(position) != null;
+    }
 }
