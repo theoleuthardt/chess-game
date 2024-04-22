@@ -1,16 +1,5 @@
 package hwr.oop.chess.application;
 
-import hwr.oop.chess.application.figures.Figure;
-import hwr.oop.chess.application.figures.FigureColor;
-import hwr.oop.chess.application.figures.PawnFigure;
-import hwr.oop.chess.application.figures.RookFigure;
-import hwr.oop.chess.application.figures.QueenFigure;
-import hwr.oop.chess.application.figures.KingFigure;
-import hwr.oop.chess.application.figures.KnightFigure;
-import hwr.oop.chess.application.figures.BishopFigure;
-
-import java.util.ArrayList;
-
 public class ChessGame {
     private Board board;
 

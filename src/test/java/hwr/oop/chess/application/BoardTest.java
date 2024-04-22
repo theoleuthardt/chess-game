@@ -18,27 +18,27 @@ public class BoardTest {
     @Test
     public void testPositionConnections() {
         // Check position connections
-        Position currentPosition = board.getStartingPosition();
+        Cell currentPosition = board.getStartingPosition();
         while (currentPosition != null) {
-            Position rowStartPosition = currentPosition; // Starting position of the current row
+            Cell rowStartPosition = currentPosition; // Starting position of the current row
 
             while (currentPosition != null) {
 //                System.out.print(currentPosition.getRow() + "" + currentPosition.getCol() + ", ");
                 // Check right position
                 if (currentPosition.getRightPosition() != null) {
-                    assertEquals(currentPosition, currentPosition.getRightPosition().getLeftPosition(), "Right position is not correctly connected");
+                    assertEquals(currentPosition, currentPosition.rightCell().leftCell(), "Right position is not correctly connected");
                 }
                 // Check bottom position
-                if (currentPosition.getBottomPosition() != null) {
-                    assertEquals(currentPosition, currentPosition.getBottomPosition().getTopPosition(), "Bottom position is not correctly connected");
+                if (currentPosition.bottomCell() != null) {
+                    assertEquals(currentPosition, currentPosition.bottomCell().topCell(), "Bottom position is not correctly connected");
                 }
                 // Check bottom right position
                 if (currentPosition.getBottomRightPosition() != null) {
-                    assertEquals(currentPosition, currentPosition.getBottomRightPosition().getTopLeftPosition(), "Bottom right position is not correctly connected");
+                    assertEquals(currentPosition, currentPosition.bottomRightCell().topLeftCell(), "Bottom right position is not correctly connected");
                 }
                 // Check bottom left position
                 if (currentPosition.getBottomLeftPosition() != null) {
-                    assertEquals(currentPosition, currentPosition.getBottomLeftPosition().getTopRightPosition(), "Bottom left position is not correctly connected");
+                    assertEquals(currentPosition, currentPosition.bottomLeftCell().topRightCell(), "Bottom left position is not correctly connected");
                 }
 
                 // Move to the next position in the current row
@@ -57,8 +57,8 @@ public class BoardTest {
     @Test
     public void testFigurePlacement() {
         // Check figure placement on each position
-        Position currentPosition = board.getStartingPosition();
-        Position rowStartPosition = board.getStartingPosition();  // Starting position of the current row
+        Cell currentPosition = board.getStartingPosition();
+        Cell rowStartPosition = board.getStartingPosition();  // Starting position of the current row
 
         while (currentPosition != null) {
             Figure figure = currentPosition.getFigure();

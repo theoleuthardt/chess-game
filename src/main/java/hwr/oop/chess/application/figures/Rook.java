@@ -1,107 +1,103 @@
 package hwr.oop.chess.application.figures;
 
-import hwr.oop.chess.application.Position;
+import hwr.oop.chess.application.Cell;
 
 import java.util.ArrayList;
 
-public class RookFigure implements Figure {
-    Position startPosition = null;
-    Position currentPosition = null;
+public class Rook implements Figure {
+    Cell startCell = null;
+    Cell currentCell = null;
     FigureType type = null;
     FigureColor color = null;
 
-    public RookFigure(FigureColor color, int x, int y) {
-        Position position = new Position(x, y);
+    public Rook(FigureColor color, int x, int y) {
+        Cell cell = new Cell(x, y);
         this.type = FigureType.ROOK;
         this.color = color;
-        this.startPosition = position;
-        this.currentPosition = position;
+        this.startCell = cell;
+        this.currentCell = cell;
     }
 
-    public ArrayList<Position> getAvailablePosition(Position currentRook) {
-        ArrayList<Position> list = new ArrayList<>();
+    public ArrayList<Cell> getAvailableCell(Cell currentRook) {
+        ArrayList<Cell> list = new ArrayList<>();
 
         // Check above
-        Position current = currentRook.getTopPosition();
+        Cell current = currentRook.getTopCell();
 
         //If there is no figure or if it's a different color, the piece can move
         while (current != null && current.getFigure() == null) {
             list.add(current);
-            current = current.getTopPosition();
+            current = current.getTopCell();
         }
         if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
             list.add(current);
         }
 
         // Check below
-        current = currentRook.getBottomPosition();
+        current = currentRook.getBottomCell();
         while (current != null && current.getFigure() == null) {
             list.add(current);
-            current = current.getBottomPosition();
+            current = current.getBottomCell();
         }
         if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
             list.add(current);
         }
 
         // Check the right
-        current = currentRook.getRightPosition();
+        current = currentRook.getRightCell();
         while (current != null && current.getFigure() == null) {
             list.add(current);
-            current = current.getRightPosition();
+            current = current.getRightCell();
         }
         if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
             list.add(current);
         }
 
         // Check the left
-        current = currentRook.getLeftPosition();
+        current = currentRook.getLeftCell();
         while (current != null && current.getFigure() == null) {
             list.add(current);
-            current = current.getLeftPosition();
+            current = current.getLeftCell();
         }
         if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
             list.add(current);
         }
-        System.out.println("availablePosition" + list.toArray().length);
+        System.out.println("availableCell" + list.toArray().length);
         return list;
     }
 
-    public boolean canMoveTo(Position prevPosition, Position nextPosition) {
-        ArrayList<Position> availablePosition = getAvailablePosition(prevPosition);
-        System.out.println("canMove: " + availablePosition.contains(nextPosition));
-        return availablePosition.contains(nextPosition);
+    public boolean canMoveTo(Cell prevCell, Cell nextCell) {
+        ArrayList<Cell> availableCell = getAvailableCell(prevCell);
+        System.out.println("canMove: " + availableCell.contains(nextCell));
+        return availableCell.contains(nextCell);
     }
 
-    public void moveTo(Position prevPosition, Position nextPosition) {
-        if (canMoveTo(prevPosition, nextPosition)) {
-            setPosition(nextPosition);
+    public void moveTo(Cell prevCell, Cell nextCell) {
+        if (canMoveTo(prevCell, nextCell)) {
+            setPosition(nextCell);
         }
     }
 
     @Override
     public boolean isOnField(int x, int y) {
-        Position field = new Position(x, y);
-        return this.currentPosition != null && this.currentPosition.equals(field);
+        Cell field = new Cell(x, y);
+        return this.currentCell != null && this.currentCell.equals(field);
     }
 
-    @Override
-    public void moveTo(int x, int y) {
-        // TODO Delete
-    }
 
     @Override
     public boolean isCaptured() {
-        return this.currentPosition != null;
+        return this.currentCell != null;
     }
 
     @Override
-    public void setPosition(Position position) {
-        this.currentPosition = position;
+    public void setCell(Cell cell) {
+        this.currentCell = cell;
     }
 
     @Override
-    public Position getPosition() {
-        return this.currentPosition;
+    public Cell getCell() {
+        return this.currentCell;
     }
 
     @Override

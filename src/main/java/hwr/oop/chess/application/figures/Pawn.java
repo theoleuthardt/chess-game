@@ -1,25 +1,25 @@
 package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Board;
-import hwr.oop.chess.application.Position;
+import hwr.oop.chess.application.Cell;
 
 import java.util.ArrayList;
 
-public class PawnFigure implements Figure {
-  private Position startPosition = null;
-  private Position currentPosition = null;
+public class Pawn implements Figure {
+  private Cell startPosition = null;
+  private Cell currentPosition = null;
   private static final FigureType type = FigureType.PAWN;
   private final FigureColor color;
 
-  public PawnFigure(FigureColor color, int x, int y) {
-    Position position = new Position(x,y);
+  public Pawn(FigureColor color, int x, int y) {
+    Cell position = new Cell(x,y);
     this.startPosition = position;
     this.currentPosition = position;
     this.color = color;
   }
 
-  public boolean canMoveTo(Position to) {
-    Position from = this.currentPosition;
+  public boolean canMoveTo(Cell to) {
+    Cell from = this.currentPosition;
 
     // white figures move from bottom up (increasing y position)
     // black figures move from top down (decreasing y position)
@@ -61,17 +61,17 @@ public class PawnFigure implements Figure {
   }
 
   @Override
-  public ArrayList<Position> getAvailablePosition(Position currentRook) {
+  public ArrayList<Cell> getAvailablePosition(Cell currentRook) {
     return null;
   }
 
   @Override
-  public boolean canMoveTo(Position prevPosition, Position nextPosition) {
+  public boolean canMoveTo(Cell prevPosition, Cell nextPosition) {
     return true;
   }
 
   public boolean isOnField(int x, int y) {
-    Position field = new Position(x, y);
+    Cell field = new Cell(x, y);
     return this.currentPosition.isEqualTo(field);
   }
 
@@ -80,34 +80,41 @@ public class PawnFigure implements Figure {
   }
 
   public void moveTo(int x, int y) {
-    Position position = new Position(x, y);
+    Cell position = new Cell(x, y);
     if(canMoveTo(position)) {
       this.setPosition(position);
     }
   }
 
+
+
+
+
+
+  
+
   @Override
-  public void moveTo(Position prevPosition, Position nextPosition) {
+  public void moveTo(Cell prevPosition, Cell nextPosition) {
 
   }
 
-  public void setPosition(Position position) {
+  public void setPosition(Cell position) {
     this.currentPosition = position;
   }
 
-  public Position getPosition() {
+  public Cell cell() {
     return this.currentPosition;
   }
 
-  public FigureColor getColor() {
+  public FigureColor color() {
     return this.color;
   }
 
-  public FigureType getType() {
+  public FigureType type() {
     return type;
   }
 
-  public char getSymbol(){
+  public char symbol(){
     if(this.color == FigureColor.WHITE){
       return 'P';
     }else{

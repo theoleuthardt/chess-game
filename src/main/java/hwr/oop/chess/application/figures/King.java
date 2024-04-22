@@ -1,30 +1,30 @@
 package hwr.oop.chess.application.figures;
 
-import hwr.oop.chess.application.Position;
+import hwr.oop.chess.application.Cell;
 
 import java.util.ArrayList;
 
-public class KingFigure implements Figure {
-    private Position startPosition = null;
-    private Position currentPosition = null;
+public class King implements Figure {
+    private Cell startCell = null;
+    private Cell currentCell = null;
     private static final FigureType type = FigureType.KING;
     private final FigureColor color;
 
-    public KingFigure(FigureColor color, int x, int y) {
-        Position position = new Position(x, y);
-        this.startPosition = position;
-        this.currentPosition = position;
+    public King(FigureColor color, int x, int y) {
+        Cell cell = new Cell(x, y);
+        this.startCell = cell;
+        this.currentCell = cell;
         this.color = color;
     }
 
 
     @Override
-    public ArrayList<Position> getAvailablePosition(Position currentRook) {
+    public ArrayList<Cell> getAvailablePosition(Cell currentRook) {
         return null;
     }
 
     @Override
-    public boolean canMoveTo(Position prevPosition, Position nextPosition) {
+    public boolean canMoveTo(Cell prevCell, Cell nextCell) {
         return false;
     }
 
@@ -39,20 +39,20 @@ public class KingFigure implements Figure {
     }
 
     public boolean isCaptured() {
-        return this.currentPosition == null;
+        return this.currentCell == null;
     }
 
     @Override
-    public void setPosition(Position position) {
+    public void setCell(Cell cel) {
 
     }
 
     @Override
-    public void moveTo(Position prevPosition, Position nextPosition) {
+    public void moveTo(Cell prevPosition, Cell nextPosition) {
 
     }
 
-    public Position getPosition() {
+    public Cell getPosition() {
         return this.currentPosition;
     }
 

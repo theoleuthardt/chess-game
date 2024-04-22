@@ -1,27 +1,26 @@
 package hwr.oop.chess.application.figures;
 
-import hwr.oop.chess.application.Position;
+import hwr.oop.chess.application.Cell;
 
 import java.util.ArrayList;
 
 public interface Figure {
-  public ArrayList<Position> getAvailablePosition(Position currentRook);
-  public boolean canMoveTo(Position prevPosition, Position nextPosition);
+  public ArrayList<Cell> getAvailableCell(Cell currentRook);
+  public boolean canMoveTo(Cell prevCell, Cell nextCell);
 
-  boolean isOnField(int x, int y);
-  // void capture();
-  // boolean isCaptured();
+//  boolean isOnField(int x, int y);
+// void capture();
+// boolean isCaptured();
+Cell
+  void moveTo(Cell prevCell, Cell nextCell);
 
-  void moveTo(int x, int y); // #TODO delete
-  void moveTo(Position prevPosition, Position nextPosition);
+//  boolean isCaptured();
 
-  boolean isCaptured();
-
-  void setPosition(Position position);
+  void setCell(Cell cell);
 
   char getSymbol();
 
-  public Position getPosition();
+  public Cell getCell();
 
   public FigureColor getColor();
 

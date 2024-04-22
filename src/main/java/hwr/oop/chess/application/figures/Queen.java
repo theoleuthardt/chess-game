@@ -1,25 +1,25 @@
 package hwr.oop.chess.application.figures;
 
-import hwr.oop.chess.application.Position;
+import hwr.oop.chess.application.Cell;
 
 import java.util.ArrayList;
 
-public class QueenFigure implements Figure {
-    private Position startPosition = null;
-    private Position currentPosition = null;
+public class Queen implements Figure {
+    private Cell startPosition = null;
+    private Cell currentPosition = null;
     private static final FigureType type = FigureType.QUEEN;
     private final FigureColor color;
 
-    public QueenFigure(FigureColor color, int x, int y) {
-        Position position = new Position(x, y);
+    public Queen(FigureColor color, int x, int y) {
+        Cell position = new Cell(x, y);
         this.startPosition = position;
         this.currentPosition = position;
         this.color = color;
     }
 
     public boolean canMoveTo(int x, int y) {
-        Position to = new Position(x, y);
-        Position from = this.currentPosition;
+        Cell to = new Cell(x, y);
+        Cell from = this.currentPosition;
 
         // this move is not allowed as it does not obey the rules.
         return false;
@@ -30,17 +30,17 @@ public class QueenFigure implements Figure {
     }
 
     @Override
-    public void setPosition(Position position) {
+    public void setPosition(Cell position) {
 
     }
 
     @Override
-    public ArrayList<Position> getAvailablePosition(Position currentRook) {
+    public ArrayList<Cell> getAvailablePosition(Cell currentRook) {
         return null;
     }
 
     @Override
-    public boolean canMoveTo(Position prevPosition, Position nextPosition) {
+    public boolean canMoveTo(Cell prevPosition, Cell nextPosition) {
         return false;
     }
 
@@ -55,11 +55,11 @@ public class QueenFigure implements Figure {
     }
 
     @Override
-    public void moveTo(Position prevPosition, Position nextPosition) {
+    public void moveTo(Cell prevPosition, Cell nextPosition) {
 
     }
 
-    public Position getPosition() {
+    public Cell getPosition() {
         return this.currentPosition;
     }
 

@@ -1,29 +1,29 @@
 package hwr.oop.chess.application.figures;
 
-import hwr.oop.chess.application.Position;
+import hwr.oop.chess.application.Cell;
 
 import java.util.ArrayList;
 
-public class KnightFigure implements Figure {
-    private Position startPosition = null;
-    private Position currentPosition = null;
+public class Knight implements Figure {
+    private Cell startPosition = null;
+    private Cell currentPosition = null;
     private static final FigureType type = FigureType.KNIGHT;
     private final FigureColor color;
 
-    public KnightFigure(FigureColor color, int x, int y) {
-        Position position = new Position(x, y);
+    public Knight(FigureColor color, int x, int y) {
+        Cell position = new Cell(x, y);
         this.startPosition = position;
         this.currentPosition = position;
         this.color = color;
     }
 
     @Override
-    public ArrayList<Position> getAvailablePosition(Position currentRook) {
+    public ArrayList<Cell> getAvailablePosition(Cell currentRook) {
         return null;
     }
 
     @Override
-    public boolean canMoveTo(Position prevPosition, Position nextPosition) {
+    public boolean canMoveTo(Cell prevPosition, Cell nextPosition) {
         return false;
     }
 
@@ -42,16 +42,16 @@ public class KnightFigure implements Figure {
     }
 
     @Override
-    public void setPosition(Position position) {
+    public void setPosition(Cell position) {
 
     }
 
     @Override
-    public void moveTo(Position prevPosition, Position nextPosition) {
+    public void moveTo(Cell prevPosition, Cell nextPosition) {
 
     }
 
-    public Position getPosition() {
+    public Cell getPosition() {
         return this.currentPosition;
     }
 

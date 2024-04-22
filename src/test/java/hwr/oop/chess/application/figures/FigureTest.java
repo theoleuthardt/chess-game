@@ -2,91 +2,91 @@ package hwr.oop.chess.application.figures;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import hwr.oop.chess.application.Position;
+import hwr.oop.chess.application.Cell;
 
 class FigureTest {
   @Test
   void createPawn() {
-    Position position = new Position('b', 2);
-    PawnFigure pawn = new PawnFigure(FigureColor.BLACK, position);
+    Cell position = new Cell('b', 2);
+    Pawn pawn = new Pawn(FigureColor.BLACK, position.x(), position.y());
     Assertions.assertThat(pawn.color()).isEqualTo(FigureColor.BLACK);
     Assertions.assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
-    Assertions.assertThat(pawn.position()).isEqualTo(position);
+    Assertions.assertThat(pawn.cell()).isEqualTo(position);
   }
 
   @Test
   void movePawn_oneFieldCorrectDirection() {
-    Position from = new Position('d', 2);
-    Position to   = new Position('d', 3);
+    Cell from = new Cell('d', 2);
+    Cell to   = new Cell('d', 3);
 
-    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, from);
+    Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isTrue();
-    Assertions.assertThat(pawn.position()).isEqualTo(from);
+    Assertions.assertThat(pawn.cell()).isEqualTo(from);
     pawn.moveTo(to);
-    Assertions.assertThat(pawn.position()).isEqualTo(to);
+    Assertions.assertThat(pawn.cell()).isEqualTo(to);
   }
 
   @Test
   void movePawn_oneFieldWrongDirection() {
-    Position from = new Position('b', 2);
-    Position to   = new Position('b', 1);
+    Cell from = new Cell('b', 2);
+    Cell to   = new Cell('b', 1);
 
-    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, from);
+    Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isFalse();
-    Assertions.assertThat(pawn.position()).isEqualTo(from);
+    Assertions.assertThat(pawn.cell()).isEqualTo(from);
     pawn.moveTo(to);
-    Assertions.assertThat(pawn.position()).isEqualTo(from);
+    Assertions.assertThat(pawn.cell()).isEqualTo(from);
   }
 
   @Test
   void movePawn_sameField() {
-    Position from = new Position('b', 2);
-    Position to   = new Position('b', 2);
+    Cell from = new Cell('b', 2);
+    Cell to   = new Cell('b', 2);
 
-    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, from);
+    Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isFalse();
-    Assertions.assertThat(pawn.position()).isEqualTo(from);
+    Assertions.assertThat(pawn.cell()).isEqualTo(from);
     pawn.moveTo(to);
-    Assertions.assertThat(pawn.position()).isEqualTo(from);
+    Assertions.assertThat(pawn.cell()).isEqualTo(from);
   }
 
   @Test
   void movePawn_twoFieldsOnStart() {
-    Position from = new Position('d', 2);
-    Position to   = new Position('d', 4);
+    Cell from = new Cell('d', 2);
+    Cell to   = new Cell('d', 4);
 
-    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, from);
+    Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isTrue();
-    Assertions.assertThat(pawn.position()).isEqualTo(from);
+    Assertions.assertThat(pawn.cell()).isEqualTo(from);
     pawn.moveTo(to);
-    Assertions.assertThat(pawn.position()).isEqualTo(to);
+    Assertions.assertThat(pawn.cell()).isEqualTo(to);
   }
 
 
   @Test
   void movePawn_twoFieldsOnlyOnStart() {
-    Position from = new Position('d', 2);
-    Position to   = new Position('d', 3);
-    Position then = new Position('d', 5);
+    Cell from = new Cell('d', 2);
+    Cell to   = new Cell('d', 3);
+    Cell then = new Cell('d', 5);
 
-    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, from);
+    Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isTrue();
     pawn.moveTo(to);
 
     Assertions.assertThat(pawn.canMoveTo(then)).isFalse();
     pawn.moveTo(then);
-    Assertions.assertThat(pawn.position()).isEqualTo(to);
+    Assertions.assertThat(pawn.cell()).isEqualTo(to);
   }
 
   @Test
   void movePawn_threeFields() {
-    Position from = new Position('b', 2);
-    Position to   = new Position('b', 5);
+    Cell from = new Cell('b', 2);
+    Cell to   = new Cell('b', 5);
 
-    PawnFigure pawn = new PawnFigure(FigureColor.WHITE, from);
+    Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isFalse();
-    Assertions.assertThat(pawn.position()).isEqualTo(from);
+    Assertions.assertThat(pawn.cell()).isEqualTo(from);
     pawn.moveTo(to);
-    Assertions.assertThat(pawn.position()).isEqualTo(from);
+    Assertions.assertThat(pawn.cell()).isEqualTo(from);
   }
 }

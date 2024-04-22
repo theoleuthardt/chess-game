@@ -2,62 +2,61 @@ package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureColor;
-import hwr.oop.chess.application.figures.PawnFigure;
-import hwr.oop.chess.application.figures.RookFigure;
-import hwr.oop.chess.application.figures.QueenFigure;
-import hwr.oop.chess.application.figures.KingFigure;
-import hwr.oop.chess.application.figures.KnightFigure;
-import hwr.oop.chess.application.figures.BishopFigure;
+import hwr.oop.chess.application.figures.Rook;
+import hwr.oop.chess.application.figures.Queen;
+import hwr.oop.chess.application.figures.King;
+import hwr.oop.chess.application.figures.Knight;
+import hwr.oop.chess.application.figures.Bishop;
 
 import java.util.Objects;
 
 public class Board {
-    private static Position startingPosition;
+    private static Cell firstCell;
 
     public Board() {
         initializeBoard();
     }
 
     private void initializeBoard() {
-        System.out.println("\u001B[32minitialize Board\u001B[0m");
         // Create the first position and store it in startingPosition
-        startingPosition = new Position(1, 1);
-        Position previousPosition = startingPosition;
-        Position previousRowStart = startingPosition;
-        Position previousRowPosition = startingPosition;
+        firstCell = new Cell(1, 1);
+        Cell leftCell = firstCell;
+        Cell topCell = firstCell;
+        Cell topCellRowStart = firstCell;
 
         // Create and connect positions for each row and column of the board
-        for (int y = 1; y < 9; y++) {
-            for (int x = 1; x < 9; x++) {
-                // System.out.print(row + "" + col + ", ");
+        for (int y = 1; y <= 8; y++) {
+            for (int x = 1; x <= 8; x++) {
                 // Skip the first position since it's already created
                 if (y == 1 && x == 1) {
                     continue;
                 }
                 if (x == 1) {
-                    previousRowPosition = previousRowStart;
+                    topCell = topCellRowStart;
                 }
                 // Create a new position
-                Position currentPosition = new Position(x, y);
+                Cell newCell = new Cell(x, y);
                 // Connect the position to the previous position
-                connectPositions(previousPosition, currentPosition);
-                if (y != 1) {
-                    connectPositions(currentPosition, previousRowPosition);
-                    if (x != 1) {
-                        connectPositions(currentPosition, previousRowPosition.getLeftPosition());
+                connectCells(newCell, leftCell); // left
+                if (topCell != null) {
+                    connectCells(newCell, topCell); // top
+                    if (topCell.leftCell() != null) {
+                        connectCells(newCell, topCell.leftCell()); // top left
                     }
-                    if (x != 8) {
-                        connectPositions(currentPosition, previousRowPosition.getRightPosition());
-                    } else {
-                        previousRowStart = previousRowStart.getTopPosition();
+                    if (topCell.rightCell() != null) {
+                        connectCells(newCell, topCell.rightCell()); // top right
+                    }
+                    if(topCell.rightCell() == null && topCellRowStart != null){
+                        topCellRowStart = topCellRowStart.topCell();
                     }
                 }
 
                 // Set the next position as the current position
-                previousPosition = currentPosition;
-                previousRowPosition = previousRowPosition.getRightPosition();
+                leftCell = newCell;
+                if(topCell != null) {
+                    topCell = topCell.rightCell();
+                }
             }
-            // System.out.println("  :" + row + "Row");
         }
 
         // Set up the initial chess positions
@@ -65,73 +64,80 @@ public class Board {
     }
 
     // Method to connect each position
-    private void connectPositions(Position currentPosition, Position nextPosition) {
-        if (nextPosition == null) {
-            return; // Skip if the next position is null
+    private void connectCells(Cell cell1, Cell cell2) {
+        Objects.requireNonNull(cell1);
+        Objects.requireNonNull(cell2);
+
+        if(cell1.isEqualTo(cell2)) {
+            throw new IllegalArgumentException("The cells are not allowed to be equal");
         }
 
         // Connect horizontally
-        if (currentPosition.y() == nextPosition.y()) {
-            if (currentPosition.x() < nextPosition.x()) {
-                currentPosition.setRightPosition(nextPosition);
-                nextPosition.setLeftPosition(currentPosition);
-            } else if (currentPosition.x() > nextPosition.x()) {
-                currentPosition.setLeftPosition(nextPosition);
-                nextPosition.setRightPosition(currentPosition);
+        if (cell1.y() == cell2.y()) {
+            if (cell1.x() < cell2.x()) { // cell1 is left of cell2
+                cell1.setRightPosition(cell2);
+                cell2.setLeftPosition(cell1);
+            } else if (cell1.x() > cell2.x()) { // cell1 is right of cell2
+                cell1.setLeftPosition(cell2);
+                cell2.setRightPosition(cell1);
             }
+            return;
         }
 
         // Connect vertically
-        if (currentPosition.x() == nextPosition.x()) {
-            // Connect vertically
-            if (currentPosition.y() > nextPosition.y()) {
-                currentPosition.setBottomPosition(nextPosition);
-                nextPosition.setTopPosition(currentPosition);
-            } else if (currentPosition.y() < nextPosition.y()) {
-                currentPosition.setTopPosition(nextPosition);
-                nextPosition.setBottomPosition(currentPosition);
+        if (cell1.x() == cell2.x()) {
+            if (cell1.y() > cell2.y()) { // cell1 is above cell2
+                cell1.setBottomPosition(cell2);
+                cell2.setTopPosition(cell1);
+            } else if (cell1.y() < cell2.y()) { // cell1 is below cell2
+                cell1.setTopPosition(cell2);
+                cell2.setBottomPosition(cell1);
             }
+            return;
         }
 
         // Connect diagonally
-        if (currentPosition.y() < nextPosition.y() && currentPosition.x() < nextPosition.x()) {
-            currentPosition.setBottomRightPosition(nextPosition);
-            nextPosition.setTopLeftPosition(currentPosition);
-        } else if (currentPosition.y() < nextPosition.y() && currentPosition.x() > nextPosition.x()) {
-            currentPosition.setBottomLeftPosition(nextPosition);
-            nextPosition.setTopRightPosition(currentPosition);
-        } else if (currentPosition.y() > nextPosition.y() && currentPosition.x() < nextPosition.x()) {
-            if (currentPosition.y() != 8) { // Exclude bottom right connection for the last row (row 8)
-                currentPosition.setTopRightPosition(nextPosition);
-                nextPosition.setBottomLeftPosition(currentPosition);
+        if (cell1.y() > cell2.y()) {
             }
-        } else if (currentPosition.y() > nextPosition.y() && currentPosition.x() > nextPosition.x()) {
-            if (currentPosition.y() != 8) { // Exclude bottom left connection for the last row (row 8)
-                currentPosition.setTopLeftPosition(nextPosition);
-                nextPosition.setBottomRightPosition(currentPosition);
+        }
+        if (cell1.y() < cell2.y() && cell1.x() < cell2.x()) {
+            cell1.setBottomRightPosition(cell2);
+            cell2.setTopLeftPosition(cell1);
+        } else if (cell1.y() < cell2.y() && cell1.x() > cell2.x()) {
+            cell1.setBottomLeftPosition(cell2);
+            cell2.setTopRightPosition(cell1);
+        } else if (cell1.y() > cell2.y() && cell1.x() < cell2.x()) {
+            if (cell1.y() != 8) { // Exclude bottom right connection for the last row (row 8)
+                cell1.setTopRightPosition(cell2);
+                cell2.setBottomLeftPosition(cell1);
+            }
+        } else if (cell1.y() > cell2.y() && cell1.x() > cell2.x()) {
+            if (cell1.y() != 8) { // Exclude bottom left connection for the last row (row 8)
+                cell1.setTopLeftPosition(cell2);
+                cell2.setBottomRightPosition(cell1);
             }
         }
     }
 
 
-    public static Position getStartingPosition() {
-        return startingPosition;
+    public static Cell getStartingPosition() {
+        return firstCell;
     }
 
     private void setUpInitialChessPositions() {
-        Position currentPosition = this.getStartingPosition();
-        Position rowStartPosition = this.getStartingPosition();  // Starting position of the current row
+        Cell currentPosition = this.getStartingPosition();
+        Cell rowStartPosition = this.getStartingPosition();  // Starting position of the current row
         while (currentPosition != null) {
             // Set up white figures
             if (currentPosition.y() == 1) {
-                placeFigure(new RookFigure(FigureColor.WHITE, 1, 1));
-                placeFigure(new KnightFigure(FigureColor.WHITE, 2, 1));
-                placeFigure(new BishopFigure(FigureColor.WHITE, 3, 1));
-                placeFigure(new QueenFigure(FigureColor.WHITE, 4, 1));
-                placeFigure(new KingFigure(FigureColor.WHITE, 5, 1));
-                placeFigure(new BishopFigure(FigureColor.WHITE, 6, 1));
-                placeFigure(new KnightFigure(FigureColor.WHITE, 7, 1));
-                placeFigure(new RookFigure(FigureColor.WHITE, 8, 1));
+                placeFigure(new Rook(FigureColor.WHITE, 1, 1));
+                placeFigure(new Knight(FigureColor.WHITE, 2, 1));
+                placeFigure(new Bishop(FigureColor.WHITE, 3, 1));
+                placeFigure(new Queen(FigureColor.WHITE, 4, 1));
+                placeFigure(new King(FigureColor.WHITE, 5, 1));
+                placeFigure(new Bishop(FigureColor.WHITE, 6, 1));
+                placeFigure(new Knight(FigureColor.WHITE, 7, 1));
+                placeFigure(new Rook(FigureColor.WHITE, 8, 1));
             }
             if (currentPosition.y() == 2) {
                 //    placeFigure(new PawnFigure(FigureColor.WHITE, currentPosition.x(), 2));
@@ -142,36 +148,36 @@ public class Board {
                 //    placeFigure(new PawnFigure(FigureColor.BLACK, currentPosition.x(), 7));
             }
             if (currentPosition.y() == 8) {
-                placeFigure(new RookFigure(FigureColor.BLACK, 1, 8));
-                placeFigure(new KnightFigure(FigureColor.BLACK, 2, 8));
-                placeFigure(new BishopFigure(FigureColor.BLACK, 3, 8));
-                placeFigure(new QueenFigure(FigureColor.BLACK, 4, 8));
-                placeFigure(new KingFigure(FigureColor.BLACK, 5, 8));
-                placeFigure(new BishopFigure(FigureColor.BLACK, 6, 8));
-                placeFigure(new KnightFigure(FigureColor.BLACK, 7, 8));
-                placeFigure(new RookFigure(FigureColor.BLACK, 8, 8));
+                placeFigure(new Rook(FigureColor.BLACK, 1, 8));
+                placeFigure(new Knight(FigureColor.BLACK, 2, 8));
+                placeFigure(new Bishop(FigureColor.BLACK, 3, 8));
+                placeFigure(new Queen(FigureColor.BLACK, 4, 8));
+                placeFigure(new King(FigureColor.BLACK, 5, 8));
+                placeFigure(new Bishop(FigureColor.BLACK, 6, 8));
+                placeFigure(new Knight(FigureColor.BLACK, 7, 8));
+                placeFigure(new Rook(FigureColor.BLACK, 8, 8));
             }
             if (currentPosition.x() < 8) {
                 // Move to the next position in the current row
-                currentPosition = currentPosition.getRightPosition();
+                currentPosition = currentPosition.rightCell();
             } else {
                 // Move to the next row
-                rowStartPosition = rowStartPosition.getTopPosition();
+                rowStartPosition = rowStartPosition.topCell();
                 currentPosition = rowStartPosition;
             }
         }
     }
 
     private void placeFigure(Figure figure) {
-        Position position = findPosition(figure.getPosition().x(), figure.getPosition().y());
+        Cell position = findPosition(figure.getPosition().x(), figure.getPosition().y());
         if (position != null) {
             position.setFigure(figure);
         }
     }
 
-    public static Position findPosition(int x, int y) {
-        Position currentPosition = getStartingPosition();
-        Position rowStartPosition = getStartingPosition();  // Starting position of the current row
+    public static Cell findPosition(int x, int y) {
+        Cell currentPosition = getStartingPosition();
+        Cell rowStartPosition = getStartingPosition();  // Starting position of the current row
         while (currentPosition != null) {
             if (currentPosition.y() == y && currentPosition.x() == x) {
                 return currentPosition;
@@ -179,10 +185,10 @@ public class Board {
 
             if (currentPosition.x() < 8) {
                 // Move to the next position in the current row
-                currentPosition = currentPosition.getRightPosition();
+                currentPosition = currentPosition.rightCell();
             } else {
                 // Move to the next row
-                rowStartPosition = rowStartPosition.getTopPosition();
+                rowStartPosition = rowStartPosition.topCell();
                 currentPosition = rowStartPosition;
             }
         }
@@ -190,11 +196,11 @@ public class Board {
     }
 
     public void printBoard() {
-        Position currentPosition = this.getStartingPosition();
-        while (currentPosition.getTopPosition() != null) {
-            currentPosition = currentPosition.getTopPosition();
+        Cell currentPosition = this.getStartingPosition();
+        while (currentPosition.topCell() != null) {
+            currentPosition = currentPosition.topCell();
         }
-        Position rowStartPosition = currentPosition;
+        Cell rowStartPosition = currentPosition;
 
         // Starting position of the current row
         while (currentPosition != null) {
@@ -208,10 +214,10 @@ public class Board {
 
             if (currentPosition.x() < 8) {
                 // Move to the next position in the current row
-                currentPosition = currentPosition.getRightPosition();
+                currentPosition = currentPosition.rightCell();
             } else {
                 // Move to the next row
-                rowStartPosition = rowStartPosition.getBottomPosition();
+                rowStartPosition = rowStartPosition.bottomCell();
                 currentPosition = rowStartPosition;
                 System.out.println();
             }
@@ -222,8 +228,8 @@ public class Board {
     // Method to move a piece on the board
     public void moveFigure(int startCol, int startRow, int endCol, int endRow) {
         // Get the piece at the start position
-        Position prevPosition = findPosition(startCol, startRow);
-        Position nextPosition = findPosition(endCol, endRow);
+        Cell prevPosition = findPosition(startCol, startRow);
+        Cell nextPosition = findPosition(endCol, endRow);
 
         assert prevPosition != null;
         assert nextPosition != null;
