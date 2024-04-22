@@ -1,8 +1,12 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,13 +14,13 @@ class BoardTest {
   private Board board;
 
   @BeforeEach
-  public void setUp() {
+   void setUp() {
     // Initialize the board
     board = new Board();
   }
 
   @Test
-  public void testPositionConnections() {
+   void testBoardCells() {
     // Check cell connections
     Cell currentCell = board.firstCell();
     while (currentCell != null) {
@@ -25,28 +29,28 @@ class BoardTest {
       while (currentCell != null) {
         //                System.out.print(currentCell.getRow() + "" + currentCell.getCol()
         // + ", ");
-        // Check right position
+        // Check right cell
         if (currentCell.rightCell() != null) {
           assertEquals(
               currentCell,
               currentCell.rightCell().leftCell(),
               "Right cell is not correctly connected");
         }
-        // Check bottom position
+        // Check bottom cell
         if (currentCell.bottomCell() != null) {
           assertEquals(
               currentCell,
               currentCell.bottomCell().topCell(),
               "Bottom cell is not correctly connected");
         }
-        // Check bottom right position
+        // Check bottom right cell
         if (currentCell.bottomRightCell() != null) {
           assertEquals(
               currentCell,
               currentCell.bottomRightCell().topLeftCell(),
               "Bottom right cell is not correctly connected");
         }
-        // Check bottom left position
+        // Check bottom left cell
         if (currentCell.bottomLeftCell() != null) {
           assertEquals(
               currentCell,
@@ -54,7 +58,7 @@ class BoardTest {
               "Bottom left cell is not correctly connected");
         }
 
-        // Move to the next position in the current row
+        // Move to the next cell in the current row
         currentCell = currentCell.rightCell();
       }
       //            System.out.println();
@@ -64,14 +68,33 @@ class BoardTest {
     }
 
     // Print message if all tests pass in yellow color
-    System.out.println("\u001B[33mPositionConnections: Cells are correctly connected.\u001B[0m");
+    System.out.println("\u001B[33mCellConnections: Cells are correctly connected.\u001B[0m");
   }
 
   @Test
-  public void testFigurePlacement() {
-    // Check figure placement on each position
+  void testCellConnections(){
+    ArrayList<Cell> cells = new ArrayList<>();      String message = "Cells are not correctly connected";
+
+    // Check right
+    cells = generateVerticalCells(1, 1);
+    board.connectCells(cells.get(0), cells.get(1));
+    Assertions.assertEquals(cells.get(0).rightCell(), cells.get(2), message);
+
+    cells = generateVerticalCells(1, 1);
+    board.connectCells(cells.get(0), cells.get(1));
+    Assertions.assertEquals(cells.get(0).rightCell(), cells.get(2), message);
+
+    // Check left
+    cells = generateVerticalCells(-1, 1);
+    board.connectCells(cells.get(0), cells.get(1));
+    Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+
+  }
+  @Test
+   void testFigurePlacement() {
+    // Check figure placement on each cell
     Cell currentCell = Board.firstCell();
-    Cell rowStartPosiCell = Board.firstCell(); // Starting position of the current row
+    Cell rowStartPosiCell = Board.firstCell(); // Starting cell of the current row
 
     while (currentCell != null) {
       Figure figure = currentCell.getFigure();
@@ -93,7 +116,7 @@ class BoardTest {
       }
       // Move to the next cell
       if (currentCell.x() < 8) {
-        // Move to the next position in the current row
+        // Move to the next cell in the current row
         currentCell = currentCell.rightCell();
       } else {
         // Move to the next row
@@ -104,7 +127,7 @@ class BoardTest {
   }
 
   @Test
-  public void testMoveFigure() {
+   void testMoveFigure() {
     // Check move
     this.moveFigureAndCheck(1, 1, 1, 5);
     this.moveFigureAndCheck(1, 8, 1, 5);
@@ -124,5 +147,34 @@ class BoardTest {
     //            assertEquals(prevFigureType, nextFigureType, "Figure moves incorrect");
     //        }
     board.printBoard();
+  }
+
+  ArrayList<Cell> generateVerticalCells(int xOperator, int yOperator){
+    ArrayList<Cell> list = new ArrayList<>();
+    Cell cellFirst = null;
+    Cell cellSecond = null;
+    int randomNumX;
+    int randomNumY;
+    Random rand = new Random();
+    switch(xOperator){
+      case 1:
+        randomNumX = rand.nextInt(7) + 1;
+        randomNumY = rand.nextInt(7) + 1;
+        cellFirst = new Cell(randomNumX, randomNumY );
+        cellSecond = new Cell(randomNumX +1, yOperator > 0 ? randomNumY + 1 :randomNumY - 1  );
+        break;
+      case 0:
+        break;
+      case -1:
+        randomNumX = rand.nextInt(7) + 2;
+        randomNumY = rand.nextInt(7) + 2;
+        cellFirst = new Cell(randomNumX, randomNumY );
+        cellSecond = new Cell(randomNumX - 1, yOperator > 0 ? randomNumY + 1 :randomNumY - 1  );
+        break;
+    }
+
+    list.add(cellFirst);
+    list.add(cellSecond);
+    return list;
   }
 }

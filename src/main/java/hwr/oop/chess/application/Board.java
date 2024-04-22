@@ -172,7 +172,7 @@ public class Board {
     }
   }
 
-  public static Cell findPosition(int x, int y) {
+  public static Cell findCell(int x, int y) {
     Cell searchFor = new Cell(x, y);
     ArrayList<Cell> cells = Board.allCells();
     for (Cell cell : cells) {
@@ -201,10 +201,10 @@ public class Board {
   }
 
   // Method to move a piece on the board
-  public void moveFigure(int startCol, int startRow, int endCol, int endRow) {
+  public void moveFigure(int startX, int startY, int endX, int endY) {
     // Get the piece at the start position
-    Cell startCell = findPosition(startCol, startRow);
-    Cell endCell = findPosition(endCol, endRow);
+    Cell startCell = findCell(startX, startY);
+    Cell endCell = findCell(endX, endY);
 
     Figure figure = startCell.getFigure();
     if (figure == null) {
@@ -220,7 +220,7 @@ public class Board {
   }
 
   public static Figure getFigureOnField(int x, int y) {
-    return Objects.requireNonNull(findPosition(x, y)).getFigure();
+    return Objects.requireNonNull(findCell(x, y)).getFigure();
   }
 
   public static boolean isFigureOnField(int x, int y) {
