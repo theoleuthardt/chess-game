@@ -16,7 +16,7 @@ class FigureTest {
   @Test
   void movePawn_oneFieldCorrectDirection() {
     Cell from = new Cell('d', 2);
-    Cell to = new Cell('d', 3);
+    Cell to   = new Cell('d', 3);
 
     Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isTrue();
@@ -28,7 +28,7 @@ class FigureTest {
   @Test
   void movePawn_oneFieldWrongDirection() {
     Cell from = new Cell('b', 2);
-    Cell to = new Cell('b', 1);
+    Cell to   = new Cell('b', 1);
 
     Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isFalse();
@@ -40,7 +40,7 @@ class FigureTest {
   @Test
   void movePawn_sameField() {
     Cell from = new Cell('b', 2);
-    Cell to = new Cell('b', 2);
+    Cell to   = new Cell('b', 2);
 
     Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isFalse();
@@ -52,7 +52,7 @@ class FigureTest {
   @Test
   void movePawn_twoFieldsOnStart() {
     Cell from = new Cell('d', 2);
-    Cell to = new Cell('d', 4);
+    Cell to   = new Cell('d', 4);
 
     Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isTrue();
@@ -61,10 +61,11 @@ class FigureTest {
     Assertions.assertThat(pawn.cell()).isEqualTo(to);
   }
 
+
   @Test
   void movePawn_twoFieldsOnlyOnStart() {
     Cell from = new Cell('d', 2);
-    Cell to = new Cell('d', 3);
+    Cell to   = new Cell('d', 3);
     Cell then = new Cell('d', 5);
 
     Pawn pawn = new Pawn(FigureColor.WHITE, from);
@@ -79,7 +80,7 @@ class FigureTest {
   @Test
   void movePawn_threeFields() {
     Cell from = new Cell('b', 2);
-    Cell to = new Cell('b', 5);
+    Cell to   = new Cell('b', 5);
 
     Pawn pawn = new Pawn(FigureColor.WHITE, from);
     Assertions.assertThat(pawn.canMoveTo(to)).isFalse();
