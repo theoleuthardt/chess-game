@@ -1,7 +1,6 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
-import hwr.oop.chess.application.figures.FigureType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
