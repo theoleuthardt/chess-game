@@ -118,20 +118,6 @@ public class Cell {
     return y;
   }
 
-  // Method to return all positions in the row to which this position belongs
-  public List<Cell> getCellsInRow() {
-    ArrayList<Cell> cells = Board.allCells();
-    cells.removeIf(cell -> cell.y() != this.y());
-    return cells;
-  }
-
-  // Method to return all positions in the column to which this position belongs
-  public List<Cell> getCellsInColumn() {
-    ArrayList<Cell> cells = Board.allCells();
-    cells.removeIf(cell -> cell.x() != this.x());
-    return cells;
-  }
-
   public boolean isEqualTo(Cell pos1) {
     Cell pos2 = this;
     return (pos1.x() == pos2.x()) && (pos1.y() == pos2.y());

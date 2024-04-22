@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Board {
-  private static Cell firstCell;
+  private Cell firstCell;
 
   public Board() {
     initializeBoard();
@@ -113,11 +113,11 @@ public class Board {
     }
   }
 
-  public static Cell firstCell() {
+  public Cell firstCell() {
     return firstCell;
   }
 
-  public static ArrayList<Cell> allCells() {
+  public ArrayList<Cell> allCells() {
     ArrayList<Cell> cells = new ArrayList<>();
     Cell cell = firstCell;
     Cell rowStart = cell;
@@ -134,7 +134,7 @@ public class Board {
   }
 
   private void setUpInitialChessPositions() {
-    ArrayList<Cell> cells = Board.allCells();
+    ArrayList<Cell> cells = allCells();
     for (Cell cell : cells) {
       // Set up white figures
       if (cell.y() == 1) {
@@ -172,9 +172,9 @@ public class Board {
     }
   }
 
-  public static Cell findCell(int x, int y) {
+  public Cell findCell(int x, int y) {
     Cell searchFor = new Cell(x, y);
-    ArrayList<Cell> cells = Board.allCells();
+    ArrayList<Cell> cells = allCells();
     for (Cell cell : cells) {
       if (cell.isEqualTo(searchFor)) {
         return cell;
@@ -184,7 +184,7 @@ public class Board {
   }
 
   public void printBoard() {
-    ArrayList<Cell> cells = Board.allCells();
+    ArrayList<Cell> cells = allCells();
     for (Cell cell : cells) {
       Figure figure = cell.getFigure();
       // Print figure if it exists, otherwise print empty position
@@ -219,11 +219,11 @@ public class Board {
     endCell.setFigure(figure);
   }
 
-  public static Figure getFigureOnField(int x, int y) {
+  public Figure getFigureOnField(int x, int y) {
     return Objects.requireNonNull(findCell(x, y)).getFigure();
   }
 
-  public static boolean isFigureOnField(int x, int y) {
+  public boolean isFigureOnField(int x, int y) {
     try {
       getFigureOnField(x, y);
       return true;
