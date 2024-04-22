@@ -1,74 +1,40 @@
 package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Cell;
+import java.util.logging.Logger;
 
 import java.util.ArrayList;
 
 public class King implements Figure {
-    private Cell startCell = null;
-    private Cell currentCell = null;
-    private static final FigureType type = FigureType.KING;
-    private final FigureColor color;
+  Logger logger = Logger.getLogger(getClass().getName());
+  private static final FigureType type = FigureType.KING;
+  private final FigureColor color;
 
-    public King(FigureColor color, int x, int y) {
-        Cell cell = new Cell(x, y);
-        this.startCell = cell;
-        this.currentCell = cell;
-        this.color = color;
-    }
+  public King(FigureColor color) {
+    this.color = color;
+  }
 
+  public ArrayList<Cell> getAvailableCells(Cell currentCell) {
+    ArrayList<Cell> list = new ArrayList<>();
 
-    @Override
-    public ArrayList<Cell> getAvailablePosition(Cell currentRook) {
-        return null;
-    }
+    return list;
+  }
 
-    @Override
-    public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-        return false;
-    }
+  public boolean canMoveTo(Cell prevCell, Cell nextCell) {
+    ArrayList<Cell> availableCell = getAvailableCells(prevCell);
+    logger.info("canMove: " + availableCell.contains(nextCell));
+    return availableCell.contains(nextCell);
+  }
 
-    @Override
-    public boolean isOnField(int x, int y) {
-        return false;
-    }
+  public char symbol() {
+    return color == FigureColor.WHITE ? 'K' : 'k';
+  }
 
-    @Override
-    public void moveTo(int x, int y) {
+  public FigureColor color() {
+    return color;
+  }
 
-    }
-
-    public boolean isCaptured() {
-        return this.currentCell == null;
-    }
-
-    @Override
-    public void setCell(Cell cel) {
-
-    }
-
-    @Override
-    public void moveTo(Cell prevPosition, Cell nextPosition) {
-
-    }
-
-    public Cell getPosition() {
-        return this.currentPosition;
-    }
-
-    public FigureColor getColor() {
-        return this.color;
-    }
-
-    public FigureType getType() {
-        return type;
-    }
-
-    public char getSymbol() {
-        if (this.color == FigureColor.WHITE) {
-            return 'K';
-        } else {
-            return 'k';
-        }
-    }
+  public FigureType type() {
+    return type;
+  }
 }

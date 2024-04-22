@@ -1,83 +1,40 @@
 package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Cell;
+import java.util.logging.Logger;
 
 import java.util.ArrayList;
 
 public class Bishop implements Figure {
-    private Cell startCell = null;
-    private Cell currentCell = null;
-    private static final FigureType type = FigureType.BISHOP;
-    private final FigureColor color;
+  Logger logger = Logger.getLogger(getClass().getName());
+  private static final FigureType type = FigureType.BISHOP;
+  private final FigureColor color;
 
-    public Bishop(FigureColor color, int x, int y) {
-        Cell cell = new Cell(x, y);
-        this.startCell = cell;
-        this.currentCell = cell;
-        this.color = color;
-    }
+  public Bishop(FigureColor color) {
+    this.color = color;
+  }
 
+  public ArrayList<Cell> getAvailableCells(Cell currentCell) {
+    ArrayList<Cell> list = new ArrayList<>();
 
-    public boolean canMoveTo(Cell to) {
-        Cell from = this.currentCell;
+    return list;
+  }
 
-        // this move is not allowed as it does not obey the rules.
-        return false;
-    }
+  public boolean canMoveTo(Cell prevCell, Cell nextCell) {
+    ArrayList<Cell> availableCell = getAvailableCells(prevCell);
+    logger.info("canMove: " + availableCell.contains(nextCell));
+    return availableCell.contains(nextCell);
+  }
 
-    @Override
-    public ArrayList<Cell> getAvailableCell(Cell currentRook) {
-        return null;
-    }
+  public char symbol() {
+    return color == FigureColor.WHITE ? 'B' : 'b';
+  }
 
-    @Override
-    public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-        return false;
-    }
+  public FigureColor color() {
+    return color;
+  }
 
-    @Override
-    public boolean isOnField(int x, int y) {
-        return false;
-    }
-
-    public boolean isCaptured() {
-        return this.currentCell == null;
-    }
-
-    @Override
-    public void setCell(Cell cell) {
-
-    }
-
-    public void moveTo(int x, int y) {
-        Cell cell = new Cell(x, y);
-        if (canMoveTo(cell)) {
-            this.currentCell = cell;
-        }
-    }
-
-    @Override
-    public void moveTo(Cell prevCell, Cell nextCell) {
-
-    }
-
-    public Cell getCell() {
-        return this.currentCell;
-    }
-
-    public FigureColor getColor() {
-        return this.color;
-    }
-
-    public FigureType getType() {
-        return type;
-    }
-
-    public char getSymbol() {
-        if (this.color == FigureColor.WHITE) {
-            return 'B';
-        } else {
-            return 'b';
-        }
-    }
+  public FigureType type() {
+    return type;
+  }
 }

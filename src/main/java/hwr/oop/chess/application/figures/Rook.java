@@ -5,116 +5,84 @@ import hwr.oop.chess.application.Cell;
 import java.util.ArrayList;
 
 public class Rook implements Figure {
-    Cell startCell = null;
-    Cell currentCell = null;
-    FigureType type = null;
-    FigureColor color = null;
+  private static final FigureType type = FigureType.ROOK;
+  private final FigureColor color;
 
-    public Rook(FigureColor color, int x, int y) {
-        Cell cell = new Cell(x, y);
-        this.type = FigureType.ROOK;
-        this.color = color;
-        this.startCell = cell;
-        this.currentCell = cell;
+  public Rook(FigureColor color) {
+    this.color = color;
+  }
+
+  public ArrayList<Cell> getAvailableCells(Cell currentRook) {
+    ArrayList<Cell> list = new ArrayList<>();
+
+    // Check above
+    Cell current = currentRook.topCell();
+
+    // If there is no figure or if it's a different color, the piece can move
+    while (current != null && current.getFigure() == null) {
+      list.add(current);
+      current = current.topCell();
+    }
+    if (current != null
+        && current.getFigure() != null
+        && current.getFigure().color() != currentRook.getFigure().color()) {
+      list.add(current);
     }
 
-    public ArrayList<Cell> getAvailableCell(Cell currentRook) {
-        ArrayList<Cell> list = new ArrayList<>();
-
-        // Check above
-        Cell current = currentRook.getTopCell();
-
-        //If there is no figure or if it's a different color, the piece can move
-        while (current != null && current.getFigure() == null) {
-            list.add(current);
-            current = current.getTopCell();
-        }
-        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
-            list.add(current);
-        }
-
-        // Check below
-        current = currentRook.getBottomCell();
-        while (current != null && current.getFigure() == null) {
-            list.add(current);
-            current = current.getBottomCell();
-        }
-        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
-            list.add(current);
-        }
-
-        // Check the right
-        current = currentRook.getRightCell();
-        while (current != null && current.getFigure() == null) {
-            list.add(current);
-            current = current.getRightCell();
-        }
-        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
-            list.add(current);
-        }
-
-        // Check the left
-        current = currentRook.getLeftCell();
-        while (current != null && current.getFigure() == null) {
-            list.add(current);
-            current = current.getLeftCell();
-        }
-        if (current != null && current.getFigure() != null && current.getFigure().getColor() != currentRook.getFigure().getColor()) {
-            list.add(current);
-        }
-        System.out.println("availableCell" + list.toArray().length);
-        return list;
+    // Check below
+    current = currentRook.bottomCell();
+    while (current != null && current.getFigure() == null) {
+      list.add(current);
+      current = current.bottomCell();
+    }
+    if (current != null
+        && current.getFigure() != null
+        && current.getFigure().color() != currentRook.getFigure().color()) {
+      list.add(current);
     }
 
-    public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-        ArrayList<Cell> availableCell = getAvailableCell(prevCell);
-        System.out.println("canMove: " + availableCell.contains(nextCell));
-        return availableCell.contains(nextCell);
+    // Check the right
+    current = currentRook.rightCell();
+    while (current != null && current.getFigure() == null) {
+      list.add(current);
+      current = current.rightCell();
+    }
+    if (current != null
+        && current.getFigure() != null
+        && current.getFigure().color() != currentRook.getFigure().color()) {
+      list.add(current);
     }
 
-    public void moveTo(Cell prevCell, Cell nextCell) {
-        if (canMoveTo(prevCell, nextCell)) {
-            setPosition(nextCell);
-        }
+    // Check the left
+    current = currentRook.leftCell();
+    while (current != null && current.getFigure() == null) {
+      list.add(current);
+      current = current.leftCell();
     }
-
-    @Override
-    public boolean isOnField(int x, int y) {
-        Cell field = new Cell(x, y);
-        return this.currentCell != null && this.currentCell.equals(field);
+    if (current != null
+        && current.getFigure() != null
+        && current.getFigure().color() != currentRook.getFigure().color()) {
+      list.add(current);
     }
+    System.out.println("availableCell" + list.toArray().length);
+    return list;
+  }
 
+  public boolean canMoveTo(Cell prevCell, Cell nextCell) {
+    ArrayList<Cell> availableCell = getAvailableCells(prevCell);
+    System.out.println("canMove: " + availableCell.contains(nextCell));
+    return availableCell.contains(nextCell);
+  }
 
-    @Override
-    public boolean isCaptured() {
-        return this.currentCell != null;
-    }
+  public char symbol() {
+    return color == FigureColor.WHITE ? 'R' : 'r';
+  }
 
-    @Override
-    public void setCell(Cell cell) {
-        this.currentCell = cell;
-    }
+  public FigureColor color() {
+    return color;
+  }
 
-    @Override
-    public Cell getCell() {
-        return this.currentCell;
-    }
-
-    @Override
-    public FigureColor getColor() {
-        return this.color;
-    }
-
-    @Override
-    public FigureType getType() {
-        return this.type;
-    }
-
-    public char getSymbol() {
-        if (this.color == FigureColor.WHITE) {
-            return 'R';
-        } else {
-            return 'r';
-        }
-    }
+  public FigureType type() {
+    return type;
+  }
 }

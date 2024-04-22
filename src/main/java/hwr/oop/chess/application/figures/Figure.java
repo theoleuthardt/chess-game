@@ -5,24 +5,13 @@ import hwr.oop.chess.application.Cell;
 import java.util.ArrayList;
 
 public interface Figure {
-  public ArrayList<Cell> getAvailableCell(Cell currentRook);
-  public boolean canMoveTo(Cell prevCell, Cell nextCell);
+  ArrayList<Cell> getAvailableCells(Cell currentRook);
 
-//  boolean isOnField(int x, int y);
-// void capture();
-// boolean isCaptured();
-Cell
-  void moveTo(Cell prevCell, Cell nextCell);
+  boolean canMoveTo(Cell prevCell, Cell nextCell);
 
-//  boolean isCaptured();
+  char symbol();
 
-  void setCell(Cell cell);
+  FigureColor color();
 
-  char getSymbol();
-
-  public Cell getCell();
-
-  public FigureColor getColor();
-
-  public FigureType getType();
+  FigureType type();
 }
