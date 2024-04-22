@@ -16,20 +16,22 @@ public class Cell {
   private Cell bottomLeftCell;
   private Cell bottomRightCell;
 
+  private final Board board;
   private final int y;
   private final int x;
 
-  public Cell(int x, int y) {
+  public Cell(Board board, int x, int y) {
     if (x < 1 || x > 8 || y < 1 || y > 8) {
       throw new IllegalArgumentException("Invalid Position");
     }
 
+    this.board = board;
     this.x = x;
     this.y = y;
   }
 
-  public Cell(char x, int y) {
-    this(x - 96, y);
+  public Cell(Board board, char x, int y) {
+    this(board, x - 96, y);
   }
 
   // Method to set the figure
@@ -120,14 +122,14 @@ public class Cell {
 
   // Method to return all positions in the row to which this position belongs
   public List<Cell> getCellsInRow() {
-    ArrayList<Cell> cells = Board.allCells();
+    ArrayList<Cell> cells = board.allCells();
     cells.removeIf(cell -> cell.y() != this.y());
     return cells;
   }
 
   // Method to return all positions in the column to which this position belongs
   public List<Cell> getCellsInColumn() {
-    ArrayList<Cell> cells = Board.allCells();
+    ArrayList<Cell> cells = board.allCells();
     cells.removeIf(cell -> cell.x() != this.x());
     return cells;
   }
