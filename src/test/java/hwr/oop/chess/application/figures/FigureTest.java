@@ -8,10 +8,9 @@ class FigureTest {
   @Test
   void createPawn() {
     Cell position = new Cell('b', 2);
-    Pawn pawn = new Pawn(FigureColor.BLACK, position.x(), position.y());
+    Pawn pawn = new Pawn(FigureColor.BLACK);
     Assertions.assertThat(pawn.color()).isEqualTo(FigureColor.BLACK);
     Assertions.assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
-    Assertions.assertThat(pawn.cell()).isEqualTo(position);
   }
 
   @Test

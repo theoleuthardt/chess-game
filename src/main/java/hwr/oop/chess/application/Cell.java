@@ -99,7 +99,7 @@ public class Cell {
   public Cell topRightCell() {
     return topRightCell;
   }
-ll
+
   public Cell bottomLeftCell() {
     return bottomLeftCell;
   }

@@ -139,66 +139,34 @@ public class Board {
       // Set up white figures
       if (cell.y() == 1) {
         switch (cell.x()) {
-          case 1 -> {
-            cell.setFigure(new Rook(FigureColor.WHITE));
-          }
-          case 2 -> {
-            cell.setFigure(new Knight(FigureColor.WHITE));
-          }
-          case 3 -> {
-            cell.setFigure(new Bishop(FigureColor.WHITE));
-          }
-          case 4 -> {
-            cell.setFigure(new Queen(FigureColor.WHITE));
-          }
-          case 5 -> {
-            cell.setFigure(new King(FigureColor.WHITE));
-          }
-          case 6 -> {
-            cell.setFigure(new Bishop(FigureColor.WHITE));
-          }
-          case 7 -> {
-            cell.setFigure(new Knight(FigureColor.WHITE));
-          }
-          case 8 -> {
-            cell.setFigure(new Rook(FigureColor.WHITE));
-          }
+          case 1 -> cell.setFigure(new Rook(FigureColor.WHITE));
+          case 2 -> cell.setFigure(new Knight(FigureColor.WHITE));
+          case 3 -> cell.setFigure(new Bishop(FigureColor.WHITE));
+          case 4 -> cell.setFigure(new Queen(FigureColor.WHITE));
+          case 5 -> cell.setFigure(new King(FigureColor.WHITE));
+          case 6 -> cell.setFigure(new Bishop(FigureColor.WHITE));
+          case 7 -> cell.setFigure(new Knight(FigureColor.WHITE));
+          case 8 -> cell.setFigure(new Rook(FigureColor.WHITE));
         }
       }
       if (cell.y() == 2) {
-        // cell.setFigure(new Pawn(FigureColor.WHITE));
+        cell.setFigure(new Pawn(FigureColor.WHITE));
       }
 
       // Set up black figures
       if (cell.y() == 7) {
-        // cell.setFigure(new Pawn(FigureColor.BLACK));
+        cell.setFigure(new Pawn(FigureColor.BLACK));
       }
       if (cell.y() == 8) {
         switch (cell.x()) {
-          case 1 -> {
-            cell.setFigure(new Rook(FigureColor.BLACK));
-          }
-          case 2 -> {
-            cell.setFigure(new Knight(FigureColor.BLACK));
-          }
-          case 3 -> {
-            cell.setFigure(new Bishop(FigureColor.BLACK));
-          }
-          case 4 -> {
-            cell.setFigure(new Queen(FigureColor.BLACK));
-          }
-          case 5 -> {
-            cell.setFigure(new King(FigureColor.BLACK));
-          }
-          case 6 -> {
-            cell.setFigure(new Bishop(FigureColor.BLACK));
-          }
-          case 7 -> {
-            cell.setFigure(new Knight(FigureColor.BLACK));
-          }
-          case 8 -> {
-            cell.setFigure(new Rook(FigureColor.BLACK));
-          }
+          case 1 -> cell.setFigure(new Rook(FigureColor.BLACK));
+          case 2 -> cell.setFigure(new Knight(FigureColor.BLACK));
+          case 3 -> cell.setFigure(new Bishop(FigureColor.BLACK));
+          case 4 -> cell.setFigure(new Queen(FigureColor.BLACK));
+          case 5 -> cell.setFigure(new King(FigureColor.BLACK));
+          case 6 -> cell.setFigure(new Bishop(FigureColor.BLACK));
+          case 7 -> cell.setFigure(new Knight(FigureColor.BLACK));
+          case 8 -> cell.setFigure(new Rook(FigureColor.BLACK));
         }
       }
     }

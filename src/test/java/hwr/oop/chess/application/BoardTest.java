@@ -26,7 +26,7 @@ class BoardTest {
         //                System.out.print(currentCell.getRow() + "" + currentCell.getCol()
         // + ", ");
         // Check right position
-        if (currentCell.RightCell() != null) {
+        if (currentCell.rightCell() != null) {
           assertEquals(
               currentCell,
               currentCell.rightCell().leftCell(),
@@ -40,14 +40,14 @@ class BoardTest {
               "Bottom cell is not correctly connected");
         }
         // Check bottom right position
-        if (currentCell.BottomRightCell() != null) {
+        if (currentCell.bottomRightCell() != null) {
           assertEquals(
               currentCell,
               currentCell.bottomRightCell().topLeftCell(),
               "Bottom right cell is not correctly connected");
         }
         // Check bottom left position
-        if (currentCell.BottomLeftCell() != null) {
+        if (currentCell.bottomLeftCell() != null) {
           assertEquals(
               currentCell,
               currentCell.bottomLeftCell().topRightCell(),
@@ -55,12 +55,12 @@ class BoardTest {
         }
 
         // Move to the next position in the current row
-        currentCell = currentCell.RightCell();
+        currentCell = currentCell.rightCell();
       }
       //            System.out.println();
 
       // Move to the next row
-      currentCell = rowStartCell.TopCell();
+      currentCell = rowStartCell.topCell();
     }
 
     // Print message if all tests pass in yellow color
@@ -70,10 +70,10 @@ class BoardTest {
   @Test
   public void testFigurePlacement() {
     // Check figure placement on each position
-    Cell currentCell = board.firstCell();
-    Cell rowStartPosiCell = board.firstCell(); // Starting position of the current row
+    Cell currentCell = Board.firstCell();
+    Cell rowStartPosiCell = Board.firstCell(); // Starting position of the current row
 
-    while (currentCell) {
+    while (currentCell != null) {
       Figure figure = currentCell.getFigure();
       if (currentCell.y() == 1
           || currentCell.y() == 2
@@ -94,12 +94,11 @@ class BoardTest {
       // Move to the next cell
       if (currentCell.x() < 8) {
         // Move to the next position in the current row
-        currentCell = currentCell.getRightCell();
+        currentCell = currentCell.rightCell();
       } else {
         // Move to the next row
-        rowStartCell = rowStartCell.getBottomCell();
-        currentCell = rowStartCell;
-        System.out.println();
+        rowStartPosiCell = rowStartPosiCell.bottomCell();
+        currentCell = rowStartPosiCell;
       }
     }
   }
