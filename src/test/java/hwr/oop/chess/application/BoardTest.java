@@ -78,46 +78,45 @@ class BoardTest {
     int count = 0;
 
     while (count < 10) {
-        // TODO make codes simple
         // Check right
         cells = generateConnectedCells(1, 0);
         board.connectCells(cells.get(0), cells.get(1));
-        Assertions.assertEquals(cells.get(0).rightCell(), cells.get(2), message);
+        Assertions.assertEquals(cells.get(0).rightCell(), cells.get(1), message);
 
         // Check left
         cells = generateConnectedCells(-1, 0);
         board.connectCells(cells.get(0), cells.get(1));
-        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(1), message);
 
         // Check top
         cells = generateConnectedCells(0, 1);
         board.connectCells(cells.get(0), cells.get(1));
-        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+        Assertions.assertEquals(cells.get(0).topCell(), cells.get(1), message);
 
         // Check bottom
         cells = generateConnectedCells(0, -1);
         board.connectCells(cells.get(0), cells.get(1));
-        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+        Assertions.assertEquals(cells.get(0).bottomCell(), cells.get(1), message);
 
         // Check top right
         cells = generateConnectedCells(1, 1);
         board.connectCells(cells.get(0), cells.get(1));
-        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+        Assertions.assertEquals(cells.get(0).topRightCell(), cells.get(1), message);
 
         // Check top left
-        cells = generateConnectedCells(1, -1);
-        board.connectCells(cells.get(0), cells.get(1));
-        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
-
-        // Check bottom right
         cells = generateConnectedCells(-1, 1);
         board.connectCells(cells.get(0), cells.get(1));
-        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+        Assertions.assertEquals(cells.get(0).topLeftCell(), cells.get(1), message);
+
+        // Check bottom right
+        cells = generateConnectedCells(1, -1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).bottomRightCell(), cells.get(1), message);
 
         // Check bottom left
         cells = generateConnectedCells(-1, -1);
         board.connectCells(cells.get(0), cells.get(1));
-        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+        Assertions.assertEquals(cells.get(0).bottomLeftCell(), cells.get(1), message);
 
         count++;
     }
@@ -126,8 +125,8 @@ class BoardTest {
   @Test
    void testFigurePlacement() {
     // Check figure placement on each cell
-    Cell currentCell = Board.firstCell();
-    Cell rowStartPosiCell = Board.firstCell(); // Starting cell of the current row
+    Cell currentCell = board.firstCell();
+    Cell rowStartPosiCell = board.firstCell(); // Starting cell of the current row
 
     while (currentCell != null) {
       Figure figure = currentCell.getFigure();
@@ -187,9 +186,8 @@ class BoardTest {
     Random rand = new Random();
 
     // Generated random number between 2 and 7
-    int randomNumX = rand.nextInt(6) + 1;
-    int randomNumY = rand.nextInt(6) + 1;
-
+    int randomNumX = rand.nextInt(5) + 2;
+    int randomNumY = rand.nextInt(5) + 2;
     Cell cellFirst  = new Cell(randomNumX, randomNumY);
     Cell cellSecond = new Cell(randomNumX + xOperator, randomNumY + yOperator);
 

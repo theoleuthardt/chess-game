@@ -15,9 +15,9 @@ public class Board {
   private void initializeBoard() {
     // Create the first cell and store it in firstCell
     firstCell = new Cell(1, 1);
-    Cell previousCell = firstCell;
-    Cell previousRowStart = firstCell;
-    Cell previousRowCell = firstCell;
+    Cell leftCell = firstCell;
+    Cell topCellRowStart = firstCell;
+    Cell topCell = firstCell;
 
     // Create and connect cells for each row and column of the board
     for (int y = 1; y <= 8; y++) {
@@ -27,90 +27,86 @@ public class Board {
           continue;
         }
         if (x == 1) {
-          previousRowCell = previousRowStart;
+          topCell = topCellRowStart;
         }
         // Create a new cell
         Cell currentCell = new Cell(x, y);
         // Connect horizontally
-        connectCells(previousCell, currentCell);
+        connectCells(leftCell, currentCell);
         if (y != 1) {
           // Connect vertically
-          connectCells(currentCell, previousRowCell);
+          connectCells(currentCell, topCell);
           if (x != 1) {
             // Connect diagonally to the left
-            connectCells(currentCell, previousRowCell.leftCell());
+            connectCells(currentCell, topCell.leftCell());
           }
           if (x != 8) {
             // Connect diagonally to the right
-            connectCells(currentCell, previousRowCell.rightCell());
+            connectCells(currentCell, topCell.rightCell());
           } else {
             // Change Row
-            previousRowStart = previousRowStart.topCell();
+            topCellRowStart = topCellRowStart.topCell();
           }
         }
         // Change next cell as the current cell
-        previousCell = currentCell;
-        previousRowCell = previousRowCell.rightCell();
+        leftCell = currentCell;
+        topCell = topCell.rightCell();
       }
     }
     // Set up the initial chess cells
-    setUpInitialChessPositions();
+    setUpInitialChessCells();
   }
 
   // Method to connect each cell
-  private void connectCells(Cell cell1, Cell cell2) {
-    Objects.requireNonNull(cell1);
-    Objects.requireNonNull(cell2);
-
-    if (cell1.isEqualTo(cell2)) {
-      throw new IllegalArgumentException("The cells are not allowed to be equal");
+  public void connectCells(Cell currentCell, Cell nextCell) {
+    // TODO make codes simple
+    if (nextCell == null) {
+      return; // Skip if the next pell is null
     }
 
     // Connect horizontally
-    if (cell1.y() == cell2.y()) {
-      if (cell1.x() < cell2.x()) { // cell1 is left of cell2
-        cell1.setRightCell(cell2);
-        cell2.setLeftCell(cell1);
-      } else { // cell1 is right of cell2
-        cell1.setLeftCell(cell2);
-        cell2.setRightCell(cell1);
+    if (currentCell.y() == nextCell.y()) {
+      if (currentCell.x() + 1 == nextCell.x()) {
+        currentCell.setRightCell(nextCell);
+        nextCell.setLeftCell(currentCell);
+      } else if (currentCell.x() == 1 + nextCell.x()) {
+        currentCell.setLeftCell(nextCell);
+        nextCell.setRightCell(currentCell);
       }
-      return;
     }
 
     // Connect vertically
-    if (cell1.x() == cell2.x()) {
-      if (cell1.y() > cell2.y()) { // cell1 is above cell2
-        cell1.setBottomCell(cell2);
-        cell2.setTopCell(cell1);
-      } else { // cell1 is below cell2
-        cell1.setTopCell(cell2);
-        cell2.setBottomCell(cell1);
+    if (currentCell.x() == nextCell.x()) {
+      // Connect vertically
+      if (currentCell.y() == 1 + nextCell.y()) {
+        currentCell.setBottomCell(nextCell);
+        nextCell.setTopCell(currentCell);
+      } else if (currentCell.y() + 1 ==  nextCell.y()) {
+        currentCell.setTopCell(nextCell);
+        nextCell.setBottomCell(currentCell);
       }
-      return;
     }
 
     // Connect diagonally
-    if (cell1.y() > cell2.y()) { // cell1 is above cell2
-      if (cell1.x() < cell2.x()) { // cell1 is left of cell2
-        cell1.setBottomRightCell(cell2);
-        cell2.setTopLeftCell(cell1);
-      } else { // cell1 is right of cell2
-        cell1.setBottomLeftCell(cell2);
-        cell2.setTopRightCell(cell1);
+    if (currentCell.y() + 1 == nextCell.y() && currentCell.x() + 1  == nextCell.x()) {
+      currentCell.setTopRightCell(nextCell);
+      nextCell.setBottomLeftCell(currentCell);
+    } else if (currentCell.y() + 1  == nextCell.y() && currentCell.x()  == 1 + nextCell.x()) {
+      currentCell.setTopLeftCell(nextCell);
+      nextCell.setBottomRightCell(currentCell);
+    } else if (currentCell.y()  == 1 + nextCell.y() && currentCell.x() + 1  == nextCell.x()) {
+      if (currentCell.y() != 8) { // Exclude bottom right connection for the last row (row 8)
+        currentCell.setBottomRightCell(nextCell);
+        nextCell.setTopLeftCell(currentCell);
       }
-      return;
-    }
-
-    // Connect diagonally, cell1 is below cell2
-    if (cell1.x() < cell2.x()) { // cell1 is left of cell2
-      cell1.setTopRightCell(cell2);
-      cell2.setBottomLeftCell(cell1);
-    } else { // cell1 is right of cell2
-      cell1.setTopCell(cell2);
-      cell2.setBottomCell(cell1);
+    } else if (currentCell.y() == 1 + nextCell.y() && currentCell.x()== 1 + nextCell.x()) {
+      if (currentCell.y() != 8) { // Exclude bottom left connection for the last row (row 8)
+        currentCell.setBottomLeftCell(nextCell);
+        nextCell.setTopRightCell(currentCell);
+      }
     }
   }
+
 
   public Cell firstCell() {
     return firstCell;
@@ -132,7 +128,7 @@ public class Board {
     return cells;
   }
 
-  private void setUpInitialChessPositions() {
+  private void setUpInitialChessCells() {
     ArrayList<Cell> cells = allCells();
     for (Cell cell : cells) {
       // Set up white figures
@@ -149,12 +145,12 @@ public class Board {
         }
       }
       if (cell.y() == 2) {
-        cell.setFigure(new Pawn(FigureColor.WHITE));
+      //  cell.setFigure(new Pawn(FigureColor.WHITE));
       }
 
       // Set up black figures
       if (cell.y() == 7) {
-        cell.setFigure(new Pawn(FigureColor.BLACK));
+      //  cell.setFigure(new Pawn(FigureColor.BLACK));
       }
       if (cell.y() == 8) {
         switch (cell.x()) {
