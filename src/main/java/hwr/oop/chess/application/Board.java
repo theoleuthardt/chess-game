@@ -4,10 +4,9 @@ import hwr.oop.chess.application.figures.*;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.stream.IntStream;
 
 public class Board {
-  private static Cell firstCell;
+  private Cell firstCell;
 
   public Board() {
     initializeBoard();
@@ -55,7 +54,7 @@ public class Board {
       }
     }
     // Set up the initial chess cells
-    setUpInitialChessCells();
+    setUpInitialChessPositions();
   }
 
   // Method to connect each cell
@@ -113,11 +112,11 @@ public class Board {
     }
   }
 
-  public static Cell firstCell() {
+  public Cell firstCell() {
     return firstCell;
   }
 
-  public static ArrayList<Cell> allCells() {
+  public ArrayList<Cell> allCells() {
     ArrayList<Cell> cells = new ArrayList<>();
     Cell cell = firstCell;
     Cell rowStart = cell;
@@ -133,8 +132,8 @@ public class Board {
     return cells;
   }
 
-  private void setUpInitialChessCells() {
-    ArrayList<Cell> cells = Board.allCells();
+  private void setUpInitialChessPositions() {
+    ArrayList<Cell> cells = allCells();
     for (Cell cell : cells) {
       // Set up white figures
       if (cell.y() == 1) {
@@ -150,12 +149,12 @@ public class Board {
         }
       }
       if (cell.y() == 2) {
-       // cell.setFigure(new Pawn(FigureColor.WHITE));
+        cell.setFigure(new Pawn(FigureColor.WHITE));
       }
 
       // Set up black figures
       if (cell.y() == 7) {
-      //  cell.setFigure(new Pawn(FigureColor.BLACK));
+        cell.setFigure(new Pawn(FigureColor.BLACK));
       }
       if (cell.y() == 8) {
         switch (cell.x()) {
@@ -172,9 +171,9 @@ public class Board {
     }
   }
 
-  public static Cell findCell(int x, int y) {
+  public Cell findCell(int x, int y) {
     Cell searchFor = new Cell(x, y);
-    ArrayList<Cell> cells = Board.allCells();
+    ArrayList<Cell> cells = allCells();
     for (Cell cell : cells) {
       if (cell.isEqualTo(searchFor)) {
         return cell;
@@ -184,7 +183,7 @@ public class Board {
   }
 
   public void printBoard() {
-    ArrayList<Cell> cells = Board.allCells();
+    ArrayList<Cell> cells = allCells();
     for (Cell cell : cells) {
       Figure figure = cell.getFigure();
       // Print figure if it exists, otherwise print empty cell
@@ -219,11 +218,11 @@ public class Board {
     endCell.setFigure(figure);
   }
 
-  public static Figure getFigureOnField(int x, int y) {
+  public Figure getFigureOnField(int x, int y) {
     return Objects.requireNonNull(findCell(x, y)).getFigure();
   }
 
-  public static boolean isFigureOnField(int x, int y) {
+  public boolean isFigureOnField(int x, int y) {
     try {
       getFigureOnField(x, y);
       return true;
