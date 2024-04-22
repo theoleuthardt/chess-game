@@ -73,23 +73,56 @@ class BoardTest {
 
   @Test
   void testCellConnections(){
-    ArrayList<Cell> cells = new ArrayList<>();      String message = "Cells are not correctly connected";
+    ArrayList<Cell> cells = new ArrayList<>();
+    String message = "Cells are not correctly connected";
+    int count = 0;
 
-    // Check right
-    cells = generateVerticalCells(1, 1);
-    board.connectCells(cells.get(0), cells.get(1));
-    Assertions.assertEquals(cells.get(0).rightCell(), cells.get(2), message);
+    while (count < 10) {
+        // TODO make codes simple
+        // Check right
+        cells = generateConnectedCells(1, 0);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).rightCell(), cells.get(2), message);
 
-    cells = generateVerticalCells(1, 1);
-    board.connectCells(cells.get(0), cells.get(1));
-    Assertions.assertEquals(cells.get(0).rightCell(), cells.get(2), message);
+        // Check left
+        cells = generateConnectedCells(-1, 0);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
 
-    // Check left
-    cells = generateVerticalCells(-1, 1);
-    board.connectCells(cells.get(0), cells.get(1));
-    Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+        // Check top
+        cells = generateConnectedCells(0, 1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
 
+        // Check bottom
+        cells = generateConnectedCells(0, -1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+
+        // Check top right
+        cells = generateConnectedCells(1, 1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+
+        // Check top left
+        cells = generateConnectedCells(1, -1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+
+        // Check bottom right
+        cells = generateConnectedCells(-1, 1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+
+        // Check bottom left
+        cells = generateConnectedCells(-1, -1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(2), message);
+
+        count++;
+    }
   }
+
   @Test
    void testFigurePlacement() {
     // Check figure placement on each cell
@@ -137,7 +170,7 @@ class BoardTest {
 
   }
 
-  private void moveFigureAndCheck(int startX, int startY, int endX, int endY) {
+  void moveFigureAndCheck(int startX, int startY, int endX, int endY) {
     Figure prevFigure = board.findCell(startX, startY).getFigure();
     //        Figure nextFigure = board.findCell(endX, endY).getFigure();
     //        if (prevFigure != null && nextFigure != null) {
@@ -149,32 +182,20 @@ class BoardTest {
     board.printBoard();
   }
 
-  ArrayList<Cell> generateVerticalCells(int xOperator, int yOperator){
+  ArrayList<Cell> generateConnectedCells(int xOperator, int yOperator){
     ArrayList<Cell> list = new ArrayList<>();
-    Cell cellFirst = null;
-    Cell cellSecond = null;
-    int randomNumX;
-    int randomNumY;
     Random rand = new Random();
-    switch(xOperator){
-      case 1:
-        randomNumX = rand.nextInt(7) + 1;
-        randomNumY = rand.nextInt(7) + 1;
-        cellFirst = new Cell(randomNumX, randomNumY );
-        cellSecond = new Cell(randomNumX +1, yOperator > 0 ? randomNumY + 1 :randomNumY - 1  );
-        break;
-      case 0:
-        break;
-      case -1:
-        randomNumX = rand.nextInt(7) + 2;
-        randomNumY = rand.nextInt(7) + 2;
-        cellFirst = new Cell(randomNumX, randomNumY );
-        cellSecond = new Cell(randomNumX - 1, yOperator > 0 ? randomNumY + 1 :randomNumY - 1  );
-        break;
-    }
+
+    // Generated random number between 2 and 7
+    int randomNumX = rand.nextInt(6) + 1;
+    int randomNumY = rand.nextInt(6) + 1;
+
+    Cell cellFirst  = new Cell(randomNumX, randomNumY);
+    Cell cellSecond = new Cell(randomNumX + xOperator, randomNumY + yOperator);
 
     list.add(cellFirst);
     list.add(cellSecond);
+
     return list;
   }
 }

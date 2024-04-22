@@ -64,7 +64,7 @@ public class Rook implements Figure {
         && current.getFigure().color() != currentRook.getFigure().color()) {
       list.add(current);
     }
-    System.out.println("availableCell" + list.toArray().length);
+    System.out.println("availableCell: " + list.toArray().length);
     return list;
   }
 

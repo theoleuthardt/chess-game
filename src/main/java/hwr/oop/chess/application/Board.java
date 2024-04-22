@@ -4,6 +4,7 @@ import hwr.oop.chess.application.figures.*;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 public class Board {
   private static Cell firstCell;
@@ -13,52 +14,51 @@ public class Board {
   }
 
   private void initializeBoard() {
-    // Create the first position and store it in startingPosition
+    // Create the first cell and store it in firstCell
     firstCell = new Cell(1, 1);
-    Cell leftCell = firstCell;
-    Cell topCell = firstCell;
-    Cell topCellRowStart = firstCell;
+    Cell previousCell = firstCell;
+    Cell previousRowStart = firstCell;
+    Cell previousRowCell = firstCell;
 
-    // Create and connect positions for each row and column of the board
+    // Create and connect cells for each row and column of the board
     for (int y = 1; y <= 8; y++) {
       for (int x = 1; x <= 8; x++) {
-        // Skip the first position since it's already created
+        // Skip the first cell since it's already created
         if (y == 1 && x == 1) {
           continue;
         }
         if (x == 1) {
-          topCell = topCellRowStart;
+          previousRowCell = previousRowStart;
         }
-        // Create a new position
-        Cell newCell = new Cell(x, y);
-        // Connect the position to the previous position
-        connectCells(newCell, leftCell); // left
-        if (topCell != null) {
-          connectCells(newCell, topCell); // top
-          if (topCell.leftCell() != null) {
-            connectCells(newCell, topCell.leftCell()); // top left
+        // Create a new cell
+        Cell currentCell = new Cell(x, y);
+        // Connect horizontally
+        connectCells(previousCell, currentCell);
+        if (y != 1) {
+          // Connect vertically
+          connectCells(currentCell, previousRowCell);
+          if (x != 1) {
+            // Connect diagonally to the left
+            connectCells(currentCell, previousRowCell.leftCell());
           }
-          if (topCell.rightCell() != null) {
-            connectCells(newCell, topCell.rightCell()); // top right
-          }
-          if (topCell.rightCell() == null && topCellRowStart != null) {
-            topCellRowStart = topCellRowStart.topCell();
+          if (x != 8) {
+            // Connect diagonally to the right
+            connectCells(currentCell, previousRowCell.rightCell());
+          } else {
+            // Change Row
+            previousRowStart = previousRowStart.topCell();
           }
         }
-
-        // Set the next position as the current position
-        leftCell = newCell;
-        if (topCell != null) {
-          topCell = topCell.rightCell();
-        }
+        // Change next cell as the current cell
+        previousCell = currentCell;
+        previousRowCell = previousRowCell.rightCell();
       }
     }
-
-    // Set up the initial chess positions
-    setUpInitialChessPositions();
+    // Set up the initial chess cells
+    setUpInitialChessCells();
   }
 
-  // Method to connect each position
+  // Method to connect each cell
   private void connectCells(Cell cell1, Cell cell2) {
     Objects.requireNonNull(cell1);
     Objects.requireNonNull(cell2);
@@ -133,7 +133,7 @@ public class Board {
     return cells;
   }
 
-  private void setUpInitialChessPositions() {
+  private void setUpInitialChessCells() {
     ArrayList<Cell> cells = Board.allCells();
     for (Cell cell : cells) {
       // Set up white figures
@@ -150,12 +150,12 @@ public class Board {
         }
       }
       if (cell.y() == 2) {
-        cell.setFigure(new Pawn(FigureColor.WHITE));
+       // cell.setFigure(new Pawn(FigureColor.WHITE));
       }
 
       // Set up black figures
       if (cell.y() == 7) {
-        cell.setFigure(new Pawn(FigureColor.BLACK));
+      //  cell.setFigure(new Pawn(FigureColor.BLACK));
       }
       if (cell.y() == 8) {
         switch (cell.x()) {
@@ -187,11 +187,11 @@ public class Board {
     ArrayList<Cell> cells = Board.allCells();
     for (Cell cell : cells) {
       Figure figure = cell.getFigure();
-      // Print figure if it exists, otherwise print empty position
+      // Print figure if it exists, otherwise print empty cell
       if (figure != null) {
         System.out.print(figure.symbol() + " "); // Assuming Figure class has getSymbol method
       } else {
-        System.out.print("- "); // Empty position symbol
+        System.out.print("- "); // Empty cell symbol
       }
 
       if (cell.rightCell() == null) {
@@ -202,7 +202,7 @@ public class Board {
 
   // Method to move a piece on the board
   public void moveFigure(int startX, int startY, int endX, int endY) {
-    // Get the piece at the start position
+    // Get the piece at the start cell
     Cell startCell = findCell(startX, startY);
     Cell endCell = findCell(endX, endY);
 
