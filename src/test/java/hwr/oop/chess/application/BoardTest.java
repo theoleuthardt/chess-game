@@ -10,13 +10,13 @@ class BoardTest {
   private Board board;
 
   @BeforeEach
-  public void setUp() {
+   void setUp() {
     // Initialize the board
-    board = new Board(true);
+    board = new Board();
   }
 
   @Test
-  public void testPositionConnections() {
+   void testBoardCells() {
     // Check cell connections
     Cell currentCell = board.firstCell();
     while (currentCell != null) {
@@ -25,28 +25,28 @@ class BoardTest {
       while (currentCell != null) {
         //                System.out.print(currentCell.getRow() + "" + currentCell.getCol()
         // + ", ");
-        // Check right position
+        // Check right cell
         if (currentCell.rightCell() != null) {
           assertEquals(
               currentCell,
               currentCell.rightCell().leftCell(),
               "Right cell is not correctly connected");
         }
-        // Check bottom position
+        // Check bottom cell
         if (currentCell.bottomCell() != null) {
           assertEquals(
               currentCell,
               currentCell.bottomCell().topCell(),
               "Bottom cell is not correctly connected");
         }
-        // Check bottom right position
+        // Check bottom right cell
         if (currentCell.bottomRightCell() != null) {
           assertEquals(
               currentCell,
               currentCell.bottomRightCell().topLeftCell(),
               "Bottom right cell is not correctly connected");
         }
-        // Check bottom left position
+        // Check bottom left cell
         if (currentCell.bottomLeftCell() != null) {
           assertEquals(
               currentCell,
@@ -54,7 +54,7 @@ class BoardTest {
               "Bottom left cell is not correctly connected");
         }
 
-        // Move to the next position in the current row
+        // Move to the next cell in the current row
         currentCell = currentCell.rightCell();
       }
       //            System.out.println();
@@ -64,7 +64,58 @@ class BoardTest {
     }
 
     // Print message if all tests pass in yellow color
-    System.out.println("\u001B[33mPositionConnections: Cells are correctly connected.\u001B[0m");
+    System.out.println("\u001B[33mCellConnections: Cells are correctly connected.\u001B[0m");
+  }
+
+  @Test
+  void testCellConnections(){
+    ArrayList<Cell> cells = new ArrayList<>();
+    String message = "Cells are not correctly connected";
+    int count = 0;
+
+    while (count < 10) {
+        // Check right
+        cells = generateConnectedCells(1, 0);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).rightCell(), cells.get(1), message);
+
+        // Check left
+        cells = generateConnectedCells(-1, 0);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).leftCell(), cells.get(1), message);
+
+        // Check top
+        cells = generateConnectedCells(0, 1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).topCell(), cells.get(1), message);
+
+        // Check bottom
+        cells = generateConnectedCells(0, -1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).bottomCell(), cells.get(1), message);
+
+        // Check top right
+        cells = generateConnectedCells(1, 1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).topRightCell(), cells.get(1), message);
+
+        // Check top left
+        cells = generateConnectedCells(-1, 1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).topLeftCell(), cells.get(1), message);
+
+        // Check bottom right
+        cells = generateConnectedCells(1, -1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).bottomRightCell(), cells.get(1), message);
+
+        // Check bottom left
+        cells = generateConnectedCells(-1, -1);
+        board.connectCells(cells.get(0), cells.get(1));
+        Assertions.assertEquals(cells.get(0).bottomLeftCell(), cells.get(1), message);
+
+        count++;
+    }
   }
 
   @Test
@@ -103,17 +154,19 @@ class BoardTest {
     }
   }
 
-  // @Test
+  @Test
   public void testMoveFigure() {
-    // this.moveFigureAndCheck(1, 1, 1, 5);
-    // this.moveFigureAndCheck(1, 8, 1, 5);
-    // this.moveFigureAndCheck(8, 8, 5, 5);
-    // this.moveFigureAndCheck(8, 1, 3, 7);
-    // this.moveFigureAndCheck(5, 5, 6, 1);
+    // Check move
+    this.moveFigureAndCheck(1, 1, 1, 5);
+    this.moveFigureAndCheck(1, 8, 1, 5);
+    //        this.moveFigureAndCheck(8, 8, 5, 5);
+    //        this.moveFigureAndCheck(8, 1, 3, 7);
+    //        this.moveFigureAndCheck(5, 5, 6, 1);
+
   }
 
   private void moveFigureAndCheck(int startX, int startY, int endX, int endY) {
-    Figure prevFigure = board.cell(startX, startY).getFigure();
+    Figure prevFigure = board.findCell(startX, startY).getFigure();
     //        Figure nextFigure = board.findCell(endX, endY).getFigure();
     //        if (prevFigure != null && nextFigure != null) {
     //            FigureType prevFigureType = prevFigure.getType();
@@ -122,6 +175,22 @@ class BoardTest {
     //            assertEquals(prevFigureType, nextFigureType, "Figure moves incorrect");
     //        }
     board.printBoard();
+  }
+
+  ArrayList<Cell> generateConnectedCells(int xOperator, int yOperator){
+    ArrayList<Cell> list = new ArrayList<>();
+    Random rand = new Random();
+
+    // Generated random number between 2 and 7
+    int randomNumX = rand.nextInt(5) + 2;
+    int randomNumY = rand.nextInt(5) + 2;
+    Cell cellFirst  = new Cell(randomNumX, randomNumY);
+    Cell cellSecond = new Cell(randomNumX + xOperator, randomNumY + yOperator);
+
+    list.add(cellFirst);
+    list.add(cellSecond);
+
+    return list;
   }
 
   @Test
