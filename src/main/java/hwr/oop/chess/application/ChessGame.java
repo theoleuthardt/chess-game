@@ -4,7 +4,7 @@ public class ChessGame {
     private Board board;
 
     public ChessGame() {
-        board = new Board();
+        board = new Board(true);
         board.printBoard();
     }
 //    void startNewGame() {
