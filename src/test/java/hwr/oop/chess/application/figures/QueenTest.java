@@ -20,12 +20,12 @@ public class QueenTest {
     board = new Board(false);
   }
 
-  // @Test
+   @Test
   void testMoveQueen() {
     int x = 4;
     int y = 1;
-    Cell whiteQueen = board.cell(x, y);
-    whiteQueen.setFigure(new Queen(FigureColor.WHITE));
+    board.cell(x, y).setFigure(new Queen(FigureColor.WHITE));
+    Figure whiteQueen = board.cell(x,y).getFigure();
 
     Cell movedCell = null;
 
@@ -43,28 +43,28 @@ public class QueenTest {
         y += randomDiff;
         movedCell = board.cell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen.getFigure(), movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.getFigure());
 
         board.moveFigureDiagonal(board, CellDirection.TOP_RIGHT, x, y, randomDiff);
         x += randomDiff;
         y += randomDiff;
         movedCell = board.cell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen.getFigure(), movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.getFigure());
 
         board.moveFigureDiagonal(board, CellDirection.BOTTOM_LEFT, x, y, randomDiff);
         x -= randomDiff;
         y -= randomDiff;
         movedCell = board.cell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen.getFigure(), movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.getFigure());
 
         board.moveFigureDiagonal(board, CellDirection.BOTTOM_RIGHT, x, y, randomDiff);
         x += randomDiff;
         y -= randomDiff;
         movedCell = board.cell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen.getFigure(), movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.getFigure());
       } catch (IllegalArgumentException e) {
         System.out.println("IllegalArgumentException occurred: " + e.getMessage());
       }
