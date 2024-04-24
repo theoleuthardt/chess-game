@@ -268,4 +268,9 @@ public class Board {
   private boolean isValidCoordinate(int x, int y) {
     return x >= 1 && x <= 8 && y >= 1 && y <= 8;
   }
+  // TODO make check
+  // TODO make checkmate
+  // TODO make castling
+  // TODO make enpassnt
+  // TODO count move
 }

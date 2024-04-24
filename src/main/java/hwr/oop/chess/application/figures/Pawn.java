@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import java.util.ArrayList;
 
 public class Pawn implements Figure {
+  // TODO pawn promotion
   Logger logger = Logger.getLogger(getClass().getName());
   private static final FigureType type = FigureType.PAWN;
   private final FigureColor color;
