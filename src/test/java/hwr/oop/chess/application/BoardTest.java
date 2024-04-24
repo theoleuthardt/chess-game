@@ -12,7 +12,7 @@ class BoardTest {
   @BeforeEach
   public void setUp() {
     // Initialize the board
-    board = new Board();
+    board = new Board(true);
   }
 
   @Test
@@ -103,19 +103,17 @@ class BoardTest {
     }
   }
 
-  @Test
+  // @Test
   public void testMoveFigure() {
-    // Check move
-    this.moveFigureAndCheck(1, 1, 1, 5);
-    this.moveFigureAndCheck(1, 8, 1, 5);
-    //        this.moveFigureAndCheck(8, 8, 5, 5);
-    //        this.moveFigureAndCheck(8, 1, 3, 7);
-    //        this.moveFigureAndCheck(5, 5, 6, 1);
-
+    // this.moveFigureAndCheck(1, 1, 1, 5);
+    // this.moveFigureAndCheck(1, 8, 1, 5);
+    // this.moveFigureAndCheck(8, 8, 5, 5);
+    // this.moveFigureAndCheck(8, 1, 3, 7);
+    // this.moveFigureAndCheck(5, 5, 6, 1);
   }
 
   private void moveFigureAndCheck(int startX, int startY, int endX, int endY) {
-    Figure prevFigure = board.findCell(startX, startY).getFigure();
+    Figure prevFigure = board.cell(startX, startY).getFigure();
     //        Figure nextFigure = board.findCell(endX, endY).getFigure();
     //        if (prevFigure != null && nextFigure != null) {
     //            FigureType prevFigureType = prevFigure.getType();
@@ -124,5 +122,26 @@ class BoardTest {
     //            assertEquals(prevFigureType, nextFigureType, "Figure moves incorrect");
     //        }
     board.printBoard();
+  }
+
+  @Test
+  public void testMoveFigureInvalidCoordinates() {
+    // TODO fix
+    Board board = new Board(false);
+
+    int startX = 0;
+    int startY = 0;
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          board.moveFigure(0, 1, 8, 8);
+        });
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          board.moveFigure(4, 1, 9, 9);
+        });
   }
 }

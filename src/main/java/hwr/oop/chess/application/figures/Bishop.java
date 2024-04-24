@@ -1,6 +1,8 @@
 package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Cell;
+import hwr.oop.chess.application.CellDirection;
+
 import java.util.logging.Logger;
 
 import java.util.ArrayList;
@@ -17,7 +19,12 @@ public class Bishop implements Figure {
   public ArrayList<Cell> getAvailableCells(Cell currentCell) {
     ArrayList<Cell> list = new ArrayList<>();
 
-    return list;
+    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.TOP_LEFT);
+    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.TOP_RIGHT);
+    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.BOTTOM_LEFT);
+    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.BOTTOM_RIGHT);
+
+    return cells;
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {

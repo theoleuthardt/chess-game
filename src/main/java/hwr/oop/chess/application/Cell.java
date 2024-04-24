@@ -132,6 +132,35 @@ public class Cell {
     return cells;
   }
 
+  public Cell cellInDirection(CellDirection direction) {
+    return switch (direction) {
+      case LEFT -> leftCell();
+      case RIGHT -> rightCell();
+      case TOP -> topCell();
+      case TOP_LEFT -> topLeftCell();
+      case TOP_RIGHT -> topRightCell();
+      case BOTTOM -> bottomCell();
+      case BOTTOM_LEFT -> bottomLeftCell();
+      case BOTTOM_RIGHT -> bottomRightCell();
+    };
+  }
+
+  public void addAvailableCellsInDirectionToList(ArrayList<Cell> list, CellDirection direction) {
+    Cell current = this;
+    while ((current = current.cellInDirection(direction)) != null) {
+      if (current.getFigure() == null) {
+        list.add(current);
+        continue;
+      }
+      if (current.getFigure().color() != getFigure().color()) {
+        list.add(current);
+        break;
+      } else {
+        break;
+      }
+    }
+  }
+
   public boolean isEqualTo(Cell pos1) {
     Cell pos2 = this;
     return (pos1.x() == pos2.x()) && (pos1.y() == pos2.y());
