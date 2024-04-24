@@ -17,7 +17,7 @@ public class King implements Figure {
   }
 
   public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-    ArrayList<Cell> list = new ArrayList<>();
+    ArrayList<Cell> cells = new ArrayList<>();
 
     // Loop though all Directions
     for (CellDirection direction : CellDirection.values()) {

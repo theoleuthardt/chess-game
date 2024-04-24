@@ -17,7 +17,7 @@ public class Bishop implements Figure {
   }
 
   public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-    ArrayList<Cell> list = new ArrayList<>();
+    ArrayList<Cell> cells = new ArrayList<>();
 
     currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.TOP_LEFT);
     currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.TOP_RIGHT);

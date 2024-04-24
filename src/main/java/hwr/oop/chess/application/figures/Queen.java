@@ -17,7 +17,7 @@ public class Queen implements Figure {
   }
 
   public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-    ArrayList<Cell> list = new ArrayList<>();
+    ArrayList<Cell> cells = new ArrayList<>();
 
     currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.LEFT);
     currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.RIGHT);

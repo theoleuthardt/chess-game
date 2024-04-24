@@ -18,7 +18,7 @@ public class Pawn implements Figure {
 
   // TODO Fix AvailableCells
   public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-    ArrayList<Cell> list = new ArrayList<>();
+    ArrayList<Cell> cells = new ArrayList<>();
 
     CellDirection forwards = CellDirection.TOP;
     boolean isInStartPosition = currentCell.y() == 2;
