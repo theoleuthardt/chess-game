@@ -1,6 +1,7 @@
 package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Cell;
+import hwr.oop.chess.application.CellDirection;
 
 import java.util.ArrayList;
 
@@ -12,60 +13,17 @@ public class Rook implements Figure {
     this.color = color;
   }
 
-  public ArrayList<Cell> getAvailableCells(Cell currentRook) {
-    ArrayList<Cell> list = new ArrayList<>();
+  public ArrayList<Cell> getAvailableCells(Cell currentCell) {
+    ArrayList<Cell> cells = new ArrayList<>();
 
     // Check above
-    Cell current = currentRook.topCell();
+    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.LEFT);
+    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.RIGHT);
+    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.TOP);
+    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.BOTTOM);
 
-    // If there is no figure or if it's a different color, the piece can move
-    while (current != null && current.getFigure() == null) {
-      list.add(current);
-      current = current.topCell();
-    }
-    if (current != null
-        && current.getFigure() != null
-        && current.getFigure().color() != currentRook.getFigure().color()) {
-      list.add(current);
-    }
-
-    // Check below
-    current = currentRook.bottomCell();
-    while (current != null && current.getFigure() == null) {
-      list.add(current);
-      current = current.bottomCell();
-    }
-    if (current != null
-        && current.getFigure() != null
-        && current.getFigure().color() != currentRook.getFigure().color()) {
-      list.add(current);
-    }
-
-    // Check the right
-    current = currentRook.rightCell();
-    while (current != null && current.getFigure() == null) {
-      list.add(current);
-      current = current.rightCell();
-    }
-    if (current != null
-        && current.getFigure() != null
-        && current.getFigure().color() != currentRook.getFigure().color()) {
-      list.add(current);
-    }
-
-    // Check the left
-    current = currentRook.leftCell();
-    while (current != null && current.getFigure() == null) {
-      list.add(current);
-      current = current.leftCell();
-    }
-    if (current != null
-        && current.getFigure() != null
-        && current.getFigure().color() != currentRook.getFigure().color()) {
-      list.add(current);
-    }
-    System.out.println("availableCell: " + list.toArray().length);
-    return list;
+    System.out.println("availableCell" + cells.toArray().length);
+    return cells;
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {

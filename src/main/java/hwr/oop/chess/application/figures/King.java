@@ -1,6 +1,8 @@
 package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Cell;
+import hwr.oop.chess.application.CellDirection;
+
 import java.util.logging.Logger;
 
 import java.util.ArrayList;
@@ -15,9 +17,18 @@ public class King implements Figure {
   }
 
   public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-    ArrayList<Cell> list = new ArrayList<>();
+    ArrayList<Cell> cells = new ArrayList<>();
 
-    return list;
+    // Loop though all Directions
+    for (CellDirection direction : CellDirection.values()) {
+      Cell neighbourCell = currentCell.cellInDirection(direction);
+      if (neighbourCell != null
+          && (neighbourCell.getFigure() == null || neighbourCell.getFigure().color() != color())) {
+        cells.add(neighbourCell);
+      }
+    }
+
+    return cells;
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {

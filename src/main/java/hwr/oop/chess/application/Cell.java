@@ -118,6 +118,49 @@ public class Cell {
     return y;
   }
 
+  // Method to return all positions in the row to which this position belongs
+  public List<Cell> getCellsInRow() {
+    ArrayList<Cell> cells = Board.allCells();
+    cells.removeIf(cell -> cell.y() != this.y());
+    return cells;
+  }
+
+  // Method to return all positions in the column to which this position belongs
+  public List<Cell> getCellsInColumn() {
+    ArrayList<Cell> cells = Board.allCells();
+    cells.removeIf(cell -> cell.x() != this.x());
+    return cells;
+  }
+
+  public Cell cellInDirection(CellDirection direction) {
+    return switch (direction) {
+      case LEFT -> leftCell();
+      case RIGHT -> rightCell();
+      case TOP -> topCell();
+      case TOP_LEFT -> topLeftCell();
+      case TOP_RIGHT -> topRightCell();
+      case BOTTOM -> bottomCell();
+      case BOTTOM_LEFT -> bottomLeftCell();
+      case BOTTOM_RIGHT -> bottomRightCell();
+    };
+  }
+
+  public void addAvailableCellsInDirectionToList(ArrayList<Cell> list, CellDirection direction) {
+    Cell current = this;
+    while ((current = current.cellInDirection(direction)) != null) {
+      if (current.getFigure() == null) {
+        list.add(current);
+        continue;
+      }
+      if (current.getFigure().color() != getFigure().color()) {
+        list.add(current);
+        break;
+      } else {
+        break;
+      }
+    }
+  }
+
   public boolean isEqualTo(Cell pos1) {
     Cell pos2 = this;
     return (pos1.x() == pos2.x()) && (pos1.y() == pos2.y());

@@ -1,12 +1,8 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -123,10 +119,10 @@ class BoardTest {
   }
 
   @Test
-   void testFigurePlacement() {
-    // Check figure placement on each cell
-    Cell currentCell = board.firstCell();
-    Cell rowStartPosiCell = board.firstCell(); // Starting cell of the current row
+  public void testFigurePlacement() {
+    // Check figure placement on each position
+    Cell currentCell = Board.firstCell();
+    Cell rowStartPosiCell = Board.firstCell(); // Starting position of the current row
 
     while (currentCell != null) {
       Figure figure = currentCell.getFigure();
@@ -148,7 +144,7 @@ class BoardTest {
       }
       // Move to the next cell
       if (currentCell.x() < 8) {
-        // Move to the next cell in the current row
+        // Move to the next position in the current row
         currentCell = currentCell.rightCell();
       } else {
         // Move to the next row
@@ -159,7 +155,7 @@ class BoardTest {
   }
 
   @Test
-   void testMoveFigure() {
+  public void testMoveFigure() {
     // Check move
     this.moveFigureAndCheck(1, 1, 1, 5);
     this.moveFigureAndCheck(1, 8, 1, 5);
@@ -169,7 +165,7 @@ class BoardTest {
 
   }
 
-  void moveFigureAndCheck(int startX, int startY, int endX, int endY) {
+  private void moveFigureAndCheck(int startX, int startY, int endX, int endY) {
     Figure prevFigure = board.findCell(startX, startY).getFigure();
     //        Figure nextFigure = board.findCell(endX, endY).getFigure();
     //        if (prevFigure != null && nextFigure != null) {
@@ -195,5 +191,26 @@ class BoardTest {
     list.add(cellSecond);
 
     return list;
+  }
+
+  @Test
+  public void testMoveFigureInvalidCoordinates() {
+    // TODO fix
+    Board board = new Board(false);
+
+    int startX = 0;
+    int startY = 0;
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          board.moveFigure(0, 1, 8, 8);
+        });
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          board.moveFigure(4, 1, 9, 9);
+        });
   }
 }
