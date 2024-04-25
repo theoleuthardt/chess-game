@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-class PositionTest {
+class CellTest {
   @Test
   void positionIsInvalid_XZeroIsTooSmall() {
     assertThatThrownBy(() -> new Cell(0, 3))
