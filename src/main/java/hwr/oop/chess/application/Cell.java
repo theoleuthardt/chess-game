@@ -119,18 +119,18 @@ public class Cell {
   }
 
   // Method to return all positions in the row to which this position belongs
-  public List<Cell> getCellsInRow() {
-    ArrayList<Cell> cells = Board.allCells();
-    cells.removeIf(cell -> cell.y() != this.y());
-    return cells;
-  }
+//  public List<Cell> getCellsInRow() {
+//    ArrayList<Cell> cells = this.allCells();
+//    cells.removeIf(cell -> cell.y() != this.y());
+//    return cells;
+//  }
 
   // Method to return all positions in the column to which this position belongs
-  public List<Cell> getCellsInColumn() {
-    ArrayList<Cell> cells = Board.allCells();
-    cells.removeIf(cell -> cell.x() != this.x());
-    return cells;
-  }
+//  public List<Cell> getCellsInColumn() {
+//    ArrayList<Cell> cells = Board.allCells();
+//    cells.removeIf(cell -> cell.x() != this.x());
+//    return cells;
+//  }
 
   public Cell cellInDirection(CellDirection direction) {
     return switch (direction) {

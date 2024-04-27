@@ -2,21 +2,122 @@ package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito; // TODO learn about Mockito for TEST
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BoardTest {
   private Board board;
+    Logger logger = Logger.getLogger(BoardTest.class.getName());
 
   @BeforeEach
    void setUp() {
     // Initialize the board
-    board = new Board(true);
+    board = Mockito.spy(new Board(true));
+  }
+
+  @Test
+  void testInitialBoard(){
+      Board boardWithFigure = new Board(true);
+      ArrayList<Cell> cells =  boardWithFigure.allCells();
+      assertEquals(64, cells.size(), "Cells are not correctly created" );
+      assertEquals('r', boardWithFigure.cell(1,8).getFigure().symbol());
+      assertEquals('r', boardWithFigure.cell(8,8).getFigure().symbol());
+      assertEquals('n', boardWithFigure.cell(2,8).getFigure().symbol());
+      assertEquals('n', boardWithFigure.cell(7,8).getFigure().symbol());
+      assertEquals('b', boardWithFigure.cell(3,8).getFigure().symbol());
+      assertEquals('b', boardWithFigure.cell(6,8).getFigure().symbol());      assertEquals('n', boardWithFigure.cell(2,8).getFigure().symbol());
+      assertEquals('q', boardWithFigure.cell(4,8).getFigure().symbol());
+      assertEquals('k', boardWithFigure.cell(5,8).getFigure().symbol());
+      Board boardNoFigure = new Board(false);
+      ArrayList<Cell> noCells =  boardNoFigure.allCells();
+      assertEquals(64, noCells.size(), "Cells are not correctly created" );
+  }
+
+  @Test
+  void testConnectionBoundaryCells(){
+      // test Bottoms
+      IntStream.range(1,9).forEach(i->{
+          Cell cell = board.cell(i,1);
+          assertNull(cell.bottomCell() );
+          assertNotNull(cell.topCell() );
+      });
+      Cell cells = board.cell(3,8);
+
+      // test Lefts
+      IntStream.range(1,9).forEach(i->{
+          Cell cell = board.cell(1,i);
+          assertNotNull(cell  );
+          assertNull(cell.leftCell() );
+          assertNotNull(cell.rightCell() );
+      });
+
+      // test Rights
+      IntStream.range(1,9).forEach(i->{
+          Cell cell = board.cell(8,i);
+          assertNotNull(cell  );
+          assertNull(cell.rightCell());
+          assertNotNull(cell.leftCell());
+      });
+
+      // test Tops
+      IntStream.range(1,9).forEach(i->{
+          Cell cell = board.cell(i,8);
+          assertNotNull(cell );
+          assertNull(cell.topCell() );
+          assertNotNull(cell.bottomCell() );
+      });
+
+      // test diagonal
+      Cell cell = board.cell(1,1);
+      assertNotNull(cell  );
+      assertNull(cell.bottomLeftCell());
+      assertNotNull(cell.topRightCell());
+
+      cell = board.cell(8,1);
+      assertNotNull(cell  );
+      assertNull(cell.bottomRightCell());
+      assertNotNull(cell.topLeftCell());
+
+      cell = board.cell(1,8);
+      assertNotNull(cell  );
+      assertNull(cell.topLeftCell());
+//  TODO fix  assertNotNull(cell.bottomRightCell());
+
+      cell = board.cell(8,8);
+      assertNotNull(cell);
+      assertNull(cell.topRightCell());
+      assertNotNull(cell.bottomLeftCell());
+  }
+
+  @Test
+  void testFirstCell(){
+      assertNotNull(board.firstCell(), "First cell is null");
+  }
+
+  @Test
+  void findNotExistCell(){
+     // TODO handle pitest board.cell return null;
+     Cell cell = board.cell(-1, -1);
+     assertNull(cell);
+     cell = board.cell(-1, 8);
+     assertNull(cell);
+     cell = board.cell(8, -1);
+     assertNull(cell);
+     cell = board.cell(1, 9);
+     assertNull(cell);
+     cell = board.cell(9, 8);
+     assertNull(cell);
   }
 
   @Test
@@ -27,8 +128,6 @@ class BoardTest {
       Cell rowStartCell = currentCell; // Starting cell of the current row
 
       while (currentCell != null) {
-        //                System.out.print(currentCell.getRow() + "" + currentCell.getCol()
-        // + ", ");
         // Check right cell
         if (currentCell.rightCell() != null) {
           assertEquals(
@@ -57,18 +156,14 @@ class BoardTest {
               currentCell.bottomLeftCell().topRightCell(),
               "Bottom left cell is not correctly connected");
         }
-
         // Move to the next cell in the current row
         currentCell = currentCell.rightCell();
       }
-      //            System.out.println();
-
       // Move to the next row
       currentCell = rowStartCell.topCell();
     }
-
     // Print message if all tests pass in yellow color
-    System.out.println("\u001B[33mCellConnections: Cells are correctly connected.\u001B[0m");
+    logger.info("Connections: Cells are correctly connected.");
   }
 
   @Test
@@ -82,44 +177,57 @@ class BoardTest {
         cells = generateConnectedCells(1, 0);
         board.connectCells(cells.get(0), cells.get(1));
         Assertions.assertEquals(cells.get(0).rightCell(), cells.get(1), message);
+        Assertions.assertEquals(cells.get(1).leftCell(), cells.get(0), message);
 
         // Check left
         cells = generateConnectedCells(-1, 0);
         board.connectCells(cells.get(0), cells.get(1));
         Assertions.assertEquals(cells.get(0).leftCell(), cells.get(1), message);
+        Assertions.assertEquals(cells.get(1).rightCell(), cells.get(0), message);
 
         // Check top
         cells = generateConnectedCells(0, 1);
         board.connectCells(cells.get(0), cells.get(1));
         Assertions.assertEquals(cells.get(0).topCell(), cells.get(1), message);
+        Assertions.assertEquals(cells.get(1).bottomCell(), cells.get(0), message);
 
         // Check bottom
         cells = generateConnectedCells(0, -1);
         board.connectCells(cells.get(0), cells.get(1));
         Assertions.assertEquals(cells.get(0).bottomCell(), cells.get(1), message);
+        Assertions.assertEquals(cells.get(1).topCell(), cells.get(0), message);
 
         // Check top right
         cells = generateConnectedCells(1, 1);
         board.connectCells(cells.get(0), cells.get(1));
         Assertions.assertEquals(cells.get(0).topRightCell(), cells.get(1), message);
+        Assertions.assertEquals(cells.get(1).bottomLeftCell(), cells.get(0), message);
 
         // Check top left
         cells = generateConnectedCells(-1, 1);
         board.connectCells(cells.get(0), cells.get(1));
         Assertions.assertEquals(cells.get(0).topLeftCell(), cells.get(1), message);
+        Assertions.assertEquals(cells.get(1).bottomRightCell(), cells.get(0), message);
 
         // Check bottom right
         cells = generateConnectedCells(1, -1);
         board.connectCells(cells.get(0), cells.get(1));
         Assertions.assertEquals(cells.get(0).bottomRightCell(), cells.get(1), message);
+        Assertions.assertEquals(cells.get(1).topLeftCell(), cells.get(0), message);
 
         // Check bottom left
         cells = generateConnectedCells(-1, -1);
         board.connectCells(cells.get(0), cells.get(1));
         Assertions.assertEquals(cells.get(0).bottomLeftCell(), cells.get(1), message);
+        Assertions.assertEquals(cells.get(1).topRightCell(), cells.get(0), message);
+
+        // Check null TODO write test if anotherCell is null
+        board.connectCells(cells.get(0), null);
+        board.connectCells(cells.get(1), null);
 
         count++;
     }
+
   }
 
   @Test
@@ -160,12 +268,18 @@ class BoardTest {
 
   // @Test
   public void testMoveFigure() {
+    // TODO fix or delete
     // Check move
     this.moveFigureAndCheck(1, 1, 1, 5);
     this.moveFigureAndCheck(1, 8, 1, 5);
+      this.moveFigureAndCheck(-1, 8, 1, 5);
+      this.moveFigureAndCheck(1, 9, 1, 5);
+      this.moveFigureAndCheck(1, 8, -1, 5);
+      this.moveFigureAndCheck(1, 8, 1, -1);
   }
 
   private void moveFigureAndCheck(int startX, int startY, int endX, int endY) {
+    // TODO fix or delete
     Figure prevFigure = board.cell(startX, startY).getFigure();
     //        Figure nextFigure = board.findCell(endX, endY).getFigure();
     //        if (prevFigure != null && nextFigure != null) {
@@ -174,7 +288,7 @@ class BoardTest {
     //            FigureType nextFigureType = nextFigure.getType();
     //            assertEquals(prevFigureType, nextFigureType, "Figure moves incorrect");
     //        }
-    board.printBoard();
+    // board.printBoard();
   }
 
   ArrayList<Cell> generateConnectedCells(int xOperator, int yOperator){
@@ -215,12 +329,8 @@ class BoardTest {
   }
 
     /*
-        5. Partie
         Spasski–Fischer 0:1
         Reykjavík, 20. Juli 1972
-        Nimzo-Indische Verteidigung, E41
-        https://de.wikipedia.org/wiki/Schachweltmeisterschaft_1972#:~:
-        text=Die%20Schachweltmeisterschaft%201972%20war%20der,die%20Schachwelt%20hinaus%20Aufsehen%20erregte.
       */
 //    @Test
     void testChessGameSpasskiFischer() {
