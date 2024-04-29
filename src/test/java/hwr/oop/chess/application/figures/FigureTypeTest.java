@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FigureTypeTest {
+class FigureTypeTest {
   @Test
   void testEnumValues() { // Test if the enum contains the valid values
     assertEquals(6, FigureType.values().length); // Check if there are exactly 6 values

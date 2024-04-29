@@ -30,14 +30,6 @@ public class Rook implements Figure {
     return availableCell.contains(nextCell);
   }
 
-  /*public boolean canCaptureKing(Cell current, FigureColor myColor) {
-    ArrayList<Cell> availableCells = getAvailableCells(current);
-    for (Cell cell : availableCells) {
-      isOpponentKing(cell, myColor);
-    }
-    return true;
-  }*/
-
   public char symbol() {
     return color == FigureColor.WHITE ? 'R' : 'r';
   }

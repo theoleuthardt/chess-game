@@ -4,6 +4,7 @@ import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Queen implements Figure {
   private static final FigureType type = FigureType.QUEEN;
@@ -49,7 +50,7 @@ public class Queen implements Figure {
     return type;
   }
 
-  public ArrayList<CellDirection> directions() {
+  public List<CellDirection> directions() {
     return directions;
   }
 }

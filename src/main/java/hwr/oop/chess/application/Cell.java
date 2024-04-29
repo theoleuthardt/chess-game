@@ -3,6 +3,7 @@ package hwr.oop.chess.application;
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureColor;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Cell {
   private final int y;
@@ -145,7 +146,7 @@ public class Cell {
     };
   }
 
-  public void addAvailableCellsInDirectionToList(ArrayList<Cell> list, CellDirection direction) {
+  public void addAvailableCellsInDirectionToList(List<Cell> list, CellDirection direction) {
     Cell current = this;
     while ((current = current.cellInDirection(direction)) != null) {
       boolean cellIsEmpty = current.figure() == null;
