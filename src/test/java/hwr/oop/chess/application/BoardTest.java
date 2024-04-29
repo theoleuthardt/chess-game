@@ -45,6 +45,9 @@ class BoardTest {
   }
 
   @Test
+  void testInitalBoard_withoutFigures() {}
+
+  @Test
   void testConnectionBoundaryCells() {
     // test Bottoms
     IntStream.range(1, 9)
@@ -137,31 +140,30 @@ class BoardTest {
       while (currentCell != null) {
         // Check right cell
         if (currentCell.rightCell() != null) {
-          assertEquals(
-              currentCell,
-              currentCell.rightCell().leftCell(),
-              "Right cell is not correctly connected");
+          assertThat(currentCell)
+              .isEqualTo(
+                  currentCell.rightCell().leftCell(), "Right cell is not correctly connected")
+              .withFailMessage();
         }
         // Check bottom cell
         if (currentCell.bottomCell() != null) {
-          assertEquals(
-              currentCell,
-              currentCell.bottomCell().topCell(),
-              "Bottom cell is not correctly connected");
+          assertThat(currentCell)
+              .isEqualTo(
+                  currentCell.bottomCell().topCell(), "Bottom cell is not correctly connected");
         }
         // Check bottom right cell
         if (currentCell.bottomRightCell() != null) {
-          assertEquals(
-              currentCell,
-              currentCell.bottomRightCell().topLeftCell(),
-              "Bottom right cell is not correctly connected");
+          assertThat(currentCell)
+              .isEqualTo(
+                  currentCell.bottomRightCell().topLeftCell(),
+                  "Bottom right cell is not correctly connected");
         }
         // Check bottom left cell
         if (currentCell.bottomLeftCell() != null) {
-          assertEquals(
-              currentCell,
-              currentCell.bottomLeftCell().topRightCell(),
-              "Bottom left cell is not correctly connected");
+          assertThat(currentCell)
+              .isEqualTo(
+                  currentCell.bottomLeftCell().topRightCell(),
+                  "Bottom left cell is not correctly connected");
         }
         // Move to the next cell in the current row
         currentCell = currentCell.rightCell();
