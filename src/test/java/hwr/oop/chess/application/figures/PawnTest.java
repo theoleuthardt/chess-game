@@ -27,6 +27,8 @@ class PawnTest {
   @ParameterizedTest
   @ValueSource(ints = {3, 4})
   void moveWhitePawn_isAllowed(int args) {
+    board.printBoard();
+
     Cell from = board.findCell('d', 2);
     Cell to = board.findCell('d', args);
 

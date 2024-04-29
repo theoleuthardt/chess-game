@@ -62,7 +62,10 @@ public class Board {
 
   // Method to connect each cell
   public void connectCells(Cell currentCell, Cell anotherCell) {
-    if(anotherCell == null || currentCell == null || !isValidCoordinate(currentCell) || !isValidCoordinate(anotherCell) ){
+    if (anotherCell == null
+        || currentCell == null
+        || !isValidCoordinate(currentCell)
+        || !isValidCoordinate(anotherCell)) {
       return;
     }
 
@@ -71,61 +74,64 @@ public class Board {
     int diffX = x - anotherCell.x();
     int diffY = y - anotherCell.y();
 
-     // do not connect edges
-    if (diffX == -1 && x == 8 || diffX == 1 && x== 1 || diffY == 1 && y == 1 || diffX == -1 && y == 8) {
+    // do not connect edges
+    if (diffX == -1 && x == 8
+        || diffX == 1 && x == 1
+        || diffY == 1 && y == 1
+        || diffX == -1 && y == 8) {
       return;
     }
 
     switch (diffX) {
-      case 0->{
+      case 0 -> {
         switch (diffY) {
-          // Connect vertically
+            // Connect vertically
           case 1 -> {
-              currentCell.setBottomCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setTopCell(currentCell);
+            currentCell.setBottomCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setTopCell(currentCell);
           }
-          // Connect vertically
+            // Connect vertically
           case -1 -> {
-              currentCell.setTopCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setBottomCell(currentCell);
+            currentCell.setTopCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setBottomCell(currentCell);
           }
         }
       }
-      case 1->{
+      case 1 -> {
         switch (diffY) {
-          // Connect horizontally
-          case 0 ->{
+            // Connect horizontally
+          case 0 -> {
             currentCell.setLeftCell(anotherCell);
             Objects.requireNonNull(anotherCell).setRightCell(currentCell);
           }
-          // Connect diagonally
+            // Connect diagonally
           case 1 -> {
-              currentCell.setBottomLeftCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setTopRightCell(currentCell);
+            currentCell.setBottomLeftCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setTopRightCell(currentCell);
           }
-          // Connect diagonally
+            // Connect diagonally
           case -1 -> {
-              currentCell.setTopLeftCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setBottomRightCell(currentCell);
+            currentCell.setTopLeftCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setBottomRightCell(currentCell);
           }
         }
       }
-      case -1 ->{
+      case -1 -> {
         switch (diffY) {
-          // Connect horizontally
-          case 0 ->{
+            // Connect horizontally
+          case 0 -> {
             currentCell.setRightCell(anotherCell);
             Objects.requireNonNull(anotherCell).setLeftCell(currentCell);
           }
-          // Connect diagonally
+            // Connect diagonally
           case 1 -> {
-              currentCell.setBottomRightCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setTopLeftCell(currentCell);
+            currentCell.setBottomRightCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setTopLeftCell(currentCell);
           }
-          // Connect diagonally
+            // Connect diagonally
           case -1 -> {
-              currentCell.setTopRightCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setBottomLeftCell(currentCell);
+            currentCell.setTopRightCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setBottomLeftCell(currentCell);
           }
         }
       }
@@ -139,6 +145,9 @@ public class Board {
   public static ArrayList<Cell> allCells() {
     ArrayList<Cell> cells = new ArrayList<>();
     Cell cell = firstCell;
+    while (cell.topCell() != null) {
+      cell = cell.topCell();
+    }
     Cell rowStart = cell;
 
     while (cell != null) {
@@ -146,7 +155,7 @@ public class Board {
       if (cell.rightCell() != null) {
         cell = cell.rightCell();
       } else {
-        cell = rowStart = rowStart.topCell();
+        cell = rowStart = rowStart.bottomCell();
       }
     }
     return cells;
@@ -159,7 +168,7 @@ public class Board {
   public Cell findCell(int x, int y) {
     ArrayList<Cell> cells = allCells();
     for (Cell cell : cells) {
-      if (cell.isEqualTo(cell)) {
+      if (cell.x() == x && cell.y() == y) {
         return cell;
       }
     }

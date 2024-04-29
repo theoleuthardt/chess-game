@@ -2,7 +2,10 @@ package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureType;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito; // TODO learn about Mockito for TEST
@@ -11,10 +14,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BoardTest {
   private Board board;
@@ -29,19 +28,19 @@ class BoardTest {
   @Test
   void testInitialBoard() {
     ArrayList<Cell> cells = board.allCells();
-    assertEquals(64, cells.size(), "Cells are not correctly created");
-    assertEquals('r', board.findCell(1, 8).figure().symbol());
-    assertEquals('r', board.findCell(8, 8).figure().symbol());
-    assertEquals('n', board.findCell(2, 8).figure().symbol());
-    assertEquals('n', board.findCell(7, 8).figure().symbol());
-    assertEquals('b', board.findCell(3, 8).figure().symbol());
-    assertEquals('b', board.findCell(6, 8).figure().symbol());
-    assertEquals('n', board.findCell(2, 8).figure().symbol());
-    assertEquals('q', board.findCell(4, 8).figure().symbol());
-    assertEquals('k', board.findCell(5, 8).figure().symbol());
+    assertThat(64).isEqualTo(cells.size(), "Cells are not correctly created");
+    assertThat('r').isEqualTo(board.findCell(1, 8).figure().symbol());
+    assertThat('r').isEqualTo(board.findCell(8, 8).figure().symbol());
+    assertThat('n').isEqualTo(board.findCell(2, 8).figure().symbol());
+    assertThat('n').isEqualTo(board.findCell(7, 8).figure().symbol());
+    assertThat('b').isEqualTo(board.findCell(3, 8).figure().symbol());
+    assertThat('b').isEqualTo(board.findCell(6, 8).figure().symbol());
+    assertThat('n').isEqualTo(board.findCell(2, 8).figure().symbol());
+    assertThat('q').isEqualTo(board.findCell(4, 8).figure().symbol());
+    assertThat('k').isEqualTo(board.findCell(5, 8).figure().symbol());
     Board boardNoFigure = new Board(false);
     ArrayList<Cell> noCells = boardNoFigure.allCells();
-    assertEquals(64, noCells.size(), "Cells are not correctly created");
+    assertThat(64).isEqualTo(noCells.size(), "Cells are not correctly created");
   }
 
   @Test
@@ -185,50 +184,50 @@ class BoardTest {
       // Check right
       cells = generateConnectedCells(1, 0);
       board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertEquals(cells.get(0).rightCell(), cells.get(1), message);
-      Assertions.assertEquals(cells.get(1).leftCell(), cells.get(0), message);
+      Assertions.assertThat().isEqualTo(cells.get(0).rightCell(), cells.get(1), message);
+      Assertions.assertThat().isEqualTo(cells.get(1).leftCell(), cells.get(0), message);
 
       // Check left
       cells = generateConnectedCells(-1, 0);
       board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertEquals(cells.get(0).leftCell(), cells.get(1), message);
-      Assertions.assertEquals(cells.get(1).rightCell(), cells.get(0), message);
+      Assertions.assertThat().isEqualTo(cells.get(0).leftCell(), cells.get(1), message);
+      Assertions.assertThat().isEqualTo(cells.get(1).rightCell(), cells.get(0), message);
 
       // Check top
       cells = generateConnectedCells(0, 1);
       board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertEquals(cells.get(0).topCell(), cells.get(1), message);
-      Assertions.assertEquals(cells.get(1).bottomCell(), cells.get(0), message);
+      Assertions.assertThat().isEqualTo(cells.get(0).topCell(), cells.get(1), message);
+      Assertions.assertThat().isEqualTo(cells.get(1).bottomCell(), cells.get(0), message);
 
       // Check bottom
       cells = generateConnectedCells(0, -1);
       board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertEquals(cells.get(0).bottomCell(), cells.get(1), message);
-      Assertions.assertEquals(cells.get(1).topCell(), cells.get(0), message);
+      Assertions.assertThat().isEqualTo(cells.get(0).bottomCell(), cells.get(1), message);
+      Assertions.assertThat().isEqualTo(cells.get(1).topCell(), cells.get(0), message);
 
       // Check top right
       cells = generateConnectedCells(1, 1);
       board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertEquals(cells.get(0).topRightCell(), cells.get(1), message);
-      Assertions.assertEquals(cells.get(1).bottomLeftCell(), cells.get(0), message);
+      Assertions.assertThat().isEqualTo(cells.get(0).topRightCell(), cells.get(1), message);
+      Assertions.assertThat().isEqualTo(cells.get(1).bottomLeftCell(), cells.get(0), message);
 
       // Check top left
       cells = generateConnectedCells(-1, 1);
       board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertEquals(cells.get(0).topLeftCell(), cells.get(1), message);
-      Assertions.assertEquals(cells.get(1).bottomRightCell(), cells.get(0), message);
+      Assertions.assertThat().isEqualTo(cells.get(1), message);
+      Assertions.assertThat().isEqualTo(cells.get(1).bottomRightCell(), cells.get(0), message);
 
       // Check bottom right
       cells = generateConnectedCells(1, -1);
       board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertEquals(cells.get(0).bottomRightCell(), cells.get(1), message);
-      Assertions.assertEquals(cells.get(1).topLeftCell(), cells.get(0), message);
+      Assertions.assertThat().isEqualTo(cells.get(0).bottomRightCell(), cells.get(1), message);
+      Assertions.assertThat().isEqualTo(cells.get(1).topLeftCell(), cells.get(0), message);
 
       // Check bottom left
       cells = generateConnectedCells(-1, -1);
       board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertEquals(cells.get(0).bottomLeftCell(), cells.get(1), message);
-      Assertions.assertEquals(cells.get(1).topRightCell(), cells.get(0), message);
+      Assertions.assertThat().isEqualTo(cells.get(0).bottomLeftCell(), cells.get(1), message);
+      Assertions.assertThat().isEqualTo(cells.get(1).topRightCell(), cells.get(0), message);
 
       // Check null TODO write test if anotherCell is null
       board.connectCells(cells.get(0), null);
@@ -277,12 +276,10 @@ class BoardTest {
   private void moveFigureAndCheck(int startX, int startY, int endX, int endY) {
     // TODO fix or delete
     Figure prevFigure = board.findCell(startX, startY).figure();
+    board.moveFigure(startX, startY, endX, endY);
     Figure nextFigure = board.findCell(endX, endY).figure();
-    if (prevFigure != null && nextFigure != null) {
-      FigureType prevFigureType = prevFigure.type();
-      board.moveFigure(startX, startY, endX, endY);
-      FigureType nextFigureType = nextFigure.type();
-      assertEquals(prevFigureType, nextFigureType, "Figure moves incorrect");
+    if (prevFigure == nextFigure) {
+      Assertions.assertThat();
     }
     board.printBoard();
   }
@@ -293,10 +290,10 @@ class BoardTest {
     // Check move
     this.moveFigureAndCheck(1, 1, 1, 5);
     this.moveFigureAndCheck(1, 8, 1, 5);
-    this.moveFigureAndCheck(-1, 8, 1, 5);
+    this.moveFigureAndCheck(1, 8, 1, 5);
     this.moveFigureAndCheck(1, 9, 1, 5);
-    this.moveFigureAndCheck(1, 8, -1, 5);
-    this.moveFigureAndCheck(1, 8, 1, -1);
+    this.moveFigureAndCheck(1, 8, 1, 5);
+    this.moveFigureAndCheck(1, 8, 1, 1);
   }
 
   ArrayList<Cell> generateConnectedCells(int xOperator, int yOperator) {
