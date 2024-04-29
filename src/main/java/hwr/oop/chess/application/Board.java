@@ -3,9 +3,10 @@ package hwr.oop.chess.application;
 import hwr.oop.chess.application.figures.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-import static hwr.oop.chess.application.Cell.canCaptureOpponenetKing;
+import static hwr.oop.chess.application.Cell.canCaptureOpponentKing;
 
 public class Board {
   // TODO Write JAVA doc
@@ -44,7 +45,9 @@ public class Board {
         // Create a new cell
         Cell currentCell = new Cell(x, y);
         // Connect horizontally
-        connectCells(currentCell, leftCell);
+        if(x != 1) {
+          connectCells(currentCell, leftCell);
+        }
         if (y != 1) {
           // Connect vertically
           connectCells(currentCell, bottomCell);
@@ -173,7 +176,6 @@ public class Board {
     Cell endCell = findCell(endX, endY);
 
     Figure figure = startCell.figure();
-    FigureColor myColor = figure.color();
     if (figure == null) {
       throw new IllegalArgumentException("On the starting cell is no figure");
     }
@@ -185,7 +187,7 @@ public class Board {
     startCell.setFigure(null);
     endCell.setFigure(figure);
 
-    this.updateCheckStatus(myColor);
+    this.updateCheckStatus(figure.color());
   }
 
   public void moveFigureDiagonal(
@@ -287,7 +289,7 @@ private void updateCheckMateStatus(FigureColor myColor) {
     ArrayList<Cell> myFigureCells = this.getPiecesWithColor(myColor); // opponents == Black
     ArrayList<Boolean> isKingCapturePossible = new ArrayList<>();
     for (Cell myFigureCell : myFigureCells) {
-      isKingCapturePossible.add(canCaptureOpponenetKing(myFigureCell, myColor));
+      isKingCapturePossible.add(canCaptureOpponentKing(myFigureCell, myColor));
     }
     return isKingCapturePossible.contains(true);
   }
@@ -302,17 +304,9 @@ private void updateCheckMateStatus(FigureColor myColor) {
     return pieces;
   }
 
-  public ArrayList<Cell> getAllPieces() {
-    ArrayList<Cell> pieces = new ArrayList<>();
-    for (Cell cell : allCells()) {
-      pieces.add(cell);
-    }
-    return pieces;
-  }
-
   public Board copy(Board oldBoard) {
     Board copyBoard = new Board(false);
-    for (Cell cell : oldBoard.getAllPieces()) {
+    for (Cell cell : oldBoard.allCells()) {
       Cell newCell = copyBoard.findCell(cell.x(), cell.y());
       newCell.setFigure(cell.figure());
     }

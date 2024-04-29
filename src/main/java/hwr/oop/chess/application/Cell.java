@@ -3,7 +3,6 @@ package hwr.oop.chess.application;
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureColor;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Cell {
   private final int y;
@@ -181,7 +180,7 @@ public class Cell {
     // 1 if anotherCell is above
     int diffY = anotherCell.y() - y;
 
-    final String notNeighboursError = "The cells are not neighbours to each other";
+    final String notNeighboursError = "The cells " + this + " and " + anotherCell + " are not neighbours to each other";
 
     switch (diffX) {
       case 0 -> {
@@ -222,7 +221,7 @@ public class Cell {
 
 }
 
-  public static boolean canCaptureOpponenetKing(Cell current, FigureColor myColor) {
+  public static boolean canCaptureOpponentKing(Cell current, FigureColor myColor) {
     ArrayList<Cell> availableCells = current.figure().getAvailableCells(current);
     for (Cell cell : availableCells) {
       if(isOpponentKing(cell, myColor )){
