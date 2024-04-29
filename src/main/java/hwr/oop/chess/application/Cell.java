@@ -2,11 +2,11 @@ package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureColor;
-
 import java.util.ArrayList;
-import java.util.List;
 
 public class Cell {
+  private final int y;
+  private final int x;
   private Figure figure;
   private Cell topCell;
   private Cell bottomCell;
@@ -16,9 +16,6 @@ public class Cell {
   private Cell topRightCell;
   private Cell bottomLeftCell;
   private Cell bottomRightCell;
-
-  private final int y;
-  private final int x;
 
   public Cell(int x, int y) {
     if (!isValidCoordinate(x, y)) {
@@ -48,9 +45,6 @@ public class Cell {
     return !isValidCoordinate(x, y);
   }
 
-  public boolean isChecked(Cell current, FigureColor myColor) {
-    return false;
-  }
 
   // Method to set the figure
   public void setFigure(Figure figure) {
@@ -138,20 +132,6 @@ public class Cell {
     return y;
   }
 
-  // Method to return all positions in the row to which this position belongs
-  //  public List<Cell> getCellsInRow() {
-  //    ArrayList<Cell> cells = this.allCells();
-  //    cells.removeIf(cell -> cell.y() != this.y());
-  //    return cells;
-  //  }
-
-  // Method to return all positions in the column to which this position belongs
-  //  public List<Cell> getCellsInColumn() {
-  //    ArrayList<Cell> cells = Board.allCells();
-  //    cells.removeIf(cell -> cell.x() != this.x());
-  //    return cells;
-  //  }
-
   public Cell cellInDirection(CellDirection direction) {
     return switch (direction) {
       case LEFT -> leftCell();
@@ -169,7 +149,10 @@ public class Cell {
     Cell current = this;
     while ((current = current.cellInDirection(direction)) != null) {
       boolean cellIsEmpty = current.figure() == null;
-      boolean enemyIsOnField = current.figure().color() != figure().color();
+      boolean enemyIsOnField = false;
+      if(!cellIsEmpty) {
+        enemyIsOnField = current.figure().color() != figure().color();
+      }
 
       if (cellIsEmpty || enemyIsOnField) {
         list.add(current);
@@ -189,8 +172,6 @@ public class Cell {
     if (anotherCell == null) {
       return;
     }
-
-    Cell currentCell = this;
     // -1 if anotherCell is to the left
     // 1 if anotherCell is to the right
     int diffX = anotherCell.x() - x;
@@ -198,11 +179,6 @@ public class Cell {
     // -1 if anotherCell is below
     // 1 if anotherCell is above
     int diffY = anotherCell.y() - y;
-
-    // do not connect edges
-    /*if (isInvalidCoordinate(diffX + x, diffX + y)) {
-      throw new IllegalArgumentException("The cell would be outside of the gameboard");
-    }*/
 
     final String notNeighboursError = "The cells are not neighbours to each other";
 
@@ -212,28 +188,35 @@ public class Cell {
         switch (diffY) {
           case 1 -> setTopCell(anotherCell);
           case 0 -> throw new IllegalArgumentException("The cells are identical");
-          case -1 -> setBottomCell(currentCell);
+          case -1 -> setBottomCell(anotherCell);
           default -> throw new IllegalArgumentException(notNeighboursError);
         }
       }
       case 1 -> {
         // anotherCell is right of currentCell
         switch (diffY) {
-          case 1 -> setTopRightCell(currentCell);
-          case 0 -> setRightCell(currentCell);
-          case -1 -> setBottomRightCell(currentCell);
+          case 1 -> setTopRightCell(anotherCell);
+          case 0 -> setRightCell(anotherCell);
+          case -1 -> setBottomRightCell(anotherCell);
           default -> throw new IllegalArgumentException(notNeighboursError);
         }
       }
       case -1 -> {
         // anotherCell is left of currentCell
         switch (diffY) {
-          case 1 -> setTopLeftCell(currentCell);
-          case 0 -> setLeftCell(currentCell);
-          case -1 -> setBottomLeftCell(currentCell);
+          case 1 -> setTopLeftCell(anotherCell);
+          case 0 -> setLeftCell(anotherCell);
+          case -1 -> setBottomLeftCell(anotherCell);
           default -> throw new IllegalArgumentException(notNeighboursError);
         }
       }
+      default -> throw new IllegalArgumentException(notNeighboursError);
     }
+  }
+
+  public String toString() {
+    return "Cell_" + (char)(x + 64) + y + "(" +
+      (figure == null ? "-" : figure.symbol()) +
+    ")";
   }
 }

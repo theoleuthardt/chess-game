@@ -11,7 +11,7 @@ public class Queen implements Figure {
   Logger logger = Logger.getLogger(getClass().getName());
   private static final FigureType type = FigureType.QUEEN;
   private final FigureColor color;
-  private ArrayList<CellDirection> directions;
+  private final ArrayList<CellDirection> directions;
 
   public Queen(FigureColor color) {
     this.color = color;

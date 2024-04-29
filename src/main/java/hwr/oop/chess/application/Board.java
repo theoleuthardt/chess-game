@@ -7,13 +7,16 @@ import java.util.Objects;
 
 public class Board {
   // TODO Write JAVA doc
-  private static Cell firstCell;
+  private Cell firstCell;
 
   public Board(boolean setFigures) {
-    initializeBoard(setFigures);
+    initializeBoard();
+    if (setFigures) {
+      addFiguresToBoard();
+    }
   }
 
-  private void initializeBoard(boolean setFigures) {
+  private void initializeBoard() {
     // TODO make codes simple
     // Create the first cell and store it in firstCell
     firstCell = new Cell(1, 1);
@@ -38,14 +41,9 @@ public class Board {
         if (y != 1) {
           // Connect vertically
           connectCells(currentCell, bottomCell);
-          if (x != 1) {
-            // Connect diagonally to the left
-            connectCells(currentCell, bottomCell.leftCell());
-          }
-          if (x != 8) {
-            // Connect diagonally to the right
-            connectCells(currentCell, bottomCell.rightCell());
-          } else {
+          connectCells(currentCell, bottomCell.leftCell());
+          connectCells(currentCell, bottomCell.rightCell());
+          if(x == 8) {
             // Change Row
             bottomCellRowStart = bottomCellRowStart.topCell();
           }
@@ -55,94 +53,23 @@ public class Board {
         bottomCell = bottomCell.rightCell();
       }
     }
-    if (setFigures) {
-      addFiguresToBoard();
-    }
+
   }
 
   // Method to connect each cell
   public void connectCells(Cell currentCell, Cell anotherCell) {
-    if (anotherCell == null
-        || currentCell == null
-        || !isValidCoordinate(currentCell)
-        || !isValidCoordinate(anotherCell)) {
+    if (anotherCell == null || currentCell == null) {
       return;
     }
-
-    int x = currentCell.x();
-    int y = currentCell.y();
-    int diffX = x - anotherCell.x();
-    int diffY = y - anotherCell.y();
-
-    // do not connect edges
-    if (diffX == -1 && x == 8
-        || diffX == 1 && x == 1
-        || diffY == 1 && y == 1
-        || diffX == -1 && y == 8) {
-      return;
-    }
-
-    switch (diffX) {
-      case 0 -> {
-        switch (diffY) {
-            // Connect vertically
-          case 1 -> {
-            currentCell.setBottomCell(anotherCell);
-            Objects.requireNonNull(anotherCell).setTopCell(currentCell);
-          }
-            // Connect vertically
-          case -1 -> {
-            currentCell.setTopCell(anotherCell);
-            Objects.requireNonNull(anotherCell).setBottomCell(currentCell);
-          }
-        }
-      }
-      case 1 -> {
-        switch (diffY) {
-            // Connect horizontally
-          case 0 -> {
-            currentCell.setLeftCell(anotherCell);
-            Objects.requireNonNull(anotherCell).setRightCell(currentCell);
-          }
-            // Connect diagonally
-          case 1 -> {
-            currentCell.setBottomLeftCell(anotherCell);
-            Objects.requireNonNull(anotherCell).setTopRightCell(currentCell);
-          }
-            // Connect diagonally
-          case -1 -> {
-            currentCell.setTopLeftCell(anotherCell);
-            Objects.requireNonNull(anotherCell).setBottomRightCell(currentCell);
-          }
-        }
-      }
-      case -1 -> {
-        switch (diffY) {
-            // Connect horizontally
-          case 0 -> {
-            currentCell.setRightCell(anotherCell);
-            Objects.requireNonNull(anotherCell).setLeftCell(currentCell);
-          }
-            // Connect diagonally
-          case 1 -> {
-            currentCell.setBottomRightCell(anotherCell);
-            Objects.requireNonNull(anotherCell).setTopLeftCell(currentCell);
-          }
-            // Connect diagonally
-          case -1 -> {
-            currentCell.setTopRightCell(anotherCell);
-            Objects.requireNonNull(anotherCell).setBottomLeftCell(currentCell);
-          }
-        }
-      }
-    }
+    currentCell.connectTo(anotherCell);
+    anotherCell.connectTo(currentCell);
   }
 
-  public static Cell firstCell() {
+  public Cell firstCell() {
     return firstCell;
   }
 
-  public static ArrayList<Cell> allCells() {
+  public ArrayList<Cell> allCells() {
     ArrayList<Cell> cells = new ArrayList<>();
     Cell cell = firstCell;
     while (cell.topCell() != null) {
@@ -240,11 +167,11 @@ public class Board {
 
     Figure figure = startCell.figure();
     if (figure == null) {
-      throw new RuntimeException("On the starting cell is no figure");
+      throw new IllegalArgumentException("On the starting cell is no figure");
     }
 
     if (!figure.canMoveTo(startCell, endCell)) {
-      throw new RuntimeException("The figure can't move to that cell");
+      throw new IllegalArgumentException("The figure can't move to that cell");
     }
 
     startCell.setFigure(null);
@@ -275,13 +202,6 @@ public class Board {
     }
   }
 
-  public static boolean isValidCoordinate(int x, int y) { // TODO move to Cell class??
-    return x >= 1 && x <= 8 && y >= 1 && y <= 8;
-  }
-
-  private boolean isValidCoordinate(Cell cell) { // TODO Change static
-    return cell.x() >= 1 && cell.x() <= 8 && cell.y() >= 1 && cell.y() <= 8;
-  }
   // TODO make check
   // TODO make checkmate
 

@@ -4,10 +4,14 @@ import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureType;
 import org.assertj.core.api.Assertions;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito; // TODO learn about Mockito for TEST
 
 import java.util.ArrayList;
@@ -26,310 +30,174 @@ class BoardTest {
   }
 
   @Test
-  void testInitialBoard() {
+  void initialBoard_withBlackFiguresOnTop() {
     ArrayList<Cell> cells = board.allCells();
-    assertThat(64).isEqualTo(cells.size(), "Cells are not correctly created");
-    assertThat('r').isEqualTo(board.findCell(1, 8).figure().symbol());
-    assertThat('r').isEqualTo(board.findCell(8, 8).figure().symbol());
-    assertThat('n').isEqualTo(board.findCell(2, 8).figure().symbol());
-    assertThat('n').isEqualTo(board.findCell(7, 8).figure().symbol());
-    assertThat('b').isEqualTo(board.findCell(3, 8).figure().symbol());
-    assertThat('b').isEqualTo(board.findCell(6, 8).figure().symbol());
-    assertThat('n').isEqualTo(board.findCell(2, 8).figure().symbol());
-    assertThat('q').isEqualTo(board.findCell(4, 8).figure().symbol());
-    assertThat('k').isEqualTo(board.findCell(5, 8).figure().symbol());
+
+    // row of black figures
+    String topRow = "rnbqkbnr";
+    for(int x = 1; x <= 8; x++) {
+      Cell cell = board.findCell(x, 8);
+      char correctSymbol = topRow.charAt(x - 1);
+      assertThat(cell.figure().symbol()).isEqualTo(correctSymbol);
+    }
+
+    // row of pawns
+    for(int x = 1; x <= 8; x++) {
+      Cell cell = board.findCell(x, 7);
+      assertThat(cell.figure().symbol()).isEqualTo('p');
+    }
+  }
+
+  @Test
+  void initialBoard_withWhiteFiguresOnBottom() {
+    // row of white figures
+    String bottomRow = "RNBQKBNR";
+    for(int x = 1; x <= 8; x++) {
+      Cell cell = board.findCell(x, 1);
+      char correctSymbol = bottomRow.charAt(x - 1);
+      assertThat(cell.figure()).isNotNull();
+      assertThat(cell.figure().symbol()).isEqualTo(correctSymbol);
+    }
+
+    // row of pawns
+    for(int x = 1; x <= 8; x++) {
+      Cell cell = board.findCell(x, 2);
+      assertThat(cell.figure().symbol()).isEqualTo('P');
+    }
+  }
+
+  @Test
+  void initialBoard_onlyMiddleIsFree() {
+    ArrayList<Cell> cells = board.allCells();
+    assertThat(cells).hasSize(64);
+    for(Cell cell : cells) {
+      if(cell.y() != 1 && cell.y() != 2 && cell.y() != 7 && cell.y() != 8) {
+        assertThat(cell.figure()).isNull();
+      } else {
+        assertThat(cell.figure()).isNotNull();
+      }
+    }
+  }
+
+  @Test
+  void initialBoard_withoutFiguresIsEmpty() {
     Board boardNoFigure = new Board(false);
-    ArrayList<Cell> noCells = boardNoFigure.allCells();
-    assertThat(64).isEqualTo(noCells.size(), "Cells are not correctly created");
-  }
-
-  @Test
-  void testInitalBoard_withoutFigures() {}
-
-  @Test
-  void testConnectionBoundaryCells() {
-    // test Bottoms
-    IntStream.range(1, 9)
-        .forEach(
-            i -> {
-              Cell cell = board.findCell(i, 1);
-              assertNull(cell.bottomCell());
-              assertNotNull(cell.topCell());
-            });
-
-    // test Lefts
-    IntStream.range(1, 9)
-        .forEach(
-            i -> {
-              Cell cell = board.findCell(1, i);
-              assertNotNull(cell);
-              assertNull(cell.leftCell());
-              assertNotNull(cell.rightCell());
-            });
-
-    // test Rights
-    IntStream.range(1, 9)
-        .forEach(
-            i -> {
-              Cell cell = board.findCell(8, i);
-              assertNotNull(cell);
-              assertNull(cell.rightCell());
-              assertNotNull(cell.leftCell());
-            });
-
-    // test Tops
-    IntStream.range(1, 9)
-        .forEach(
-            i -> {
-              Cell cell = board.findCell(i, 8);
-              assertNotNull(cell);
-              assertNull(cell.topCell());
-              assertNotNull(cell.bottomCell());
-            });
-
-    // test diagonal
-    Cell cell = board.findCell(1, 1);
-    assertNotNull(cell);
-    assertNull(cell.bottomLeftCell());
-    assertNotNull(cell.topRightCell());
-
-    cell = board.findCell(8, 1);
-    assertNotNull(cell);
-    assertNull(cell.bottomRightCell());
-    assertNotNull(cell.topLeftCell());
-
-    cell = board.findCell(1, 8);
-    assertNotNull(cell);
-    assertNull(cell.topLeftCell());
-    assertNotNull(cell.bottomRightCell());
-
-    cell = board.findCell(8, 8);
-    assertNotNull(cell);
-    assertNull(cell.topRightCell());
-    assertNotNull(cell.bottomLeftCell());
-  }
-
-  @Test
-  void testFirstCell() {
-    assertNotNull(board.firstCell(), "First cell is null");
-  }
-
-  @Test
-  void findNotExistCell() {
-    // TODO handle pitest board.cell return null;
-    Cell cell = board.findCell(-1, -1);
-    assertNull(cell);
-    cell = board.findCell(-1, 8);
-    assertNull(cell);
-    cell = board.findCell(8, -1);
-    assertNull(cell);
-    cell = board.findCell(1, 9);
-    assertNull(cell);
-    cell = board.findCell(9, 8);
-    assertNull(cell);
-  }
-
-  @Test
-  void testBoardCells() {
-    // Check cell connections
-    Cell currentCell = board.firstCell();
-    while (currentCell != null) {
-      Cell rowStartCell = currentCell; // Starting cell of the current row
-
-      while (currentCell != null) {
-        // Check right cell
-        if (currentCell.rightCell() != null) {
-          assertThat(currentCell)
-              .isEqualTo(
-                  currentCell.rightCell().leftCell(), "Right cell is not correctly connected")
-              .withFailMessage();
-        }
-        // Check bottom cell
-        if (currentCell.bottomCell() != null) {
-          assertThat(currentCell)
-              .isEqualTo(
-                  currentCell.bottomCell().topCell(), "Bottom cell is not correctly connected");
-        }
-        // Check bottom right cell
-        if (currentCell.bottomRightCell() != null) {
-          assertThat(currentCell)
-              .isEqualTo(
-                  currentCell.bottomRightCell().topLeftCell(),
-                  "Bottom right cell is not correctly connected");
-        }
-        // Check bottom left cell
-        if (currentCell.bottomLeftCell() != null) {
-          assertThat(currentCell)
-              .isEqualTo(
-                  currentCell.bottomLeftCell().topRightCell(),
-                  "Bottom left cell is not correctly connected");
-        }
-        // Move to the next cell in the current row
-        currentCell = currentCell.rightCell();
-      }
-      // Move to the next row
-      currentCell = rowStartCell.topCell();
-    }
-    // Print message if all tests pass in yellow color
-    logger.info("Connections: Cells are correctly connected.");
-  }
-
-  @Test
-  void testCellConnections() {
-    ArrayList<Cell> cells = new ArrayList<>();
-    String message = "Cells are not correctly connected";
-    int count = 0;
-
-    while (count < 10) {
-      // Check right
-      cells = generateConnectedCells(1, 0);
-      board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertThat().isEqualTo(cells.get(0).rightCell(), cells.get(1), message);
-      Assertions.assertThat().isEqualTo(cells.get(1).leftCell(), cells.get(0), message);
-
-      // Check left
-      cells = generateConnectedCells(-1, 0);
-      board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertThat().isEqualTo(cells.get(0).leftCell(), cells.get(1), message);
-      Assertions.assertThat().isEqualTo(cells.get(1).rightCell(), cells.get(0), message);
-
-      // Check top
-      cells = generateConnectedCells(0, 1);
-      board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertThat().isEqualTo(cells.get(0).topCell(), cells.get(1), message);
-      Assertions.assertThat().isEqualTo(cells.get(1).bottomCell(), cells.get(0), message);
-
-      // Check bottom
-      cells = generateConnectedCells(0, -1);
-      board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertThat().isEqualTo(cells.get(0).bottomCell(), cells.get(1), message);
-      Assertions.assertThat().isEqualTo(cells.get(1).topCell(), cells.get(0), message);
-
-      // Check top right
-      cells = generateConnectedCells(1, 1);
-      board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertThat().isEqualTo(cells.get(0).topRightCell(), cells.get(1), message);
-      Assertions.assertThat().isEqualTo(cells.get(1).bottomLeftCell(), cells.get(0), message);
-
-      // Check top left
-      cells = generateConnectedCells(-1, 1);
-      board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertThat().isEqualTo(cells.get(1), message);
-      Assertions.assertThat().isEqualTo(cells.get(1).bottomRightCell(), cells.get(0), message);
-
-      // Check bottom right
-      cells = generateConnectedCells(1, -1);
-      board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertThat().isEqualTo(cells.get(0).bottomRightCell(), cells.get(1), message);
-      Assertions.assertThat().isEqualTo(cells.get(1).topLeftCell(), cells.get(0), message);
-
-      // Check bottom left
-      cells = generateConnectedCells(-1, -1);
-      board.connectCells(cells.get(0), cells.get(1));
-      Assertions.assertThat().isEqualTo(cells.get(0).bottomLeftCell(), cells.get(1), message);
-      Assertions.assertThat().isEqualTo(cells.get(1).topRightCell(), cells.get(0), message);
-
-      // Check null TODO write test if anotherCell is null
-      board.connectCells(cells.get(0), null);
-      board.connectCells(cells.get(1), null);
-
-      count++;
+    ArrayList<Cell> cells = boardNoFigure.allCells();
+    assertThat(cells).hasSize(64);
+    for(Cell cell : cells) {
+      assertThat(cell.figure()).isNull();
     }
   }
 
   @Test
-  void testFigurePlacement() {
-    // Check figure placement on each position
-    Cell currentCell = board.firstCell();
-    Cell rowStartPosiCell = board.firstCell(); // Starting position of the current row
+  void outerCells_leftCellColumnHasNoLeftCell() {
+    for (int y : IntStream.range(1, 9).toArray()) {
+      Cell cell = board.findCell(1, y);
+      assertThat(cell).isNotNull();
+      assertThat(cell.leftCell()).isNull();
+      assertThat(cell.topLeftCell()).isNull();
+      assertThat(cell.bottomLeftCell()).isNull();
+      assertThat(cell.rightCell()).isNotNull();
+    }
+  }
 
-    while (currentCell != null) {
-      Figure figure = currentCell.figure();
-      if (currentCell.y() == 1
-          || currentCell.y() == 2
-          || currentCell.y() == 7
-          || currentCell.y() == 8) {
-        assertNotNull(
-            figure,
-            "Figure is not placed on cell (" + currentCell.y() + ", " + currentCell.x() + ")");
-      } else {
-        assertNull(
-            figure,
-            "Figure should not be placed on cell ("
-                + currentCell.y()
-                + ", "
-                + currentCell.x()
-                + ")");
-      }
-      // Move to the next cell
-      if (currentCell.x() < 8) {
-        // Move to the next position in the current row
-        currentCell = currentCell.rightCell();
-      } else {
-        // Move to the next row
-        rowStartPosiCell = rowStartPosiCell.bottomCell();
-        currentCell = rowStartPosiCell;
+  @Test
+  void outerCells_rightCellColumnHasNoRightCell() {
+    for (int y : IntStream.range(1, 9).toArray()) {
+      Cell cell = board.findCell(8, y);
+      assertThat(cell).isNotNull();
+      assertThat(cell.rightCell()).isNull();
+      assertThat(cell.topRightCell()).isNull();
+      assertThat(cell.bottomRightCell()).isNull();
+      assertThat(cell.leftCell()).isNotNull();
+    }
+  }
+
+  @Test
+  void outerCells_topCellRowHasNoTopCell() {
+    for (int x : IntStream.range(1, 9).toArray()) {
+      Cell cell = board.findCell(x, 8);
+      assertThat(cell).isNotNull();
+      assertThat(cell.topCell()).isNull();
+      assertThat(cell.topLeftCell()).isNull();
+      assertThat(cell.topRightCell()).isNull();
+      assertThat(cell.bottomCell()).isNotNull();
+    }
+  }
+  @Test
+  void outerCells_bottomCellRowHasNoBottomCell() {
+    for (int x : IntStream.range(1, 9).toArray()) {
+      Cell cell = board.findCell(x, 1);
+      assertThat(cell).isNotNull();
+      assertThat(cell.bottomCell()).isNull();
+      assertThat(cell.bottomLeftCell()).isNull();
+      assertThat(cell.bottomRightCell()).isNull();
+      assertThat(cell.topCell()).isNotNull();
+    }
+  }
+
+  @ParameterizedTest
+  @EnumSource(CellDirection.class)
+  void innerCells_hasNeighbourCellInEveryDirection(CellDirection direction) {
+    for (int x : IntStream.range(2, 8).toArray()) {
+      for (int y : IntStream.range(2, 8).toArray()) {
+        Cell cell = board.findCell(x, y);
+        assertThat(cell).isNotNull();
+        assertThat(cell.cellInDirection(direction)).isNotNull();
       }
     }
   }
 
-  private void moveFigureAndCheck(int startX, int startY, int endX, int endY) {
-    // TODO fix or delete
-    Figure prevFigure = board.findCell(startX, startY).figure();
-    board.moveFigure(startX, startY, endX, endY);
-    Figure nextFigure = board.findCell(endX, endY).figure();
-    if (prevFigure == nextFigure) {
-      Assertions.assertThat();
-    }
-    board.printBoard();
+  @Test
+  void firstCellIsNotNull() {
+    assertThat(board.firstCell()).isNotNull();
   }
 
   @Test
-  public void testMoveFigure() {
-    // TODO fix or delete
-    // Check move
-    this.moveFigureAndCheck(1, 1, 1, 5);
-    this.moveFigureAndCheck(1, 8, 1, 5);
-    this.moveFigureAndCheck(1, 8, 1, 5);
-    this.moveFigureAndCheck(1, 9, 1, 5);
-    this.moveFigureAndCheck(1, 8, 1, 5);
-    this.moveFigureAndCheck(1, 8, 1, 1);
+  void cellsOutsideOfBoardDoNotExist() {
+    assertThat(board.findCell(-1, -1)).isNull();
+    assertThat(board.findCell(1, -1)).isNull();
+    assertThat(board.findCell(-1, 1)).isNull();
+    assertThat(board.findCell(9, 1)).isNull();
+    assertThat(board.findCell(1, 9)).isNull();
   }
 
-  ArrayList<Cell> generateConnectedCells(int xOperator, int yOperator) {
-    ArrayList<Cell> list = new ArrayList<>();
-    Random rand = new Random();
+  private CellDirection getOppositeDirection(CellDirection direction) {
+    return switch(direction) {
+      case TOP -> CellDirection.BOTTOM;
+      case TOP_LEFT -> CellDirection.BOTTOM_RIGHT;
+      case TOP_RIGHT -> CellDirection.BOTTOM_LEFT;
+      case BOTTOM -> CellDirection.TOP;
+      case BOTTOM_LEFT -> CellDirection.TOP_RIGHT;
+      case BOTTOM_RIGHT -> CellDirection.TOP_LEFT;
+      case LEFT -> CellDirection.RIGHT;
+      case RIGHT -> CellDirection.LEFT;
+      default -> throw new IllegalArgumentException("You must pass a valid direction");
+    };
+  }
 
-    // Generated random number between 2 and 7
-    int randomNumX = rand.nextInt(5) + 2;
-    int randomNumY = rand.nextInt(5) + 2;
-    Cell cellFirst = new Cell(randomNumX, randomNumY);
-    Cell cellSecond = new Cell(randomNumX + xOperator, randomNumY + yOperator);
+  @ParameterizedTest
+  @EnumSource(CellDirection.class)
+  void testBoardCells(CellDirection direction) {
+    CellDirection returnDirection = getOppositeDirection(direction);
+    ArrayList<Cell> cells = board.allCells();
 
-    list.add(cellFirst);
-    list.add(cellSecond);
-
-    return list;
+    for (Cell currentCell : cells) {
+      if (currentCell.cellInDirection(direction) != null) {
+        Cell neighbourCell = currentCell.cellInDirection(direction);
+        Cell startingCell = neighbourCell.cellInDirection(returnDirection);
+        assertThat(startingCell).isEqualTo(currentCell);
+      }
+    }
   }
 
   @Test
   void testMoveFigureInvalidCoordinates() {
     Board board = new Board(false);
-
-    int startX = 0;
-    int startY = 0;
-
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          board.moveFigure(0, 1, 8, 8);
-        });
-
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          board.moveFigure(4, 1, 9, 9);
-        });
+    assertThatThrownBy(() -> board.moveFigure(0, 1, 8, 8))
+            .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> board.moveFigure(4, 1, 9, 9))
+            .isInstanceOf(IllegalArgumentException.class);
   }
 
   /*
