@@ -166,4 +166,22 @@ public class Cell {
   public boolean isEqualTo(int x1, int y1, int x2, int y2) {
     return (x1 == x2) && (y1 == y2);
   }
+
+  public static boolean canCaptureKing(Cell current, FigureColor myColor) {
+    ArrayList<Cell> availableCells = current.getFigure().getAvailableCells(current);
+    for (Cell cell : availableCells) {
+      if(isOpponentKing(cell, myColor )){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean isOpponentKing(Cell cell, FigureColor myColor){
+    if(myColor == FigureColor.WHITE){
+      return cell.getFigure().symbol() == 'k';
+    }else {
+      return cell.getFigure().symbol() == 'K';
+    }
+  }
 }

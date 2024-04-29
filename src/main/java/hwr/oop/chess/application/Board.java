@@ -5,9 +5,15 @@ import hwr.oop.chess.application.figures.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static hwr.oop.chess.application.Cell.canCaptureKing;
+
 public class Board {
   // TODO Write JAVA doc
   private static Cell firstCell;
+  private boolean isCheckWhite;
+  private boolean isCheckMateWhite;
+  private boolean isCheckBlack;
+  private boolean isCheckMateBlack;
 
   public Board(boolean setFigures) {
     initializeBoard(setFigures);
@@ -216,6 +222,7 @@ public class Board {
     Cell endCell = cell(endX, endY);
 
     Figure figure = startCell.getFigure();
+    FigureColor myColor = figure.color();
     if (figure == null) {
       throw new RuntimeException("On the starting cell is no figure");
     }
@@ -226,6 +233,20 @@ public class Board {
 
     startCell.setFigure(null);
     endCell.setFigure(figure);
+
+    if(canCaptureKing(endCell, myColor)){
+      if(myColor == FigureColor.BLACK){
+        this.isCheckWhite = true;
+      }else{
+        this.isCheckBlack = true;
+      }
+    }else {
+      if(myColor == FigureColor.BLACK){
+        this.isCheckWhite = false;
+      }else{
+        this.isCheckBlack = false;
+      }
+    }
   }
 
   public void moveFigureDiagonal(
@@ -258,6 +279,29 @@ public class Board {
   private boolean isValidCoordinate(Cell cell) { // TODO Change static
     return cell.x() >= 1 && cell.x() <= 8 && cell.y() >= 1 && cell.y() <= 8;
   }
+
+  public boolean getCheck(FigureColor myColor){
+    if (myColor == FigureColor.BLACK) {
+      return this.isCheckWhite;
+    }else{
+      return this.isCheckBlack;
+    }
+  }
+
+  public boolean getCheckedMate(FigureColor myColor){
+    if (myColor == FigureColor.BLACK) {
+      return this.isCheckMateWhite;
+    }else{
+      return this.isCheckMateBlack;
+    }
+  }
+
+  public boolean isBlackCheckMate(){
+
+
+    return false;
+  }
+
   // TODO make check
   // TODO make checkmate
 

@@ -5,6 +5,8 @@ import hwr.oop.chess.application.CellDirection;
 
 import java.util.ArrayList;
 
+import static hwr.oop.chess.application.Cell.isOpponentKing;
+
 public class Rook implements Figure {
   private static final FigureType type = FigureType.ROOK;
   private final FigureColor color;
