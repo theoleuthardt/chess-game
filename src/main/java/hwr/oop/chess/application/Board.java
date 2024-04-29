@@ -152,15 +152,14 @@ public class Board {
     return cells;
   }
 
-  public Cell cell(char x, int y) {
+  public Cell cell(char x, int y) { // TODO change name findCell
     return cell(x - 96, y);
   }
 
   public Cell cell(int x, int y) {
-    Cell searchFor = new Cell(x, y);
     ArrayList<Cell> cells = Board.allCells();
     for (Cell cell : cells) {
-      if (cell.isEqualTo(searchFor)) {
+      if (cell.isEqualTo(x, y, cell.x(), cell.y())) {
         return cell;
       }
     }
@@ -252,11 +251,11 @@ public class Board {
     }
   }
 
-  private boolean isValidCoordinate(int x, int y) {
+  public static boolean isValidCoordinate(int x, int y) { // TODO move to Cell class??
     return x >= 1 && x <= 8 && y >= 1 && y <= 8;
   }
 
-  private boolean isValidCoordinate(Cell cell) {
+  private boolean isValidCoordinate(Cell cell) { // TODO Change static
     return cell.x() >= 1 && cell.x() <= 8 && cell.y() >= 1 && cell.y() <= 8;
   }
   // TODO make check
@@ -265,4 +264,5 @@ public class Board {
   // TODO make castling
   // TODO make enpassnt
   // TODO count move
+  // TODO write Compare, CompareTo
 }

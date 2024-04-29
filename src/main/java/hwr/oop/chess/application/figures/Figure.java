@@ -9,6 +9,8 @@ public interface Figure {
 
   boolean canMoveTo(Cell prevCell, Cell nextCell);
 
+  // TODO write boolean isCheck(Cell currentCell);
+
   char symbol();
 
   FigureColor color();
