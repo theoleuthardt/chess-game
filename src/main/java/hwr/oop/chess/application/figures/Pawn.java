@@ -79,25 +79,25 @@ public class Pawn implements Figure {
   }
 
   // choose figure for the promotion
-  public int getPromotionFigure() {
-    int selectFigure;
-    int promotionFigure;
-    switch (selectFigure) {
-      case 1:
-        promotionFigure = FigureType.ROOK;
-        break;
-      case 2:
-        promotionFigure = FigureType.BISHOP;
-        break;
-      case 3:
-        promotionFigure = FigureType.KNIGHT;
-        break;
-      default:
-      case 0:
-        promotionFigure = FigureType.QUEEN;
-    }
-    return promotionFigure;
-  }
+//  public int getPromotionFigure() {
+//    int selectFigure;
+//    int promotionFigure;
+//    switch (selectFigure) {
+//      case 1:
+//        promotionFigure = FigureType.ROOK;
+//        break;
+//      case 2:
+//        promotionFigure = FigureType.BISHOP;
+//        break;
+//      case 3:
+//        promotionFigure = FigureType.KNIGHT;
+//        break;
+//      default:
+//      case 0:
+//        promotionFigure = FigureType.QUEEN;
+//    }
+//    return promotionFigure;
+//  }
 
   public char symbol() {
     return color == FigureColor.WHITE ? 'P' : 'p';
