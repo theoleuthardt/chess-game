@@ -20,12 +20,12 @@ public class QueenTest {
     board = new Board(false);
   }
 
-  @Test
+   @Test
   void testMoveQueen() {
     int x = 4;
     int y = 1;
-    board.findCell(x, y).setFigure(new Queen(FigureColor.WHITE));
-    Figure whiteQueen = board.findCell(x, y).figure();
+    board.cell(x, y).setFigure(new Queen(FigureColor.WHITE));
+    Figure whiteQueen = board.cell(x,y).getFigure();
 
     Cell movedCell = null;
 

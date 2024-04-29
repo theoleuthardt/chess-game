@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class Board {
   // TODO Write JAVA doc
-  private Cell firstCell;
+  private static Cell firstCell;
 
   public Board(boolean setFigures) {
     initializeBoard(setFigures);
@@ -62,18 +62,81 @@ public class Board {
 
   // Method to connect each cell
   public void connectCells(Cell currentCell, Cell anotherCell) {
-    if (anotherCell == null || currentCell == null) {
+    if(anotherCell == null || currentCell == null || !isValidCoordinate(currentCell) || !isValidCoordinate(anotherCell) ){
       return;
     }
-    currentCell.connectTo(anotherCell);
-    anotherCell.connectTo(currentCell);
+
+    int x = currentCell.x();
+    int y = currentCell.y();
+    int diffX = x - anotherCell.x();
+    int diffY = y - anotherCell.y();
+
+     // do not connect edges
+    if (diffX == -1 && x == 8 || diffX == 1 && x== 1 || diffY == 1 && y == 1 || diffX == -1 && y == 8) {
+      return;
+    }
+
+    switch (diffX) {
+      case 0->{
+        switch (diffY) {
+          // Connect vertically
+          case 1 -> {
+              currentCell.setBottomCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setTopCell(currentCell);
+          }
+          // Connect vertically
+          case -1 -> {
+              currentCell.setTopCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setBottomCell(currentCell);
+          }
+        }
+      }
+      case 1->{
+        switch (diffY) {
+          // Connect horizontally
+          case 0 ->{
+            currentCell.setLeftCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setRightCell(currentCell);
+          }
+          // Connect diagonally
+          case 1 -> {
+              currentCell.setBottomLeftCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setTopRightCell(currentCell);
+          }
+          // Connect diagonally
+          case -1 -> {
+              currentCell.setTopLeftCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setBottomRightCell(currentCell);
+          }
+        }
+      }
+      case -1 ->{
+        switch (diffY) {
+          // Connect horizontally
+          case 0 ->{
+            currentCell.setRightCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setLeftCell(currentCell);
+          }
+          // Connect diagonally
+          case 1 -> {
+              currentCell.setBottomRightCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setTopLeftCell(currentCell);
+          }
+          // Connect diagonally
+          case -1 -> {
+              currentCell.setTopRightCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setBottomLeftCell(currentCell);
+          }
+        }
+      }
+    }
   }
 
-  public Cell firstCell() {
+  public static Cell firstCell() {
     return firstCell;
   }
 
-  public ArrayList<Cell> allCells() {
+  public static ArrayList<Cell> allCells() {
     ArrayList<Cell> cells = new ArrayList<>();
     Cell cell = firstCell;
     Cell rowStart = cell;
@@ -203,8 +266,15 @@ public class Board {
     }
   }
 
-  // TODO make check : Hyejin macht dieses
-  // TODO make checkmate : Hyejin macht dieses
+  public static boolean isValidCoordinate(int x, int y) { // TODO move to Cell class??
+    return x >= 1 && x <= 8 && y >= 1 && y <= 8;
+  }
+
+  private boolean isValidCoordinate(Cell cell) { // TODO Change static
+    return cell.x() >= 1 && cell.x() <= 8 && cell.y() >= 1 && cell.y() <= 8;
+  }
+  // TODO make check
+  // TODO make checkmate
 
   // TODO make castling
   // TODO make enpassnt

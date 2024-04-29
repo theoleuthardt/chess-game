@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

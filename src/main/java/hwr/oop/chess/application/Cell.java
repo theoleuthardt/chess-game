@@ -1,9 +1,9 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
-import hwr.oop.chess.application.figures.FigureColor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Cell {
   private Figure figure;
@@ -20,10 +20,9 @@ public class Cell {
   private final int x;
 
   public Cell(int x, int y) {
-    if (x < 1 || x > 8 || y < 1 || y > 8) {
-      throw new IllegalArgumentException("Invalid Position");
+    if(!isValidCoordinate(x, y)) {
+        throw new IllegalArgumentException("Invalid Position");
     }
-
     this.x = x;
     this.y = y;
   }
