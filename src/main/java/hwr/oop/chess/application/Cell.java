@@ -218,5 +218,23 @@ public class Cell {
     return "Cell_" + (char)(x + 64) + y + "(" +
       (figure == null ? "-" : figure.symbol()) +
     ")";
+  
+  
+  public static boolean canCaptureKing(Cell current, FigureColor myColor) {
+    ArrayList<Cell> availableCells = current.getFigure().getAvailableCells(current);
+    for (Cell cell : availableCells) {
+      if(isOpponentKing(cell, myColor )){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean isOpponentKing(Cell cell, FigureColor myColor){
+    if(myColor == FigureColor.WHITE){
+      return cell.getFigure().symbol() == 'k';
+    }else {
+      return cell.getFigure().symbol() == 'K';
+    }
   }
 }

@@ -9,7 +9,7 @@ public interface Figure {
 
   boolean canMoveTo(Cell prevCell, Cell nextCell);
 
-  // TODO write boolean isCheck(Cell currentCell);
+  // boolean isChecked(Cell currentCell);
 
   char symbol();
 
