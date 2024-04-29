@@ -4,7 +4,6 @@ import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 public class Rook implements Figure {
   private static final FigureType type = FigureType.ROOK;
@@ -23,15 +22,11 @@ public class Rook implements Figure {
     currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.TOP);
     currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.BOTTOM);
 
-    Logger logger = Logger.getLogger(this.getClass().getName());
-    logger.info("Available cells: " + cells.toArray().length);
     return cells;
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
     ArrayList<Cell> availableCell = getAvailableCells(prevCell);
-    Logger logger = Logger.getLogger(this.getClass().getName());
-    logger.info("canMove: " + availableCell.contains(nextCell));
     return availableCell.contains(nextCell);
   }
 

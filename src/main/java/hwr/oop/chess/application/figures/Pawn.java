@@ -3,13 +3,10 @@ package hwr.oop.chess.application.figures;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 
-import java.util.logging.Logger;
-
 import java.util.ArrayList;
 
 public class Pawn implements Figure {
   // TODO pawn promotion
-  Logger logger = Logger.getLogger(getClass().getName());
   private static final FigureType type = FigureType.PAWN;
   private final FigureColor color;
 
@@ -67,14 +64,12 @@ public class Pawn implements Figure {
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
     ArrayList<Cell> availableCell = getAvailableCells(prevCell);
-    logger.info("canMove: " + availableCell.contains(nextCell));
     return availableCell.contains(nextCell);
   }
 
   // Pawn Promotion
   public boolean promotePawn(Cell currentCell, Cell nextCell) {
     ArrayList<Cell> availableCell = getAvailableCells(currentCell);
-    logger.info("promotePawn: " + availableCell.contains(nextCell));
     return availableCell.contains(nextCell);
   }
 

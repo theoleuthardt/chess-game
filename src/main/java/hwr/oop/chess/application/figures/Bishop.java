@@ -3,12 +3,9 @@ package hwr.oop.chess.application.figures;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 
-import java.util.logging.Logger;
-
 import java.util.ArrayList;
 
 public class Bishop implements Figure {
-  Logger logger = Logger.getLogger(getClass().getName());
   private static final FigureType type = FigureType.BISHOP;
   private final FigureColor color;
 
@@ -29,7 +26,6 @@ public class Bishop implements Figure {
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
     ArrayList<Cell> availableCell = getAvailableCells(prevCell);
-    logger.info("canMove: " + availableCell.contains(nextCell));
     return availableCell.contains(nextCell);
   }
 

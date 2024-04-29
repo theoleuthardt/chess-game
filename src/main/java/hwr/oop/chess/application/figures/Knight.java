@@ -1,14 +1,10 @@
 package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Cell;
-
 import java.util.Objects;
-import java.util.logging.Logger;
-
 import java.util.ArrayList;
 
 public class Knight implements Figure {
-  Logger logger = Logger.getLogger(getClass().getName());
   private static final FigureType type = FigureType.KNIGHT;
   private final FigureColor color;
 
@@ -47,7 +43,6 @@ public class Knight implements Figure {
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
     ArrayList<Cell> availableCell = getAvailableCells(prevCell);
-    logger.info("canMove: " + availableCell.contains(nextCell));
     return availableCell.contains(nextCell);
   }
 
