@@ -71,6 +71,34 @@ public class Pawn implements Figure {
     return availableCell.contains(nextCell);
   }
 
+  // Pawn Promotion
+  public boolean promotePawn(Cell currentCell, Cell nextCell) {
+    ArrayList<Cell> availableCell = getAvailableCells(currentCell);
+    logger.info("promotePawn: " + availableCell.contains(nextCell));
+    return availableCell.contains(nextCell);
+  }
+
+  // choose figure for the promotion
+  public int getPromotionFigure() {
+    int selectFigure;
+    int promotionFigure;
+    switch (selectFigure) {
+      case 1:
+        promotionFigure = FigureType.ROOK;
+        break;
+      case 2:
+        promotionFigure = FigureType.BISHOP;
+        break;
+      case 3:
+        promotionFigure = FigureType.KNIGHT;
+        break;
+      default:
+      case 0:
+        promotionFigure = FigureType.QUEEN;
+    }
+    return promotionFigure;
+  }
+
   public char symbol() {
     return color == FigureColor.WHITE ? 'P' : 'p';
   }
