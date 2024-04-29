@@ -24,7 +24,7 @@ public class King implements Figure {
     for (CellDirection direction : CellDirection.values()) {
       Cell neighbourCell = currentCell.cellInDirection(direction);
       if (neighbourCell != null
-          && (neighbourCell.getFigure() == null || neighbourCell.getFigure().color() != color())) {
+          && (neighbourCell.figure() == null || neighbourCell.figure().color() != color())) {
         cells.add(neighbourCell);
       }
     }

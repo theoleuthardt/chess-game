@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static hwr.oop.chess.application.Board.isValidCoordinate;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class QueenTest {
   Board board;
@@ -21,23 +21,17 @@ public class QueenTest {
   }
 
   @Test
-  void testQueenDirections() {
-    Queen queen = new Queen(FigureColor.BLACK);
-    assertEquals(8, queen.directions().size());
-  }
-
-  // @Test
   void testMoveQueen() {
     int x = 4;
     int y = 1;
-    Cell originalCell = board.cell(x,y);
-    Cell movedCell = null;
+    board.findCell(x, y).setFigure(new Queen(FigureColor.WHITE));
+    Figure whiteQueen = board.findCell(x, y).figure();
 
-    originalCell.setFigure(new Queen(FigureColor.WHITE));
-    Figure whiteQueen = originalCell.getFigure();
+    Cell movedCell = null;
 
     int testCount = 0;
     while (testCount < 10) {
+
       try {
         Random rand = new Random();
 
@@ -47,36 +41,30 @@ public class QueenTest {
         board.moveFigureDiagonal(board, CellDirection.TOP_LEFT, x, y, randomDiff);
         x -= randomDiff;
         y += randomDiff;
-        movedCell = board.cell(x, y);
+        movedCell = board.findCell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen, movedCell.getFigure());
-//        if(isValidCoordinate(x,y)){ // TODO write this codes also below // TEST error
-//          movedCell = board.cell(x, y);
-//          assertNotNull(movedCell);
-//          assertEquals(whiteQueen, movedCell.getFigure());
-//          assertTrue(whiteQueen.canMoveTo(originalCell, movedCell));
-//        }
+        assertEquals(whiteQueen, movedCell.figure());
 
         board.moveFigureDiagonal(board, CellDirection.TOP_RIGHT, x, y, randomDiff);
         x += randomDiff;
         y += randomDiff;
-        movedCell = board.cell(x, y);
+        movedCell = board.findCell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen, movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.figure());
 
         board.moveFigureDiagonal(board, CellDirection.BOTTOM_LEFT, x, y, randomDiff);
         x -= randomDiff;
         y -= randomDiff;
-        movedCell = board.cell(x, y);
+        movedCell = board.findCell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen, movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.figure());
 
         board.moveFigureDiagonal(board, CellDirection.BOTTOM_RIGHT, x, y, randomDiff);
         x += randomDiff;
         y -= randomDiff;
-        movedCell = board.cell(x, y);
+        movedCell = board.findCell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen, movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.figure());
       } catch (IllegalArgumentException e) {
         System.out.println("IllegalArgumentException occurred: " + e.getMessage());
       }

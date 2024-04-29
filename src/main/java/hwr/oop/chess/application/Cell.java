@@ -4,8 +4,7 @@ import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureColor;
 
 import java.util.ArrayList;
-
-import static hwr.oop.chess.application.Board.isValidCoordinate;
+import java.util.List;
 
 public class Cell {
   private Figure figure;
@@ -22,8 +21,8 @@ public class Cell {
   private final int x;
 
   public Cell(int x, int y) {
-    if(!isValidCoordinate(x, y)) {
-        throw new IllegalArgumentException("Invalid Position");
+    if (!isValidCoordinate(x, y)) {
+      throw new IllegalArgumentException("Invalid Position");
     }
     this.x = x;
     this.y = y;
@@ -31,7 +30,27 @@ public class Cell {
 
   public Cell(char x, int y) {
     this(x - 96, y);
-  } // TODO add isValidCoordinate
+  }
+
+  public boolean isValidCoordinate(int c) {
+    return c >= 1 && c <= 8;
+  }
+
+  public boolean isInvalidCoordinate(int c) {
+    return !isValidCoordinate(c);
+  }
+
+  public boolean isValidCoordinate(int x, int y) {
+    return isValidCoordinate(x) && isValidCoordinate(y);
+  }
+
+  public boolean isInvalidCoordinate(int x, int y) {
+    return !isValidCoordinate(x, y);
+  }
+
+  public boolean isChecked(Cell current, FigureColor myColor) {
+    return false;
+  }
 
   // Method to set the figure
   public void setFigure(Figure figure) {
@@ -39,7 +58,7 @@ public class Cell {
   }
 
   // Method to get the figure
-  public Figure getFigure() {
+  public Figure figure() {
     return figure;
   }
 
@@ -120,18 +139,18 @@ public class Cell {
   }
 
   // Method to return all positions in the row to which this position belongs
-//  public List<Cell> getCellsInRow() {
-//    ArrayList<Cell> cells = this.allCells();
-//    cells.removeIf(cell -> cell.y() != this.y());
-//    return cells;
-//  }
+  //  public List<Cell> getCellsInRow() {
+  //    ArrayList<Cell> cells = this.allCells();
+  //    cells.removeIf(cell -> cell.y() != this.y());
+  //    return cells;
+  //  }
 
   // Method to return all positions in the column to which this position belongs
-//  public List<Cell> getCellsInColumn() {
-//    ArrayList<Cell> cells = Board.allCells();
-//    cells.removeIf(cell -> cell.x() != this.x());
-//    return cells;
-//  }
+  //  public List<Cell> getCellsInColumn() {
+  //    ArrayList<Cell> cells = Board.allCells();
+  //    cells.removeIf(cell -> cell.x() != this.x());
+  //    return cells;
+  //  }
 
   public Cell cellInDirection(CellDirection direction) {
     return switch (direction) {
@@ -147,24 +166,75 @@ public class Cell {
   }
 
   public void addAvailableCellsInDirectionToList(ArrayList<Cell> list, CellDirection direction) {
-   // TODO fix test error testMoveQueen line 54
     Cell current = this;
     while ((current = current.cellInDirection(direction)) != null) {
-      if (current.getFigure() == null) {
+      boolean cellIsEmpty = current.figure() == null;
+      boolean enemyIsOnField = current.figure().color() != figure().color();
+
+      if (cellIsEmpty || enemyIsOnField) {
         list.add(current);
-        continue;
       }
-      if (current.getFigure().color() != getFigure().color()) {
-        list.add(current);
-        break;
-      } else {
+      if (!cellIsEmpty) {
         break;
       }
     }
   }
 
-  public boolean isEqualTo(int x1, int y1, int x2, int y2) {
-    return (x1 == x2) && (y1 == y2);
+  public boolean isEqualTo(Cell pos1) {
+    Cell pos2 = this;
+    return (pos1.x() == pos2.x()) && (pos1.y() == pos2.y());
+  }
+
+  public void connectTo(Cell anotherCell) {
+    if (anotherCell == null) {
+      return;
+    }
+
+    Cell currentCell = this;
+    // -1 if anotherCell is to the left
+    // 1 if anotherCell is to the right
+    int diffX = anotherCell.x() - x;
+
+    // -1 if anotherCell is below
+    // 1 if anotherCell is above
+    int diffY = anotherCell.y() - y;
+
+    // do not connect edges
+    /*if (isInvalidCoordinate(diffX + x, diffX + y)) {
+      throw new IllegalArgumentException("The cell would be outside of the gameboard");
+    }*/
+
+    final String notNeighboursError = "The cells are not neighbours to each other";
+
+    switch (diffX) {
+      case 0 -> {
+        // anotherCell is above or below currentCell
+        switch (diffY) {
+          case 1 -> setTopCell(anotherCell);
+          case 0 -> throw new IllegalArgumentException("The cells are identical");
+          case -1 -> setBottomCell(currentCell);
+          default -> throw new IllegalArgumentException(notNeighboursError);
+        }
+      }
+      case 1 -> {
+        // anotherCell is right of currentCell
+        switch (diffY) {
+          case 1 -> setTopRightCell(currentCell);
+          case 0 -> setRightCell(currentCell);
+          case -1 -> setBottomRightCell(currentCell);
+          default -> throw new IllegalArgumentException(notNeighboursError);
+        }
+      }
+      case -1 -> {
+        // anotherCell is left of currentCell
+        switch (diffY) {
+          case 1 -> setTopLeftCell(currentCell);
+          case 0 -> setLeftCell(currentCell);
+          case -1 -> setBottomLeftCell(currentCell);
+          default -> throw new IllegalArgumentException(notNeighboursError);
+        }
+      }
+    }
   }
 
   public static boolean canCaptureKing(Cell current, FigureColor myColor) {

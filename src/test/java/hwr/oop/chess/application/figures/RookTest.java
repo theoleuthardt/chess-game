@@ -13,18 +13,18 @@ class RookTest {
   void before() {
     board = new Board(false);
 
-    board.cell('a', 1).setFigure(new Rook(FigureColor.WHITE));
-    board.cell('h', 1).setFigure(new Rook(FigureColor.WHITE));
+    board.findCell('a', 1).setFigure(new Rook(FigureColor.WHITE));
+    board.findCell('h', 1).setFigure(new Rook(FigureColor.WHITE));
 
-    board.cell('a', 8).setFigure(new Rook(FigureColor.WHITE));
-    board.cell('h', 8).setFigure(new Rook(FigureColor.WHITE));
+    board.findCell('a', 8).setFigure(new Rook(FigureColor.WHITE));
+    board.findCell('h', 8).setFigure(new Rook(FigureColor.WHITE));
   }
 
   @Test
   void moveRook() {
-    Cell cellA1 = board.cell('a', 1);
-    Cell cellA6 = board.cell('a', 6);
-    boolean canMove = cellA1.getFigure().canMoveTo(cellA1, cellA6);
+    Cell cellA1 = board.findCell('a', 1);
+    Cell cellA6 = board.findCell('a', 6);
+    boolean canMove = cellA1.figure().canMoveTo(cellA1, cellA6);
     Assertions.assertThat(canMove).isTrue();
   }
 }

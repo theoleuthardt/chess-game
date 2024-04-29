@@ -33,7 +33,7 @@ public class Pawn implements Figure {
         oneFieldForwards == null ? null : oneFieldForwards.cellInDirection(forwards);
 
     // move one field forwards
-    if (oneFieldForwards != null && oneFieldForwards.getFigure() == null) {
+    if (oneFieldForwards != null && oneFieldForwards.figure() == null) {
       cells.add(oneFieldForwards);
     }
 
@@ -41,8 +41,8 @@ public class Pawn implements Figure {
     if (isInStartPosition
         && oneFieldForwards != null
         && twoFieldForwards != null
-        && oneFieldForwards.getFigure() == null
-        && twoFieldForwards.getFigure() == null) {
+        && oneFieldForwards.figure() == null
+        && twoFieldForwards.figure() == null) {
       cells.add(twoFieldForwards);
     }
 
@@ -50,15 +50,15 @@ public class Pawn implements Figure {
     if (oneFieldForwards != null) {
       Cell diagonalLeftCell = oneFieldForwards.leftCell();
       if (diagonalLeftCell != null
-          && diagonalLeftCell.getFigure() != null
-          && diagonalLeftCell.getFigure().color() != color()) {
+          && diagonalLeftCell.figure() != null
+          && diagonalLeftCell.figure().color() != color()) {
         cells.add(diagonalLeftCell);
       }
 
       Cell diagonalRightCell = oneFieldForwards.rightCell();
       if (diagonalRightCell != null
-          && diagonalRightCell.getFigure() != null
-          && diagonalRightCell.getFigure().color() != color()) {
+          && diagonalRightCell.figure() != null
+          && diagonalRightCell.figure().color() != color()) {
         cells.add(diagonalRightCell);
       }
     }

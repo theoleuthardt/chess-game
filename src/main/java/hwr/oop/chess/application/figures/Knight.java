@@ -40,11 +40,7 @@ public class Knight implements Figure {
     cells.removeIf(Objects::isNull);
 
     // Remove cell if figure is mine
-    for (Cell cell : cells) {
-      if (cell.getFigure() != null && cell.getFigure().color() == color()) {
-        cells.remove(cell);
-      }
-    }
+    cells.removeIf(cell -> cell.figure() != null && cell.figure().color() == color());
 
     return cells;
   }
