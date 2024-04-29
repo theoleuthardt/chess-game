@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito; // TODO learn about Mockito for TEST
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -31,7 +32,7 @@ class BoardTest {
 
   @Test
   void initialBoard_withBlackFiguresOnTop() {
-    ArrayList<Cell> cells = board.allCells();
+    List<Cell> cells = board.allCells();
 
     // row of black figures
     String topRow = "rnbqkbnr";
@@ -68,7 +69,7 @@ class BoardTest {
 
   @Test
   void initialBoard_onlyMiddleIsFree() {
-    ArrayList<Cell> cells = board.allCells();
+    List<Cell> cells = board.allCells();
     assertThat(cells).hasSize(64);
     for(Cell cell : cells) {
       if(cell.y() != 1 && cell.y() != 2 && cell.y() != 7 && cell.y() != 8) {
@@ -82,7 +83,7 @@ class BoardTest {
   @Test
   void initialBoard_withoutFiguresIsEmpty() {
     Board boardNoFigure = new Board(false);
-    ArrayList<Cell> cells = boardNoFigure.allCells();
+    List<Cell> cells = boardNoFigure.allCells();
     assertThat(cells).hasSize(64);
     for(Cell cell : cells) {
       assertThat(cell.figure()).isNull();
@@ -180,7 +181,7 @@ class BoardTest {
   @EnumSource(CellDirection.class)
   void testBoardCells(CellDirection direction) {
     CellDirection returnDirection = getOppositeDirection(direction);
-    ArrayList<Cell> cells = board.allCells();
+    List<Cell> cells = board.allCells();
 
     for (Cell currentCell : cells) {
       if (currentCell.cellInDirection(direction) != null) {

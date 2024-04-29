@@ -17,10 +17,10 @@ public class ChessGame {
 
 
 
-        if(board.getCheckedMate(FigureColor.BLACK)){
+        if(board.isCheckmate(FigureColor.BLACK)){
             logger.info("Black lost");
         }
-        if(board.getCheckedMate(FigureColor.WHITE)){
+        if(board.isCheckmate(FigureColor.WHITE)){
             logger.info("White lost");
         }
     }
