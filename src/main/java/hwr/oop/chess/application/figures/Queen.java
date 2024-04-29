@@ -4,30 +4,19 @@ import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Queen implements Figure {
   private static final FigureType type = FigureType.QUEEN;
   private final FigureColor color;
-  private final ArrayList<CellDirection> directions;
 
   public Queen(FigureColor color) {
     this.color = color;
-    directions = new ArrayList<>();
-    directions.add(CellDirection.LEFT);
-    directions.add(CellDirection.RIGHT);
-    directions.add(CellDirection.TOP);
-    directions.add(CellDirection.TOP_LEFT);
-    directions.add(CellDirection.TOP_RIGHT);
-    directions.add(CellDirection.BOTTOM);
-    directions.add(CellDirection.BOTTOM_LEFT);
-    directions.add(CellDirection.BOTTOM_RIGHT);
   }
 
   public ArrayList<Cell> getAvailableCells(Cell currentCell) {
     ArrayList<Cell> cells = new ArrayList<>();
 
-    for (CellDirection direction : directions) {
+    for (CellDirection direction : CellDirection.values()) {
       currentCell.addAvailableCellsInDirectionToList(cells, direction);
     }
      return cells;
@@ -50,7 +39,4 @@ public class Queen implements Figure {
     return type;
   }
 
-  public List<CellDirection> directions() {
-    return directions;
-  }
 }

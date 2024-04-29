@@ -14,7 +14,6 @@ public class Pawn implements Figure {
     this.color = color;
   }
 
-  // TODO Fix AvailableCells
   public ArrayList<Cell> getAvailableCells(Cell currentCell) {
     ArrayList<Cell> cells = new ArrayList<>();
 
