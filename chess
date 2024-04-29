@@ -1,0 +1,3 @@
+#!/bin/bash
+
+java -cp target/chess-game-0.1.0.jar hwr.oop.chess.application

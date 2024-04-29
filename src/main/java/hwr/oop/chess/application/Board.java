@@ -6,110 +6,129 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Board {
+  // TODO Write JAVA doc
   private static Cell firstCell;
 
-  public Board() {
-    initializeBoard();
+  public Board(boolean setFigures) {
+    initializeBoard(setFigures);
   }
 
-  private void initializeBoard() {
-    // Create the first position and store it in startingPosition
+  private void initializeBoard(boolean setFigures) {
+    // TODO make codes simple
+    // Create the first cell and store it in firstCell
     firstCell = new Cell(1, 1);
     Cell leftCell = firstCell;
-    Cell topCell = firstCell;
-    Cell topCellRowStart = firstCell;
+    Cell bottomCellRowStart = firstCell;
+    Cell bottomCell = firstCell;
 
-    // Create and connect positions for each row and column of the board
+    // Create and connect cells for each row and column of the board
     for (int y = 1; y <= 8; y++) {
       for (int x = 1; x <= 8; x++) {
-        // Skip the first position since it's already created
+        // Skip the first cell since it's already created
         if (y == 1 && x == 1) {
           continue;
         }
         if (x == 1) {
-          topCell = topCellRowStart;
+          bottomCell = bottomCellRowStart;
         }
-        // Create a new position
-        Cell newCell = new Cell(x, y);
-        // Connect the position to the previous position
-        connectCells(newCell, leftCell); // left
-        if (topCell != null) {
-          connectCells(newCell, topCell); // top
-          if (topCell.leftCell() != null) {
-            connectCells(newCell, topCell.leftCell()); // top left
+        // Create a new cell
+        Cell currentCell = new Cell(x, y);
+        // Connect horizontally
+        connectCells(currentCell, leftCell);
+        if (y != 1) {
+          // Connect vertically
+          connectCells(currentCell, bottomCell);
+          if (x != 1) {
+            // Connect diagonally to the left
+            connectCells(currentCell, bottomCell.leftCell());
           }
-          if (topCell.rightCell() != null) {
-            connectCells(newCell, topCell.rightCell()); // top right
-          }
-          if (topCell.rightCell() == null && topCellRowStart != null) {
-            topCellRowStart = topCellRowStart.topCell();
+          if (x != 8) {
+            // Connect diagonally to the right
+            connectCells(currentCell, bottomCell.rightCell());
+          } else {
+            // Change Row
+            bottomCellRowStart = bottomCellRowStart.topCell();
           }
         }
-
-        // Set the next position as the current position
-        leftCell = newCell;
-        if (topCell != null) {
-          topCell = topCell.rightCell();
-        }
+        // Change next cell as the current cell
+        leftCell = currentCell;
+        bottomCell = bottomCell.rightCell();
       }
     }
-
-    // Set up the initial chess positions
-    setUpInitialChessPositions();
+    if (setFigures) {
+      addFiguresToBoard();
+    }
   }
 
-  // Method to connect each position
-  private void connectCells(Cell cell1, Cell cell2) {
-    Objects.requireNonNull(cell1);
-    Objects.requireNonNull(cell2);
-
-    if (cell1.isEqualTo(cell2)) {
-      throw new IllegalArgumentException("The cells are not allowed to be equal");
-    }
-
-    // Connect horizontally
-    if (cell1.y() == cell2.y()) {
-      if (cell1.x() < cell2.x()) { // cell1 is left of cell2
-        cell1.setRightCell(cell2);
-        cell2.setLeftCell(cell1);
-      } else { // cell1 is right of cell2
-        cell1.setLeftCell(cell2);
-        cell2.setRightCell(cell1);
-      }
+  // Method to connect each cell
+  public void connectCells(Cell currentCell, Cell anotherCell) {
+    if(anotherCell == null || currentCell == null || !isValidCoordinate(currentCell) || !isValidCoordinate(anotherCell) ){
       return;
     }
 
-    // Connect vertically
-    if (cell1.x() == cell2.x()) {
-      if (cell1.y() > cell2.y()) { // cell1 is above cell2
-        cell1.setBottomCell(cell2);
-        cell2.setTopCell(cell1);
-      } else { // cell1 is below cell2
-        cell1.setTopCell(cell2);
-        cell2.setBottomCell(cell1);
-      }
+    int x = currentCell.x();
+    int y = currentCell.y();
+    int diffX = x - anotherCell.x();
+    int diffY = y - anotherCell.y();
+
+     // do not connect edges
+    if (diffX == -1 && x == 8 || diffX == 1 && x== 1 || diffY == 1 && y == 1 || diffX == -1 && y == 8) {
       return;
     }
 
-    // Connect diagonally
-    if (cell1.y() > cell2.y()) { // cell1 is above cell2
-      if (cell1.x() < cell2.x()) { // cell1 is left of cell2
-        cell1.setBottomRightCell(cell2);
-        cell2.setTopLeftCell(cell1);
-      } else { // cell1 is right of cell2
-        cell1.setBottomLeftCell(cell2);
-        cell2.setTopRightCell(cell1);
+    switch (diffX) {
+      case 0->{
+        switch (diffY) {
+          // Connect vertically
+          case 1 -> {
+              currentCell.setBottomCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setTopCell(currentCell);
+          }
+          // Connect vertically
+          case -1 -> {
+              currentCell.setTopCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setBottomCell(currentCell);
+          }
+        }
       }
-      return;
-    }
-
-    // Connect diagonally, cell1 is below cell2
-    if (cell1.x() < cell2.x()) { // cell1 is left of cell2
-      cell1.setTopRightCell(cell2);
-      cell2.setBottomLeftCell(cell1);
-    } else { // cell1 is right of cell2
-      cell1.setTopCell(cell2);
-      cell2.setBottomCell(cell1);
+      case 1->{
+        switch (diffY) {
+          // Connect horizontally
+          case 0 ->{
+            currentCell.setLeftCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setRightCell(currentCell);
+          }
+          // Connect diagonally
+          case 1 -> {
+              currentCell.setBottomLeftCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setTopRightCell(currentCell);
+          }
+          // Connect diagonally
+          case -1 -> {
+              currentCell.setTopLeftCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setBottomRightCell(currentCell);
+          }
+        }
+      }
+      case -1 ->{
+        switch (diffY) {
+          // Connect horizontally
+          case 0 ->{
+            currentCell.setRightCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setLeftCell(currentCell);
+          }
+          // Connect diagonally
+          case 1 -> {
+              currentCell.setBottomRightCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setTopLeftCell(currentCell);
+          }
+          // Connect diagonally
+          case -1 -> {
+              currentCell.setTopRightCell(anotherCell);
+              Objects.requireNonNull(anotherCell).setBottomLeftCell(currentCell);
+          }
+        }
+      }
     }
   }
 
@@ -127,13 +146,27 @@ public class Board {
       if (cell.rightCell() != null) {
         cell = cell.rightCell();
       } else {
-        cell = rowStart = rowStart.topCell();
+        cell =  rowStart = rowStart.topCell();
       }
     }
     return cells;
   }
 
-  private void setUpInitialChessPositions() {
+  public Cell cell(char x, int y) { // TODO change name findCell
+    return cell(x - 96, y);
+  }
+
+  public Cell cell(int x, int y) {
+    ArrayList<Cell> cells = Board.allCells();
+    for (Cell cell : cells) {
+      if (cell.isEqualTo(x, y, cell.x(), cell.y())) {
+        return cell;
+      }
+    }
+    return null;
+  }
+
+  private void addFiguresToBoard() {
     ArrayList<Cell> cells = Board.allCells();
     for (Cell cell : cells) {
       // Set up white figures
@@ -172,39 +205,15 @@ public class Board {
     }
   }
 
-  public static Cell findCell(int x, int y) {
-    Cell searchFor = new Cell(x, y);
-    ArrayList<Cell> cells = Board.allCells();
-    for (Cell cell : cells) {
-      if (cell.isEqualTo(searchFor)) {
-        return cell;
-      }
-    }
-    throw new RuntimeException("The given cell is not found");
-  }
-
-  public void printBoard() {
-    ArrayList<Cell> cells = Board.allCells();
-    for (Cell cell : cells) {
-      Figure figure = cell.getFigure();
-      // Print figure if it exists, otherwise print empty position
-      if (figure != null) {
-        System.out.print(figure.symbol() + " "); // Assuming Figure class has getSymbol method
-      } else {
-        System.out.print("- "); // Empty position symbol
-      }
-
-      if (cell.rightCell() == null) {
-        System.out.println();
-      }
-    }
-  }
-
   // Method to move a piece on the board
-  public void moveFigure(int startX, int startY, int endX, int endY) {
+  public void moveFigure(int startX, int startY, int endX, int endY)  {
+    if (!isValidCoordinate(startX, startY) || !isValidCoordinate(endX, endY)) {
+      throw new IllegalArgumentException(
+          "Invalid coordinates. Coordinates must be between 1 and 8.");
+    }
     // Get the piece at the start position
-    Cell startCell = findCell(startX, startY);
-    Cell endCell = findCell(endX, endY);
+    Cell startCell = cell(startX, startY);
+    Cell endCell = cell(endX, endY);
 
     Figure figure = startCell.getFigure();
     if (figure == null) {
@@ -219,11 +228,21 @@ public class Board {
     endCell.setFigure(figure);
   }
 
-  public static Figure getFigureOnField(int x, int y) {
-    return Objects.requireNonNull(findCell(x, y)).getFigure();
+  public void moveFigureDiagonal(
+      Board board, CellDirection direction, int startX, int startY, int diff)  {
+    switch (direction) {
+      case TOP_LEFT -> board.moveFigure(startX, startY, startX - diff, startY + diff);
+      case TOP_RIGHT -> board.moveFigure(startX, startY, startX + diff, startY + diff);
+      case BOTTOM_LEFT -> board.moveFigure(startX, startY, startX - diff, startY - diff);
+      case BOTTOM_RIGHT -> board.moveFigure(startX, startY, startX + diff, startY - diff);
+    }
   }
 
-  public static boolean isFigureOnField(int x, int y) {
+  public Figure getFigureOnField(int x, int y) {
+    return Objects.requireNonNull(cell(x, y)).getFigure();
+  }
+
+  public boolean isFigureOnField(int x, int y) {
     try {
       getFigureOnField(x, y);
       return true;
@@ -231,4 +250,19 @@ public class Board {
       return false;
     }
   }
+
+  public static boolean isValidCoordinate(int x, int y) { // TODO move to Cell class??
+    return x >= 1 && x <= 8 && y >= 1 && y <= 8;
+  }
+
+  private boolean isValidCoordinate(Cell cell) { // TODO Change static
+    return cell.x() >= 1 && cell.x() <= 8 && cell.y() >= 1 && cell.y() <= 8;
+  }
+  // TODO make check
+  // TODO make checkmate
+
+  // TODO make castling
+  // TODO make enpassnt
+  // TODO count move
+  // TODO write Compare, CompareTo
 }

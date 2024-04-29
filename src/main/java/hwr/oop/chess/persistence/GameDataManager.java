@@ -1,5 +1,6 @@
 package hwr.oop.chess.persistence;
 
+<<<<<<< HEAD
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -70,4 +71,14 @@ public class DynamicGameDataManager {
     manager.loadGame();
     manager.saveGame();
   }
+=======
+public class GameDataManager {
+    // TODO save data
+    // TODO read data from file
+    // TODO connect with ChessGame or Board
+    // TODO connect with server and database
+    // Loose coupling for saving and loading game
+
+    // public interface
+>>>>>>> main
 }

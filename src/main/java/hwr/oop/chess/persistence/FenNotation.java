@@ -1,6 +1,8 @@
 package hwr.oop.chess.persistence;
 
 public class FenNotation {
+  // TODO connect with board
+  // TODO connect with GameDataManager
   private String cell;
   private String activeColor;
   private String castling;

@@ -1,9 +1,11 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
+import hwr.oop.chess.application.figures.FigureColor;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import static hwr.oop.chess.application.Board.isValidCoordinate;
 
 public class Cell {
   private Figure figure;
@@ -20,17 +22,16 @@ public class Cell {
   private final int x;
 
   public Cell(int x, int y) {
-    if (x < 1 || x > 8 || y < 1 || y > 8) {
-      throw new IllegalArgumentException("Invalid Position");
+    if(!isValidCoordinate(x, y)) {
+        throw new IllegalArgumentException("Invalid Position");
     }
-
     this.x = x;
     this.y = y;
   }
 
   public Cell(char x, int y) {
     this(x - 96, y);
-  }
+  } // TODO add isValidCoordinate
 
   // Method to set the figure
   public void setFigure(Figure figure) {
@@ -119,21 +120,50 @@ public class Cell {
   }
 
   // Method to return all positions in the row to which this position belongs
-  public List<Cell> getCellsInRow() {
-    ArrayList<Cell> cells = Board.allCells();
-    cells.removeIf(cell -> cell.y() != this.y());
-    return cells;
-  }
+//  public List<Cell> getCellsInRow() {
+//    ArrayList<Cell> cells = this.allCells();
+//    cells.removeIf(cell -> cell.y() != this.y());
+//    return cells;
+//  }
 
   // Method to return all positions in the column to which this position belongs
-  public List<Cell> getCellsInColumn() {
-    ArrayList<Cell> cells = Board.allCells();
-    cells.removeIf(cell -> cell.x() != this.x());
-    return cells;
+//  public List<Cell> getCellsInColumn() {
+//    ArrayList<Cell> cells = Board.allCells();
+//    cells.removeIf(cell -> cell.x() != this.x());
+//    return cells;
+//  }
+
+  public Cell cellInDirection(CellDirection direction) {
+    return switch (direction) {
+      case LEFT -> leftCell();
+      case RIGHT -> rightCell();
+      case TOP -> topCell();
+      case TOP_LEFT -> topLeftCell();
+      case TOP_RIGHT -> topRightCell();
+      case BOTTOM -> bottomCell();
+      case BOTTOM_LEFT -> bottomLeftCell();
+      case BOTTOM_RIGHT -> bottomRightCell();
+    };
   }
 
-  public boolean isEqualTo(Cell pos1) {
-    Cell pos2 = this;
-    return (pos1.x() == pos2.x()) && (pos1.y() == pos2.y());
+  public void addAvailableCellsInDirectionToList(ArrayList<Cell> list, CellDirection direction) {
+   // TODO fix test error testMoveQueen line 54
+    Cell current = this;
+    while ((current = current.cellInDirection(direction)) != null) {
+      if (current.getFigure() == null) {
+        list.add(current);
+        continue;
+      }
+      if (current.getFigure().color() != getFigure().color()) {
+        list.add(current);
+        break;
+      } else {
+        break;
+      }
+    }
+  }
+
+  public boolean isEqualTo(int x1, int y1, int x2, int y2) {
+    return (x1 == x2) && (y1 == y2);
   }
 }
