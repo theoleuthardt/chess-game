@@ -3,6 +3,7 @@ package hwr.oop.chess.application;
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureColor;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Cell {
   private final int y;
@@ -218,10 +219,11 @@ public class Cell {
     return "Cell_" + (char)(x + 64) + y + "(" +
       (figure == null ? "-" : figure.symbol()) +
     ")";
-  
-  
-  public static boolean canCaptureKing(Cell current, FigureColor myColor) {
-    ArrayList<Cell> availableCells = current.getFigure().getAvailableCells(current);
+
+}
+
+  public static boolean canCaptureOpponenetKing(Cell current, FigureColor myColor) {
+    ArrayList<Cell> availableCells = current.figure().getAvailableCells(current);
     for (Cell cell : availableCells) {
       if(isOpponentKing(cell, myColor )){
         return true;
@@ -232,9 +234,9 @@ public class Cell {
 
   public static boolean isOpponentKing(Cell cell, FigureColor myColor){
     if(myColor == FigureColor.WHITE){
-      return cell.getFigure().symbol() == 'k';
+      return cell.figure().symbol() == 'k';
     }else {
-      return cell.getFigure().symbol() == 'K';
+      return cell.figure().symbol() == 'K';
     }
   }
 }

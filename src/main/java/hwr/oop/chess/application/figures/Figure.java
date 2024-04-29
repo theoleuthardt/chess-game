@@ -9,11 +9,11 @@ public interface Figure {
 
   boolean canMoveTo(Cell prevCell, Cell nextCell);
 
-  // boolean isChecked(Cell currentCell);
-
   char symbol();
 
   FigureColor color();
 
   FigureType type();
+
+  // TODO write @Overide in other Figure Class
 }
