@@ -68,7 +68,10 @@ public class Board {
 
   // Method to connect each cell
   public void connectCells(Cell currentCell, Cell anotherCell) {
-    if(anotherCell == null || currentCell == null || !isValidCoordinate(currentCell) || !isValidCoordinate(anotherCell) ){
+    if (anotherCell == null
+            || currentCell == null
+            || !isValidCoordinate(currentCell)
+            || !isValidCoordinate(anotherCell)) {
       return;
     }
 
@@ -77,61 +80,64 @@ public class Board {
     int diffX = x - anotherCell.x();
     int diffY = y - anotherCell.y();
 
-     // do not connect edges
-    if (diffX == -1 && x == 8 || diffX == 1 && x== 1 || diffY == 1 && y == 1 || diffX == -1 && y == 8) {
+    // do not connect edges
+    if (diffX == -1 && x == 8
+            || diffX == 1 && x == 1
+            || diffY == 1 && y == 1
+            || diffX == -1 && y == 8) {
       return;
     }
 
     switch (diffX) {
-      case 0->{
+      case 0 -> {
         switch (diffY) {
           // Connect vertically
           case 1 -> {
-              currentCell.setBottomCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setTopCell(currentCell);
+            currentCell.setBottomCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setTopCell(currentCell);
           }
           // Connect vertically
           case -1 -> {
-              currentCell.setTopCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setBottomCell(currentCell);
+            currentCell.setTopCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setBottomCell(currentCell);
           }
         }
       }
-      case 1->{
+      case 1 -> {
         switch (diffY) {
           // Connect horizontally
-          case 0 ->{
+          case 0 -> {
             currentCell.setLeftCell(anotherCell);
             Objects.requireNonNull(anotherCell).setRightCell(currentCell);
           }
           // Connect diagonally
           case 1 -> {
-              currentCell.setBottomLeftCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setTopRightCell(currentCell);
+            currentCell.setBottomLeftCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setTopRightCell(currentCell);
           }
           // Connect diagonally
           case -1 -> {
-              currentCell.setTopLeftCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setBottomRightCell(currentCell);
+            currentCell.setTopLeftCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setBottomRightCell(currentCell);
           }
         }
       }
-      case -1 ->{
+      case -1 -> {
         switch (diffY) {
           // Connect horizontally
-          case 0 ->{
+          case 0 -> {
             currentCell.setRightCell(anotherCell);
             Objects.requireNonNull(anotherCell).setLeftCell(currentCell);
           }
           // Connect diagonally
           case 1 -> {
-              currentCell.setBottomRightCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setTopLeftCell(currentCell);
+            currentCell.setBottomRightCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setTopLeftCell(currentCell);
           }
           // Connect diagonally
           case -1 -> {
-              currentCell.setTopRightCell(anotherCell);
-              Objects.requireNonNull(anotherCell).setBottomLeftCell(currentCell);
+            currentCell.setTopRightCell(anotherCell);
+            Objects.requireNonNull(anotherCell).setBottomLeftCell(currentCell);
           }
         }
       }
@@ -152,7 +158,7 @@ public class Board {
       if (cell.rightCell() != null) {
         cell = cell.rightCell();
       } else {
-        cell =  rowStart = rowStart.topCell();
+        cell = rowStart = rowStart.topCell();
       }
     }
     return cells;
@@ -212,10 +218,10 @@ public class Board {
   }
 
   // Method to move a piece on the board
-  public void moveFigure(int startX, int startY, int endX, int endY)  {
+  public void moveFigure(int startX, int startY, int endX, int endY) {
     if (!isValidCoordinate(startX, startY) || !isValidCoordinate(endX, endY)) {
       throw new IllegalArgumentException(
-          "Invalid coordinates. Coordinates must be between 1 and 8.");
+              "Invalid coordinates. Coordinates must be between 1 and 8.");
     }
     // Get the piece at the start position
     Cell startCell = cell(startX, startY);
@@ -234,23 +240,11 @@ public class Board {
     startCell.setFigure(null);
     endCell.setFigure(figure);
 
-    if(canCaptureKing(endCell, myColor)){
-      if(myColor == FigureColor.BLACK){
-        this.isCheckWhite = true;
-      }else{
-        this.isCheckBlack = true;
-      }
-    }else {
-      if(myColor == FigureColor.BLACK){
-        this.isCheckWhite = false;
-      }else{
-        this.isCheckBlack = false;
-      }
-    }
+    this.updateCheckStatus(myColor);
   }
 
   public void moveFigureDiagonal(
-      Board board, CellDirection direction, int startX, int startY, int diff)  {
+          Board board, CellDirection direction, int startX, int startY, int diff) {
     switch (direction) {
       case TOP_LEFT -> board.moveFigure(startX, startY, startX - diff, startY + diff);
       case TOP_RIGHT -> board.moveFigure(startX, startY, startX + diff, startY + diff);
@@ -280,30 +274,124 @@ public class Board {
     return cell.x() >= 1 && cell.x() <= 8 && cell.y() >= 1 && cell.y() <= 8;
   }
 
-  public boolean getCheck(FigureColor myColor){
+  public boolean getCheck(FigureColor myColor) {
     if (myColor == FigureColor.BLACK) {
       return this.isCheckWhite;
-    }else{
+    } else {
       return this.isCheckBlack;
     }
   }
 
-  public boolean getCheckedMate(FigureColor myColor){
+  public boolean getCheckedMate(FigureColor myColor) {
     if (myColor == FigureColor.BLACK) {
       return this.isCheckMateWhite;
-    }else{
+    } else {
       return this.isCheckMateBlack;
     }
   }
 
-  public boolean isBlackCheckMate(){
-
-
-    return false;
+  public boolean isCheckMate(FigureColor myColor) {
+    return !canEscapeCheck(this, myColor);
   }
 
-  // TODO make check
-  // TODO make checkmate
+  private void updateCheckStatus(FigureColor myColor) {
+    if (isOpponentKingInCheck(myColor)) {
+      if (myColor == FigureColor.BLACK) {
+        this.isCheckWhite = true;
+        updateCheckMateStatus(FigureColor.WHITE);
+      } else {
+        this.isCheckBlack = true;
+        updateCheckMateStatus(FigureColor.BLACK);
+      }
+    } else {
+      if (myColor == FigureColor.BLACK) {
+        this.isCheckWhite = false;
+        updateCheckMateStatus(FigureColor.WHITE);
+      } else {
+        this.isCheckBlack = false;
+        updateCheckMateStatus(FigureColor.BLACK);
+      }
+    }
+  }
+
+private void updateCheckMateStatus(FigureColor myColor) {
+  if(isCheckMate(myColor)){
+    if(myColor == FigureColor.BLACK){
+      this.isCheckMateBlack = true;
+    }else{
+      this.isCheckMateWhite = true;
+    }
+  }else{
+    if(myColor == FigureColor.BLACK){
+      this.isCheckMateBlack = false;
+    }else{
+      this.isCheckMateWhite = false;
+    }
+  }
+}
+  /*
+   * Check if Opponent King in Check
+   */
+  public boolean isOpponentKingInCheck(FigureColor myColor) {
+    FigureColor opposingColor =
+            myColor == FigureColor.BLACK ? FigureColor.WHITE : FigureColor.BLACK;
+
+    ArrayList<Cell> opponents = this.getPiecesWithColor(opposingColor);
+    ArrayList<Boolean> isKingCapturePossible = new ArrayList<>();
+    for (Cell opponent : opponents) {
+      isKingCapturePossible.add(canCaptureKing(opponent, opposingColor));
+    }
+    return isKingCapturePossible.contains(true);
+  }
+
+  public ArrayList<Cell> getPiecesWithColor(FigureColor myColor) {
+    ArrayList<Cell> pieces = new ArrayList<>();
+    for (Cell cell : allCells()) {
+      if (cell.getFigure().color() == myColor) {
+        pieces.add(cell);
+      }
+    }
+    return pieces;
+  }
+
+  public ArrayList<Cell> getAllPieces() {
+    ArrayList<Cell> pieces = new ArrayList<>();
+    for (Cell cell : allCells()) {
+      pieces.add(cell);
+    }
+    return pieces;
+  }
+
+  public Board copy(Board oldBoard) {
+    Board copyBoard = new Board(false);
+    for (Cell cell : oldBoard.getAllPieces()) {
+      Cell newCell = copyBoard.findCell(cell.x(), cell.y());
+      newCell.setFigure(cell.getFigure());
+    }
+    return copyBoard;
+  }
+
+  // This method checks if all the related pieces can escape from the check position.
+  private boolean canEscapeCheck(Board board, FigureColor color) {
+    ArrayList<Cell> myCells = board.getPiecesWithColor(color);
+    ArrayList<Boolean> canKingMove = new ArrayList<>();
+    // Check if each Cell can move to a place without check condition.
+    for (Cell cell : myCells) {
+      ArrayList<Cell> moves = cell.getFigure().getAvailableCells(cell);
+      for (Cell move : moves) {
+        // Get the position of the new king if the piece moves.
+        Board copy = board.copy(this);
+        copy.moveFigure(cell.x(), cell.y(), move.x(), move.y());
+
+        canKingMove.add(!copy.getCheck(color));
+      }
+    }
+    // Check if the king can escape from the check position in the new place.
+    return canKingMove.contains(true);
+  }
+
+  // TODO write test check
+  // TODO write test checkmate
 
   // TODO make castling
   // TODO make enpassnt
