@@ -5,9 +5,15 @@ import hwr.oop.chess.application.figures.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static hwr.oop.chess.application.Cell.canCaptureKing;
+
 public class Board {
   // TODO Write JAVA doc
   private static Cell firstCell;
+  private boolean isCheckWhite;
+  private boolean isCheckMateWhite;
+  private boolean isCheckBlack;
+  private boolean isCheckMateBlack;
 
   public Board(boolean setFigures) {
     initializeBoard(setFigures);
@@ -239,6 +245,7 @@ public class Board {
     Cell endCell = findCell(endX, endY);
 
     Figure figure = startCell.figure();
+    FigureColor myColor = figure.color();
     if (figure == null) {
       throw new RuntimeException("On the starting cell is no figure");
     }
@@ -249,6 +256,8 @@ public class Board {
 
     startCell.setFigure(null);
     endCell.setFigure(figure);
+
+    this.updateCheckStatus(myColor);
   }
 
   public void moveFigureDiagonal(
@@ -282,8 +291,125 @@ public class Board {
   private boolean isValidCoordinate(Cell cell) { // TODO Change static
     return cell.x() >= 1 && cell.x() <= 8 && cell.y() >= 1 && cell.y() <= 8;
   }
-  // TODO make check
-  // TODO make checkmate
+
+  public boolean getCheck(FigureColor myColor) {
+    if (myColor == FigureColor.BLACK) {
+      return this.isCheckWhite;
+    } else {
+      return this.isCheckBlack;
+    }
+  }
+
+  public boolean getCheckedMate(FigureColor myColor) {
+    if (myColor == FigureColor.BLACK) {
+      return this.isCheckMateWhite;
+    } else {
+      return this.isCheckMateBlack;
+    }
+  }
+
+  public boolean isCheckMate(FigureColor myColor) {
+    return !canEscapeCheck(this, myColor);
+  }
+
+  private void updateCheckStatus(FigureColor myColor) {
+    if (isOpponentKingInCheck(myColor)) {
+      if (myColor == FigureColor.BLACK) {
+        this.isCheckWhite = true;
+        updateCheckMateStatus(FigureColor.WHITE);
+      } else {
+        this.isCheckBlack = true;
+        updateCheckMateStatus(FigureColor.BLACK);
+      }
+    } else {
+      if (myColor == FigureColor.BLACK) {
+        this.isCheckWhite = false;
+        updateCheckMateStatus(FigureColor.WHITE);
+      } else {
+        this.isCheckBlack = false;
+        updateCheckMateStatus(FigureColor.BLACK);
+      }
+    }
+  }
+
+private void updateCheckMateStatus(FigureColor myColor) {
+  if(isCheckMate(myColor)){
+    if(myColor == FigureColor.BLACK){
+      this.isCheckMateBlack = true;
+    }else{
+      this.isCheckMateWhite = true;
+    }
+  }else{
+    if(myColor == FigureColor.BLACK){
+      this.isCheckMateBlack = false;
+    }else{
+      this.isCheckMateWhite = false;
+    }
+  }
+}
+  /*
+   * Check if Opponent King in Check
+   */
+  public boolean isOpponentKingInCheck(FigureColor myColor) {
+    FigureColor opposingColor =
+            myColor == FigureColor.BLACK ? FigureColor.WHITE : FigureColor.BLACK;
+
+    ArrayList<Cell> opponents = this.getPiecesWithColor(opposingColor);
+    ArrayList<Boolean> isKingCapturePossible = new ArrayList<>();
+    for (Cell opponent : opponents) {
+      isKingCapturePossible.add(canCaptureKing(opponent, opposingColor));
+    }
+    return isKingCapturePossible.contains(true);
+  }
+
+  public ArrayList<Cell> getPiecesWithColor(FigureColor myColor) {
+    ArrayList<Cell> pieces = new ArrayList<>();
+    for (Cell cell : allCells()) {
+      if (cell.figure().color() == myColor) {
+        pieces.add(cell);
+      }
+    }
+    return pieces;
+  }
+
+  public ArrayList<Cell> getAllPieces() {
+    ArrayList<Cell> pieces = new ArrayList<>();
+    for (Cell cell : allCells()) {
+      pieces.add(cell);
+    }
+    return pieces;
+  }
+
+  public Board copy(Board oldBoard) {
+    Board copyBoard = new Board(false);
+    for (Cell cell : oldBoard.getAllPieces()) {
+      Cell newCell = copyBoard.findCell(cell.x(), cell.y());
+      newCell.setFigure(cell.figure());
+    }
+    return copyBoard;
+  }
+
+  // This method checks if all the related pieces can escape from the check position.
+  private boolean canEscapeCheck(Board board, FigureColor color) {
+    ArrayList<Cell> myCells = board.getPiecesWithColor(color);
+    ArrayList<Boolean> canKingMove = new ArrayList<>();
+    // Check if each Cell can move to a place without check condition.
+    for (Cell cell : myCells) {
+      ArrayList<Cell> moves = cell.figure().getAvailableCells(cell);
+      for (Cell move : moves) {
+        // Get the position of the new king if the piece moves.
+        Board copy = board.copy(this);
+        copy.moveFigure(cell.x(), cell.y(), move.x(), move.y());
+
+        canKingMove.add(!copy.getCheck(color));
+      }
+    }
+    // Check if the king can escape from the check position in the new place.
+    return canKingMove.contains(true);
+  }
+
+  // TODO write test check
+  // TODO write test checkmate
 
   // TODO make castling
   // TODO make enpassnt
