@@ -1,5 +1,9 @@
 package hwr.oop.chess.persistence;
 
+// https://www.chess.com/de/terms/forsyth-edwards-notation-fen
+
+// pawn = "P", knight = "N", bishop = "B", rook = "R", queen = "Q" and king = "K"
+
 public class FenNotation {
   // TODO connect with board
   // TODO connect with GameDataManager

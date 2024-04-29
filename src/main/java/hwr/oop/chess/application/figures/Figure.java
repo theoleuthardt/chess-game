@@ -9,6 +9,9 @@ public interface Figure {
 
   boolean canMoveTo(Cell prevCell, Cell nextCell);
 
+  // boolean canCaptureKing(Cell current, FigureColor myColor);
+  // boolean isChecked(Cell current);
+
   char symbol();
 
   FigureColor color();

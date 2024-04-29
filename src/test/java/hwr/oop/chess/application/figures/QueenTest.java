@@ -20,12 +20,12 @@ public class QueenTest {
     board = new Board(false);
   }
 
-   @Test
+  @Test
   void testMoveQueen() {
     int x = 4;
     int y = 1;
-    board.cell(x, y).setFigure(new Queen(FigureColor.WHITE));
-    Figure whiteQueen = board.cell(x,y).getFigure();
+    board.findCell(x, y).setFigure(new Queen(FigureColor.WHITE));
+    Figure whiteQueen = board.findCell(x, y).figure();
 
     Cell movedCell = null;
 
@@ -41,30 +41,30 @@ public class QueenTest {
         board.moveFigureDiagonal(board, CellDirection.TOP_LEFT, x, y, randomDiff);
         x -= randomDiff;
         y += randomDiff;
-        movedCell = board.cell(x, y);
+        movedCell = board.findCell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen, movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.figure());
 
         board.moveFigureDiagonal(board, CellDirection.TOP_RIGHT, x, y, randomDiff);
         x += randomDiff;
         y += randomDiff;
-        movedCell = board.cell(x, y);
+        movedCell = board.findCell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen, movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.figure());
 
         board.moveFigureDiagonal(board, CellDirection.BOTTOM_LEFT, x, y, randomDiff);
         x -= randomDiff;
         y -= randomDiff;
-        movedCell = board.cell(x, y);
+        movedCell = board.findCell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen, movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.figure());
 
         board.moveFigureDiagonal(board, CellDirection.BOTTOM_RIGHT, x, y, randomDiff);
         x += randomDiff;
         y -= randomDiff;
-        movedCell = board.cell(x, y);
+        movedCell = board.findCell(x, y);
         assertNotNull(movedCell);
-        assertEquals(whiteQueen, movedCell.getFigure());
+        assertEquals(whiteQueen, movedCell.figure());
       } catch (IllegalArgumentException e) {
         System.out.println("IllegalArgumentException occurred: " + e.getMessage());
       }

@@ -27,10 +27,10 @@ class PawnTest {
   @ParameterizedTest
   @ValueSource(ints = {3, 4})
   void moveWhitePawn_isAllowed(int args) {
-    Cell from = board.cell('d', 2);
-    Cell to = board.cell('d', args);
+    Cell from = board.findCell('d', 2);
+    Cell to = board.findCell('d', args);
 
-    Figure pawn = from.getFigure();
+    Figure pawn = from.figure();
     Assertions.assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
     Assertions.assertThat(pawn.canMoveTo(from, to)).isTrue();
   }
@@ -38,21 +38,21 @@ class PawnTest {
   @ParameterizedTest
   @ValueSource(ints = {1, 2, 5})
   void moveWhitePawn_isNotAllowed(int args) {
-    Cell from = board.cell('d', 2);
-    Cell to = board.cell('d', args);
+    Cell from = board.findCell('d', 2);
+    Cell to = board.findCell('d', args);
 
-    Figure pawn = from.getFigure();
+    Figure pawn = from.figure();
     Assertions.assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
     Assertions.assertThat(pawn.canMoveTo(from, to)).isFalse();
   }
 
   @Test
   void moveWhitePawn_twoFieldsOnlyOnStart() {
-    Cell from = board.cell('d', 2);
-    Cell to = board.cell('d', 3);
-    Cell then = board.cell('d', 5);
+    Cell from = board.findCell('d', 2);
+    Cell to = board.findCell('d', 3);
+    Cell then = board.findCell('d', 5);
 
-    Figure pawn = from.getFigure();
+    Figure pawn = from.figure();
     Assertions.assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
     Assertions.assertThat(pawn.canMoveTo(from, to)).isTrue();
     Assertions.assertThat(pawn.canMoveTo(to, then)).isFalse();
@@ -61,10 +61,10 @@ class PawnTest {
   @ParameterizedTest
   @ValueSource(ints = {6})
   void moveBlackPawn_isAllowed(int args) {
-    Cell from = board.cell('c', 7);
-    Cell to = board.cell('c', args);
+    Cell from = board.findCell('c', 7);
+    Cell to = board.findCell('c', args);
 
-    Figure pawn = from.getFigure();
+    Figure pawn = from.figure();
     Assertions.assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
     Assertions.assertThat(pawn.canMoveTo(from, to)).isTrue();
   }
@@ -72,21 +72,21 @@ class PawnTest {
   @ParameterizedTest
   @ValueSource(ints = {8, 7, 4})
   void moveBlackPawn_isNotAllowed(int args) {
-    Cell from = board.cell('c', 7);
-    Cell to = board.cell('c', args);
+    Cell from = board.findCell('c', 7);
+    Cell to = board.findCell('c', args);
 
-    Figure pawn = from.getFigure();
+    Figure pawn = from.figure();
     Assertions.assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
     Assertions.assertThat(pawn.canMoveTo(from, to)).isFalse();
   }
 
   @Test
   void moveBlackPawn_twoFieldsOnlyOnStart() {
-    Cell from = board.cell('c', 7);
-    Cell to = board.cell('c', 6);
-    Cell then = board.cell('c', 4);
+    Cell from = board.findCell('c', 7);
+    Cell to = board.findCell('c', 6);
+    Cell then = board.findCell('c', 4);
 
-    Figure pawn = from.getFigure();
+    Figure pawn = from.figure();
     Assertions.assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
     Assertions.assertThat(pawn.canMoveTo(from, to)).isTrue();
     Assertions.assertThat(pawn.canMoveTo(to, then)).isFalse();
