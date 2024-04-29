@@ -5,7 +5,7 @@ import hwr.oop.chess.application.figures.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static hwr.oop.chess.application.Cell.canCaptureKing;
+import static hwr.oop.chess.application.Cell.canCaptureOpponenetKing;
 
 public class Board {
   // TODO Write JAVA doc
@@ -351,13 +351,12 @@ private void updateCheckMateStatus(FigureColor myColor) {
    * Check if Opponent King in Check
    */
   public boolean isOpponentKingInCheck(FigureColor myColor) {
-    FigureColor opposingColor =
-            myColor == FigureColor.BLACK ? FigureColor.WHITE : FigureColor.BLACK;
-
-    ArrayList<Cell> opponents = this.getPiecesWithColor(opposingColor);
+//    FigureColor opposingColor =
+//            myColor == FigureColor.BLACK ? FigureColor.WHITE : FigureColor.BLACK;
+    ArrayList<Cell> myFigureCells = this.getPiecesWithColor(myColor); // opponents == Black
     ArrayList<Boolean> isKingCapturePossible = new ArrayList<>();
-    for (Cell opponent : opponents) {
-      isKingCapturePossible.add(canCaptureKing(opponent, opposingColor));
+    for (Cell myFigureCell : myFigureCells) {
+      isKingCapturePossible.add(canCaptureOpponenetKing(myFigureCell, myColor));
     }
     return isKingCapturePossible.contains(true);
   }
