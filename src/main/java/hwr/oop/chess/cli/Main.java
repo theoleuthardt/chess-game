@@ -7,7 +7,7 @@ import java.util.Map;
 // The use of System.out is allowed here as the only place in the repo!
 @java.lang.SuppressWarnings("java:S106")
 public class Main {
-  private final CLIAdapter cli = new CLIAdapter(System.out);
+  protected CLIAdapter cli = new CLIAdapter(System.out);
 
   public static void main(String[] args) {
     new Main(args);

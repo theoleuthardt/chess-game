@@ -4,7 +4,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 public class CLIAdapter {
-    private final PrintStream printStream;
+    protected final PrintStream printStream;
 
     public CLIAdapter(OutputStream outputStream) {
         this.printStream = new PrintStream(outputStream);
