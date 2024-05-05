@@ -5,6 +5,7 @@ import hwr.oop.chess.application.CellDirection;
 import hwr.oop.chess.cli.InvalidUserInputException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Pawn implements Figure {
     // TODO pawn promotion
@@ -15,22 +16,23 @@ public class Pawn implements Figure {
         this.color = color;
     }
 
+    private boolean isInStartPosition(Cell cell) {
+        return cell.y() == (color == FigureColor.WHITE ? 2 : 7);
+    }
+
+    private CellDirection forwards() {
+        return color() == FigureColor.WHITE ? CellDirection.TOP : CellDirection.BOTTOM;
+    }
+
     public ArrayList<Cell> getAvailableCells(Cell currentCell) {
         ArrayList<Cell> cells = new ArrayList<>();
 
-        CellDirection forwards = CellDirection.TOP;
-        boolean isInStartPosition = currentCell.y() == 2;
-        if (color() == FigureColor.BLACK) {
-            forwards = CellDirection.BOTTOM;
-            isInStartPosition = currentCell.y() == 7;
-        }
-
-        Cell oneFieldForwards = currentCell.cellInDirection(forwards);
+        Cell oneFieldForwards = currentCell.cellInDirection(forwards());
         if (oneFieldForwards == null) {
             return cells;
         }
 
-        Cell twoFieldForwards = oneFieldForwards.cellInDirection(forwards);
+        Cell twoFieldForwards = oneFieldForwards.cellInDirection(forwards());
 
         // move one field forwards
         if (oneFieldForwards.figure() == null) {
@@ -38,7 +40,7 @@ public class Pawn implements Figure {
         }
 
         // move two fields forwards
-        if (isInStartPosition
+        if (isInStartPosition(currentCell)
                 && twoFieldForwards != null
                 && oneFieldForwards.figure() == null
                 && twoFieldForwards.figure() == null) {
@@ -68,22 +70,21 @@ public class Pawn implements Figure {
         return availableCell.contains(nextCell);
     }
 
-  // Pawn Promotion
-  public boolean promotePawn(Cell currentCell, Cell nextCell) {
-    ArrayList<Cell> availableCell = getAvailableCells(currentCell);
-    return availableCell.contains(nextCell);
-  }
+    private boolean isAbleToPromote(Cell currentCell) {
+        return currentCell.cellInDirection(forwards()) == null;
+    }
 
-  // choose figure for the promotion
-  public FigureType getPromotionFigure(int selectFigure) {
-    return switch (selectFigure) {
-      case 1 -> FigureType.ROOK;
-      case 2 -> FigureType.BISHOP;
-      case 3 -> FigureType.KNIGHT;
-      case 0 -> FigureType.QUEEN;
-      default -> FigureType.QUEEN;
-    };
-  }
+    // Pawn Promotion
+    public void promotePawn(Cell currentCell, FigureType toType) {
+        if (!isAbleToPromote(currentCell)) {
+            throw new InvalidUserInputException("The pawn is not allowed to be promoted as it has not reached the end.");
+        }
+        List<FigureType> canPromoteTo = List.of(FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
+        if (!canPromoteTo.contains(toType)) {
+            throw new InvalidUserInputException("The pawn cannot become a " + toType.name() + ".");
+        }
+        currentCell.setFigure(getFigureFromTypeAndColor(toType, color()));
+    }
 
     public char symbol() {
         return color == FigureColor.WHITE ? 'P' : 'p';

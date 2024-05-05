@@ -1,27 +1,38 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.FigureColor;
-
-import java.util.logging.Logger;
+import hwr.oop.chess.cli.CLIAdapter;
 
 public class ChessGame {
-   private Logger logger;
-    private Board board;
-
-    public ChessGame() {
-        logger = Logger.getLogger(getClass().getName());
-        board = new Board(true);
+    private final CLIAdapter cli;
+    private final Board board;
 
 
-        // Game goes on..
+    public ChessGame(CLIAdapter cli) {
+        this.cli = cli;
 
+        board = new Board(cli);
 
+        loadGame();
 
-        if(board.isCheckmate(FigureColor.BLACK)){
-            logger.info("Black lost");
+        if (board.isCheckmate(FigureColor.BLACK)) {
+            cli.println("Black lost");
         }
-        if(board.isCheckmate(FigureColor.WHITE)){
-            logger.info("White lost");
+        if (board.isCheckmate(FigureColor.WHITE)) {
+            cli.println("White lost");
         }
+    }
+
+    private void loadGame() {
+        board.addFiguresToBoard(cli.persistence().loadState("figures"));
+    }
+
+    public void saveGame(int gameId) {
+        cli.persistence().storeState("figures", board.figuresOnBoard());
+        cli.persistence().saveGame(gameId);
+    }
+
+    public Board board() {
+        return board;
     }
 }

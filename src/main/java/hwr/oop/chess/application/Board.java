@@ -112,7 +112,7 @@ public class Board {
         printBoard(null);
     }
 
-    public void printBoard(Cell highlightCell) {
+    public void printBoard(List<Cell> highlightCell) {
         List<Cell> cells = allCells();
         cli.println();
         for (Cell cell : cells) {
@@ -124,7 +124,7 @@ public class Board {
             String cellText = String.valueOf(figure == null ? '-' : figure.symbol());
 
             // Print figure if it exists, otherwise print empty position
-            if (highlightCell == cell) {
+            if (highlightCell.contains(cell)) {
                 cli.printBlue(cellText);
             } else {
                 cli.print(cellText);
@@ -300,7 +300,6 @@ public class Board {
         cells.removeIf(cell -> cell.figure().color() != myColor);
         return cells;
     }
-
 
 
     // TODO make castling
