@@ -2,16 +2,12 @@ package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
-import hwr.oop.chess.application.CellDirection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class QueenTest {
   Board board;
@@ -68,8 +64,8 @@ class QueenTest {
     Cell from = board.findCell(x, y);
     from.setFigure(queen);
 
-    assertThat(queen.canMoveTo(from, new Cell(x + 1, y + 2))).isFalse();
-    assertThat(queen.canMoveTo(from, new Cell(x - 1, y + 2))).isFalse();
-    assertThat(queen.canMoveTo(from, new Cell(x - 2, y + 3))).isFalse();
+    assertThat(queen.canMoveTo(from, board.findCell(x + 1, y + 2))).isFalse();
+    assertThat(queen.canMoveTo(from, board.findCell(x - 1, y + 2))).isFalse();
+    assertThat(queen.canMoveTo(from, board.findCell(x - 2, y + 3))).isFalse();
   }
 }
