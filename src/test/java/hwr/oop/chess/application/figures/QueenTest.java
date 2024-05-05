@@ -10,62 +10,69 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class QueenTest {
-  Board board;
+    Board board;
 
-  @BeforeEach
-  void setUp() {
-    // Initialize the board
-    board = new Board(false);
-  }
-
-  @Test
-  void moveQueen_diagonalIsValid() {
-    Queen queen = new Queen(FigureColor.WHITE);
-    Cell from = board.findCell(4, 4);
-    from.setFigure(queen);
-
-    for(int distance : List.of(1,2,3)) {
-      assertThat(queen.canMoveTo(from, board.findCell(4 - distance, 4 - distance))).isTrue();
-      assertThat(queen.canMoveTo(from, board.findCell(4 + distance, 4 - distance))).isTrue();
-      assertThat(queen.canMoveTo(from, board.findCell(4 - distance, 4 + distance))).isTrue();
-      assertThat(queen.canMoveTo(from, board.findCell(4 + distance, 4 + distance))).isTrue();
+    @BeforeEach
+    void setUp() {
+        // Initialize the board
+        board = new Board(false);
     }
-  }
 
 
-  @Test
-  void moveQueen_straightIsValid() {
-    Queen queen = new Queen(FigureColor.BLACK);
-    Cell from = board.findCell(4, 4);
-    from.setFigure(queen);
-
-    for(int distance : List.of(1,2,3)) {
-      assertThat(queen.canMoveTo(from, board.findCell(4 - distance, 4))).isTrue();
-      assertThat(queen.canMoveTo(from, board.findCell(4 + distance, 4))).isTrue();
-      assertThat(queen.canMoveTo(from, board.findCell(4, 4 - distance))).isTrue();
-      assertThat(queen.canMoveTo(from, board.findCell(4, 4 + distance))).isTrue();
+    @Test
+    void queen_hasTypeQueen() {
+        Queen queen = new Queen(FigureColor.WHITE);
+        assertThat(queen.type()).isEqualTo(FigureType.QUEEN);
     }
-  }
 
-  @Test
-  void moveQueen_cannotStayOnItsOwnField() {
-    Queen queen = new Queen(FigureColor.BLACK);
-    Cell from = board.findCell(4, 4);
-    from.setFigure(queen);
+    @Test
+    void moveQueen_diagonalIsValid() {
+        Queen queen = new Queen(FigureColor.WHITE);
+        Cell from = board.findCell(4, 4);
+        from.setFigure(queen);
 
-    assertThat(queen.canMoveTo(from, from)).isFalse();
-  }
+        for (int distance : List.of(1, 2, 3)) {
+            assertThat(queen.canMoveTo(from, board.findCell(4 - distance, 4 - distance))).isTrue();
+            assertThat(queen.canMoveTo(from, board.findCell(4 + distance, 4 - distance))).isTrue();
+            assertThat(queen.canMoveTo(from, board.findCell(4 - distance, 4 + distance))).isTrue();
+            assertThat(queen.canMoveTo(from, board.findCell(4 + distance, 4 + distance))).isTrue();
+        }
+    }
 
-  @Test
-  void moveQueen_cannotMoveInACurve() {
-    Queen queen = new Queen(FigureColor.BLACK);
-    int x = 4;
-    int y = 4;
-    Cell from = board.findCell(x, y);
-    from.setFigure(queen);
 
-    assertThat(queen.canMoveTo(from, board.findCell(x + 1, y + 2))).isFalse();
-    assertThat(queen.canMoveTo(from, board.findCell(x - 1, y + 2))).isFalse();
-    assertThat(queen.canMoveTo(from, board.findCell(x - 2, y + 3))).isFalse();
-  }
+    @Test
+    void moveQueen_straightIsValid() {
+        Queen queen = new Queen(FigureColor.BLACK);
+        Cell from = board.findCell(4, 4);
+        from.setFigure(queen);
+
+        for (int distance : List.of(1, 2, 3)) {
+            assertThat(queen.canMoveTo(from, board.findCell(4 - distance, 4))).isTrue();
+            assertThat(queen.canMoveTo(from, board.findCell(4 + distance, 4))).isTrue();
+            assertThat(queen.canMoveTo(from, board.findCell(4, 4 - distance))).isTrue();
+            assertThat(queen.canMoveTo(from, board.findCell(4, 4 + distance))).isTrue();
+        }
+    }
+
+    @Test
+    void moveQueen_cannotStayOnItsOwnField() {
+        Queen queen = new Queen(FigureColor.BLACK);
+        Cell from = board.findCell(4, 4);
+        from.setFigure(queen);
+
+        assertThat(queen.canMoveTo(from, from)).isFalse();
+    }
+
+    @Test
+    void moveQueen_cannotMoveInACurve() {
+        Queen queen = new Queen(FigureColor.BLACK);
+        int x = 4;
+        int y = 4;
+        Cell from = board.findCell(x, y);
+        from.setFigure(queen);
+
+        assertThat(queen.canMoveTo(from, board.findCell(x + 1, y + 2))).isFalse();
+        assertThat(queen.canMoveTo(from, board.findCell(x - 1, y + 2))).isFalse();
+        assertThat(queen.canMoveTo(from, board.findCell(x - 2, y + 3))).isFalse();
+    }
 }
