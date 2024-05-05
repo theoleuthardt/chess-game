@@ -6,43 +6,43 @@ import hwr.oop.chess.application.CellDirection;
 import java.util.ArrayList;
 
 public class King implements Figure {
-  private static final FigureType type = FigureType.KING;
-  private final FigureColor color;
+    private static final FigureType type = FigureType.KING;
+    private final FigureColor color;
 
-  public King(FigureColor color) {
-    this.color = color;
-  }
-
-  public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-    // TODO upgrade function after writing check, checkmate
-    ArrayList<Cell> cells = new ArrayList<>();
-
-    // Loop though all Directions
-    for (CellDirection direction : CellDirection.values()) {
-      Cell neighbourCell = currentCell.cellInDirection(direction);
-      if (neighbourCell != null
-          && (neighbourCell.figure() == null || neighbourCell.figure().color() != color())) {
-        cells.add(neighbourCell);
-      }
+    public King(FigureColor color) {
+        this.color = color;
     }
 
-    return cells;
-  }
+    public ArrayList<Cell> getAvailableCells(Cell currentCell) {
+        // TODO upgrade function after writing check, checkmate
+        ArrayList<Cell> cells = new ArrayList<>();
 
-  public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    ArrayList<Cell> availableCell = getAvailableCells(prevCell);
-    return availableCell.contains(nextCell);
-  }
+        // Loop though all Directions
+        for (CellDirection direction : CellDirection.values()) {
+            Cell neighbourCell = currentCell.cellInDirection(direction);
+            if (neighbourCell != null
+                    && (neighbourCell.figure() == null || neighbourCell.figure().color() != color())) {
+                cells.add(neighbourCell);
+            }
+        }
 
-  public char symbol() {
-    return color == FigureColor.WHITE ? 'K' : 'k';
-  }
+        return cells;
+    }
 
-  public FigureColor color() {
-    return color;
-  }
+    public boolean canMoveTo(Cell prevCell, Cell nextCell) {
+        ArrayList<Cell> availableCell = getAvailableCells(prevCell);
+        return availableCell.contains(nextCell);
+    }
 
-  public FigureType type() {
-    return type;
-  }
+    public char symbol() {
+        return color == FigureColor.WHITE ? 'K' : 'k';
+    }
+
+    public FigureColor color() {
+        return color;
+    }
+
+    public FigureType type() {
+        return type;
+    }
 }

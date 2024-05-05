@@ -1,8 +1,5 @@
 package hwr.oop.chess.persistence;
 
-import java.lang.reflect.Method;
-import java.util.Scanner;
-
 public class DynamicGameDataManager {
     /*
     public void loadGame(int gameId) throws Exception {

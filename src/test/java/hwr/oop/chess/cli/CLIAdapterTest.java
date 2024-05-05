@@ -1,23 +1,19 @@
 package hwr.oop.chess.cli;
 
 import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayOutputStream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CLIAdapterTest {
+class CLIAdapterTest {
 
     @Test
     void printlnTest() {
         // given
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         CLIAdapter cliAdapter = new CLIAdapter(outputStream);
-        String message = "";
-            if (isWindows()) {
-                message = "Hello, World!\r\n"; // for windows
-            } else {
-                message = "Hello, World!\n"; // for macOS
-            }
-
+        String message = isWindows() ? "Hello, World!\r\n" : "Hello, World!\n";
         // when
         cliAdapter.println("Hello, World!");
 

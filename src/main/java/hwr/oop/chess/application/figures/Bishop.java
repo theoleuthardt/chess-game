@@ -6,38 +6,38 @@ import hwr.oop.chess.application.CellDirection;
 import java.util.ArrayList;
 
 public class Bishop implements Figure {
-  private static final FigureType type = FigureType.BISHOP;
-  private final FigureColor color;
+    private static final FigureType type = FigureType.BISHOP;
+    private final FigureColor color;
 
-  public Bishop(FigureColor color) {
-    this.color = color;
-  }
+    public Bishop(FigureColor color) {
+        this.color = color;
+    }
 
-  public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-    ArrayList<Cell> cells = new ArrayList<>();
+    public ArrayList<Cell> getAvailableCells(Cell currentCell) {
+        ArrayList<Cell> cells = new ArrayList<>();
 
-    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.TOP_LEFT);
-    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.TOP_RIGHT);
-    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.BOTTOM_LEFT);
-    currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.BOTTOM_RIGHT);
+        currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.TOP_LEFT);
+        currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.TOP_RIGHT);
+        currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.BOTTOM_LEFT);
+        currentCell.addAvailableCellsInDirectionToList(cells, CellDirection.BOTTOM_RIGHT);
 
-    return cells;
-  }
+        return cells;
+    }
 
-  public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    ArrayList<Cell> availableCell = getAvailableCells(prevCell);
-    return availableCell.contains(nextCell);
-  }
+    public boolean canMoveTo(Cell prevCell, Cell nextCell) {
+        ArrayList<Cell> availableCell = getAvailableCells(prevCell);
+        return availableCell.contains(nextCell);
+    }
 
-  public char symbol() {
-    return color == FigureColor.WHITE ? 'B' : 'b';
-  }
+    public char symbol() {
+        return color == FigureColor.WHITE ? 'B' : 'b';
+    }
 
-  public FigureColor color() {
-    return color;
-  }
+    public FigureColor color() {
+        return color;
+    }
 
-  public FigureType type() {
-    return type;
-  }
+    public FigureType type() {
+        return type;
+    }
 }
