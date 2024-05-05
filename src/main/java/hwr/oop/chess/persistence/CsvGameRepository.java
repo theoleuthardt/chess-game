@@ -1,5 +1,7 @@
 package hwr.oop.chess.persistence;
 
+import hwr.oop.chess.cli.InvalidUserInputException;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -8,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CsvGameRepository implements GameDataManager {
-    private Map<String, String> gameData = new HashMap<>();
+    private final Map<String, String> gameData = new HashMap<>();
 
     public void storeState(String key, String value) {
         gameData.put(key, value);
@@ -31,7 +33,7 @@ public class CsvGameRepository implements GameDataManager {
                 gameData.put(line.substring(0, comma), line.substring(comma + 1));
             }
         } catch (IOException e) {
-            System.err.println("Error reading game data from CSV file: " + e.getMessage());
+            throw new InvalidUserInputException("The Game #" + gameId + " could not be started. Please verify that the file '" + fileName(gameId)+ "' exists. (Error: " + e.getMessage() + ")");
         }
     }
 
@@ -41,7 +43,7 @@ public class CsvGameRepository implements GameDataManager {
                 writer.write(entry.getKey() + "," + entry.getValue() + "\n");
             }
         } catch (IOException e) {
-            System.err.println("Error saving game data to CSV file: " + e.getMessage());
+            throw new InvalidUserInputException("The Game #" + gameId + " could not be saved. Please verify that the current folder is not protected. (Error: " + e.getMessage() + ")");
         }
     }
 }
