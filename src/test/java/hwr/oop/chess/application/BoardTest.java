@@ -1,7 +1,9 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.FigureColor;
+import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.cli.CLIAdapter;
+import hwr.oop.chess.cli.InvalidUserInputException;
 import hwr.oop.chess.persistence.FenNotation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
   Logger logger = Logger.getLogger(BoardTest.class.getName());
@@ -179,19 +182,127 @@ class BoardTest {
         .isInstanceOf(IllegalArgumentException.class);
   }
 
-  @Test
-  void testCheckMateBlackKing_h7() {
-    FenNotation fen = new FenNotation();
-    String fenString = "2K5/1B6/8/8/8/4b2N/R7/4r2k b - -";
-    fen.placeFigureFromFEN(board, fenString);
-    assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
-  }
+    @Test
+    void testCheckMateBlackKing_h7() {
+        board = (new Board(new CLIAdapter(System.out)));
+        FenNotation fen = new FenNotation();
+        // Status CheckMate
+        String fenString = "2K5/1B6/8/8/8/4b2N/R7/4r2k b - -";
+        fen.placeFigureFromFEN(board, fenString);
+        assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
+    }
 
-  @Test
-  void testCheckMateBlackKing_e4() {
-    FenNotation fen = new FenNotation();
-    String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - -";
-    fen.placeFigureFromFEN(board, fenString);
-    assertThat(board.isCheckmate(FigureColor.BLACK)).isFalse();
-  }
+    @Test
+    void testDoesNotCheckMate() {
+        board = (new Board(new CLIAdapter(System.out)));
+        FenNotation fen = new FenNotation();
+        // Status No CheckMate
+        String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - -";
+        fen.placeFigureFromFEN(board, fenString);
+        assertThat(board.isCheckmate(FigureColor.BLACK)).isFalse();
+    }
+
+    // @Test TODO Update Checkmate
+    void testCheckMateBlackKing_e4() {
+        board = (new Board(new CLIAdapter(System.out)));
+        FenNotation fen = new FenNotation();
+        String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - -";
+        fen.placeFigureFromFEN(board, fenString);
+        assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
+    }
+
+    @Test
+    void testFindCellWithString(){
+        // invalid Value
+        assertThrows(InvalidUserInputException.class, () -> {
+            board.findCell("c3d");
+        });
+        assertThrows(InvalidUserInputException.class, () -> {
+            board.findCell("a");
+        });
+        assertNotNull(board.findCell("a1"));
+        assertNotNull(board.findCell("e5"));
+    }
+
+    @Test
+    void testPrintBoard() {
+        board = (new Board(new CLIAdapter(System.out)));
+        board.printBoard();
+    }
+
+    @Test
+    void testAddFiguresToBoard(){
+        board = (new Board(new CLIAdapter(System.out)));
+        // Initial Status as string
+        String string = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR";
+        board.addFiguresToBoard(string);
+        testInitailPosition();
+        testInitailColor();
+    }
+
+    @Test
+    void testAddFiguresToBoardWithLongString(){
+        board = (new Board(new CLIAdapter(System.out)));
+        // Initial Status as string
+        String string = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR_aaa";
+        assertThrows(IllegalArgumentException.class, () -> {
+            board.addFiguresToBoard(string);
+        });
+    }
+
+    @Test
+    void testAddFiguresToBoardNoParams(){
+        board = (new Board(new CLIAdapter(System.out)));
+        board.addFiguresToBoard(null);
+        testInitailPosition();
+        testInitailColor();
+    }
+
+    @Test
+    void testFiguresOnBoard(){
+        String initial = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR";
+        String string = board.figuresOnBoard();
+        assertThat(string).isEqualTo(initial);
+    }
+
+    @Test
+    void testMoveFigureWithInteger(){
+        board.moveFigure(4,2,4,4);
+        assertThat(board.findCell(4,2).figure()).isNull();
+        assertThat(board.findCell(4,4).figure().type()).isEqualTo(FigureType.PAWN);
+    }
+
+    void testInitailPosition(){
+        assertThat(board.findCell(1,1).figure().type()).isEqualTo(FigureType.ROOK);
+        assertThat(board.findCell(2,1).figure().type()).isEqualTo(FigureType.KNIGHT);
+        assertThat(board.findCell(3,1).figure().type()).isEqualTo(FigureType.BISHOP);
+        assertThat(board.findCell(4,1).figure().type()).isEqualTo(FigureType.QUEEN);
+        assertThat(board.findCell(5,1).figure().type()).isEqualTo(FigureType.KING);
+        assertThat(board.findCell(6,1).figure().type()).isEqualTo(FigureType.BISHOP);
+        assertThat(board.findCell(7,1).figure().type()).isEqualTo(FigureType.KNIGHT);
+        assertThat(board.findCell(8,1).figure().type()).isEqualTo(FigureType.ROOK);
+        assertThat(board.findCell(1,8).figure().type()).isEqualTo(FigureType.ROOK);
+        assertThat(board.findCell(2,8).figure().type()).isEqualTo(FigureType.KNIGHT);
+        assertThat(board.findCell(3,8).figure().type()).isEqualTo(FigureType.BISHOP);
+        assertThat(board.findCell(4,8).figure().type()).isEqualTo(FigureType.QUEEN);
+        assertThat(board.findCell(5,8).figure().type()).isEqualTo(FigureType.KING);
+        assertThat(board.findCell(6,8).figure().type()).isEqualTo(FigureType.BISHOP);
+        assertThat(board.findCell(7,8).figure().type()).isEqualTo(FigureType.KNIGHT);
+        assertThat(board.findCell(8,8).figure().type()).isEqualTo(FigureType.ROOK);
+
+            IntStream.range(1, 9).forEach(i ->{
+                assertThat(board.findCell(i,2).figure().type()).isEqualTo(FigureType.PAWN);
+                assertThat(board.findCell(i,7).figure().type()).isEqualTo(FigureType.PAWN);
+            });
+    }
+
+    void testInitailColor(){
+        IntStream.range(1, 9).forEach(i ->{
+            assertThat(board.findCell(i,1).figure().color()).isEqualTo(FigureColor.WHITE);
+            assertThat(board.findCell(i,2).figure().color()).isEqualTo(FigureColor.WHITE);
+            assertThat(board.findCell(i,7).figure().color()).isEqualTo(FigureColor.BLACK);
+            assertThat(board.findCell(i,8).figure().color()).isEqualTo(FigureColor.BLACK);
+        });
+    }
+
 }
