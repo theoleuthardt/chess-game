@@ -5,25 +5,23 @@ import hwr.oop.chess.application.Cell;
 import java.util.ArrayList;
 
 public interface Figure {
-    ArrayList<Cell> getAvailableCells(Cell currentRook);
+  ArrayList<Cell> getAvailableCells(Cell currentRook);
 
-    boolean canMoveTo(Cell prevCell, Cell nextCell);
+  boolean canMoveTo(Cell prevCell, Cell nextCell);
 
-    char symbol();
+  char symbol();
 
-    FigureColor color();
+  FigureColor color();
 
-    FigureType type();
+  FigureType type();
 
-    default Figure getFigureFromTypeAndColor(FigureType type, FigureColor color) {
-        return switch (type) {
-            case BISHOP -> new Bishop(color);
-            case KING -> new King(color);
-            case KNIGHT -> new Knight(color);
-            case PAWN -> new Pawn(color);
-            case QUEEN -> new Queen(color);
-            case ROOK -> new Rook(color);
-            default -> throw new IllegalArgumentException("This is not a valid FigureType");
-        };
-    }
+  default Figure getFigureFromTypeAndColor(FigureType type, FigureColor color) {
+    return switch (type) {
+      case BISHOP -> new Bishop(color);
+      case KNIGHT -> new Knight(color);
+      case QUEEN -> new Queen(color);
+      case ROOK -> new Rook(color);
+      default -> throw new IllegalArgumentException("This is not a valid FigureType");
+    };
+  }
 }

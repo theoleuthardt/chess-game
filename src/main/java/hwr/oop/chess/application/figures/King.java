@@ -2,47 +2,46 @@ package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
-
 import java.util.ArrayList;
 
 public class King implements Figure {
-    private static final FigureType type = FigureType.KING;
-    private final FigureColor color;
+  private static final FigureType type = FigureType.KING;
+  private final FigureColor color;
 
-    public King(FigureColor color) {
-        this.color = color;
+  public King(FigureColor color) {
+    this.color = color;
+  }
+
+  public ArrayList<Cell> getAvailableCells(Cell currentCell) {
+    // TODO upgrade function after writing check, checkmate
+    ArrayList<Cell> cells = new ArrayList<>();
+
+    // Loop though all Directions
+    for (CellDirection direction : CellDirection.values()) {
+      Cell neighbourCell = currentCell.cellInDirection(direction);
+      if (neighbourCell != null
+          && (neighbourCell.figure() == null || neighbourCell.figure().color() != color())) {
+        cells.add(neighbourCell);
+      }
     }
 
-    public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-        // TODO upgrade function after writing check, checkmate
-        ArrayList<Cell> cells = new ArrayList<>();
+    return cells;
+  }
 
-        // Loop though all Directions
-        for (CellDirection direction : CellDirection.values()) {
-            Cell neighbourCell = currentCell.cellInDirection(direction);
-            if (neighbourCell != null
-                    && (neighbourCell.figure() == null || neighbourCell.figure().color() != color())) {
-                cells.add(neighbourCell);
-            }
-        }
+  public boolean canMoveTo(Cell prevCell, Cell nextCell) {
+    ArrayList<Cell> availableCell = getAvailableCells(prevCell);
+    return availableCell.contains(nextCell);
+  }
 
-        return cells;
-    }
+  public char symbol() {
+    return color == FigureColor.WHITE ? 'K' : 'k';
+  }
 
-    public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-        ArrayList<Cell> availableCell = getAvailableCells(prevCell);
-        return availableCell.contains(nextCell);
-    }
+  public FigureColor color() {
+    return color;
+  }
 
-    public char symbol() {
-        return color == FigureColor.WHITE ? 'K' : 'k';
-    }
-
-    public FigureColor color() {
-        return color;
-    }
-
-    public FigureType type() {
-        return type;
-    }
+  public FigureType type() {
+    return type;
+  }
 }
