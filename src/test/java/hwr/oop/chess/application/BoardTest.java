@@ -33,6 +33,7 @@ class BoardTest {
 
   @Test
   void initialBoard_withCorrectSymbolOnEachPosition() {
+    board.addFiguresToBoard(null);
     for (int x = 1; x <= 8; x++) {
       // row of black figures
       assertThatFigureOnCellHasSymbol(x, 8, " rnbqkbnr ".charAt(x));
@@ -46,6 +47,7 @@ class BoardTest {
 
   @Test
   void initialBoard_onlyMiddleIsFree() {
+    board.addFiguresToBoard(null);
     List<Cell> cells = board.allCells();
     assertThat(cells).hasSize(64);
     for (Cell cell : cells) {
