@@ -16,6 +16,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.InstanceOfAssertFactories.completableFuture;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
@@ -262,6 +263,7 @@ class BoardTest {
 
     @Test
     void testFiguresOnBoard(){
+        board = new Board(true);
         String initial = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR";
         String string = board.figuresOnBoard();
         assertThat(string).isEqualTo(initial);
@@ -269,6 +271,7 @@ class BoardTest {
 
     @Test
     void testMoveFigureWithInteger(){
+        board = new Board(true);
         board.moveFigure(4,2,4,4);
         assertThat(board.findCell(4,2).figure()).isNull();
         assertThat(board.findCell(4,4).figure().type()).isEqualTo(FigureType.PAWN);
