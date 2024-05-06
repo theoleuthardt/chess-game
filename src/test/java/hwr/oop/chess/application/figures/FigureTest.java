@@ -4,14 +4,16 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FigureTest {
 
-  // TOOO Fix Test
+  // TODO Fix Test
   @ParameterizedTest
   @EnumSource(
       value = FigureType.class,
-      types = {"BISHOP", "KNIGHT", "QUEEN", "ROOK"})
+      names = {"BISHOP", "KNIGHT", "QUEEN", "ROOK"})
   void getFigure(FigureType type) {
     Pawn pawn = new Pawn(FigureColor.BLACK);
     Figure testFigure = pawn.getFigureFromTypeAndColor(type, FigureColor.BLACK);
@@ -21,16 +23,12 @@ class FigureTest {
   @Test
   void getFigureException() {
     Pawn pawn = new Pawn(FigureColor.BLACK);
-    Exception exception =
-        org.junit.jupiter.api.Assertions.assertThrows(
+    RuntimeException exception =
+        assertThrows(
             RuntimeException.class,
-            () -> {
-              pawn.getFigureFromTypeAndColor(FigureType.KING, FigureColor.BLACK);
-            });
+            () -> pawn.getFigureFromTypeAndColor(FigureType.KING, FigureColor.BLACK));
 
     String expectedMessage = "This is not a valid FigureType";
-    String actualMessage = exception.getMessage();
-
-    org.junit.jupiter.api.Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    assertThat(exception.getMessage()).contains(expectedMessage);
   }
 }
