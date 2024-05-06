@@ -233,16 +233,32 @@ public class Board {
             throw new InvalidUserInputException("The game is over as you are in Checkmate!");
         }
 
-        if (isCheck(figure.color())) {
-            throw new InvalidUserInputException("TODO: Only the king can be moved (if it is a field where the opponent can't get");
-        }
+        // After this move the king is not allowed to be in check anymore
+        boolean wasInCheck = isCheck(figure.color());
 
         if (!figure.canMoveTo(startCell, endCell)) {
             throw new InvalidUserInputException("The figure can't move to that cell");
         }
 
+        Figure figureOnEndCell = endCell.figure();
         startCell.setFigure(null);
         endCell.setFigure(figure);
+
+
+        if (wasInCheck && isCheck(figure.color())) {
+            // After this move the king is not allowed to be in check anymore.
+            // As the king is still in check, we undo this action
+            startCell.setFigure(figure);
+            endCell.setFigure(figureOnEndCell);
+            throw new InvalidUserInputException("This move is not allowed as your king is in check! Move a figure so that your king is not in check anymore.");
+        }
+
+        if(isCheck(FigureColor.WHITE)) {
+            this.cli.printlnError("The white king is in check!");
+        }
+        if(isCheck(FigureColor.BLACK)) {
+            this.cli.printlnError("The black king is in check!");
+        }
     }
 
     // TODO make check
