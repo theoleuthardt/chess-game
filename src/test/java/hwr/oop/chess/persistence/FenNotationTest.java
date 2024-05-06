@@ -2,6 +2,7 @@ package hwr.oop.chess.persistence;
 
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.figures.FigureType;
+import hwr.oop.chess.cli.CLIAdapter;
 import org.junit.jupiter.api.Test;
 
 import static hwr.oop.chess.persistence.FenNotation.charToFigureType;
