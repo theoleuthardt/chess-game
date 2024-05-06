@@ -23,7 +23,7 @@ public class Main {
         }
         String command = arguments.removeFirst();
 
-        List<String> commandsWithGameId = List.of("on", "show-board");
+        List<String> commandsWithGameId = List.of("on", "show");
         if (commandsWithGameId.contains(command)) {
             cli.forGameId(arguments.removeFirst());
         }

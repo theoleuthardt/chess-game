@@ -124,7 +124,7 @@ public class Board {
             String cellText = String.valueOf(figure == null ? '-' : figure.symbol());
 
             // Print figure if it exists, otherwise print empty position
-            if (highlightCell.contains(cell)) {
+            if (highlightCell != null && highlightCell.contains(cell)) {
                 cli.printBlue(cellText);
             } else {
                 cli.print(cellText);
