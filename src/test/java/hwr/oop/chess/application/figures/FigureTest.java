@@ -11,7 +11,7 @@ class FigureTest {
   @ParameterizedTest
   @EnumSource(
       value = FigureType.class,
-      types = {"BISHOP", "KNIGHT", "QUEEN", "ROOK"})
+      names = {"BISHOP", "KNIGHT", "QUEEN", "ROOK"})
   void getFigure(FigureType type) {
     Pawn pawn = new Pawn(FigureColor.BLACK);
     Figure testFigure = pawn.getFigureFromTypeAndColor(type, FigureColor.BLACK);
