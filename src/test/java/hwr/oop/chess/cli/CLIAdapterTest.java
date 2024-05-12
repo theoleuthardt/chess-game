@@ -10,7 +10,6 @@ import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.persistence.CsvGameRepository;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -143,7 +142,7 @@ class CLIAdapterTest {
   void requireArgumentIsFigureType() {
     ChessGame game = cliAdapter.createGame("123");
     Board board = game.board();
-    assertThat(cliAdapter.requireArgumentIsFigureType(board, "queen")).isEqualTo(FigureType.QUEEN);
+    assertThat(cliAdapter.requireArgumentIsFigureType("queen")).isEqualTo(FigureType.QUEEN);
   }
 
   @Test

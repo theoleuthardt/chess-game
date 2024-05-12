@@ -39,11 +39,16 @@ just build
 
 ## Abstract
 
-This is a chess game which you can play on the cli. The game is stored as a csv file.
-
-[TODO]: # (State most important features.)
-
-[TODO]: # (State the most interesting problems you encountered during the project.)
+Chess is a Java-based command line chess game developed as a collaborative project as part of the object-oriented
+programming course. The game offers a traditional chess experience accessible through the command line interface,
+making it lightweight and easy to play on any system with Java installed. Players can engage in classic chess matches,
+pitting their strategic prowess against each other. The game includes essential features such as move validation, the
+display of a figure's movement options, checkmate detection, a rank system and game storage through csv files. Through
+this project, students delve into Java programming principles, object-oriented design, algorithmic thinking, and
+software development methodologies, culminating in a functional and enjoyable implementation of the timeless game of
+chess in the command line environment. We as a group encountered problems in the development process such as finding
+effective collaboration methods in development, managing the branches and commits in the versioning system,
+reaching PrintStreams to test them and realizing loose coupling in our library.
 
 ## Commands overview
 
@@ -70,11 +75,44 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 
 ## Feature List
 
-[TODO]: # (For each feature implemented, add a row to the table!)
+### Library
 
-| Number | Feature | Tests |
-|--------|---------|-------|
-| 1      | /       | /     |
+| Number | Feature         | Tests              |
+|--------|-----------------|--------------------|
+| 1      | Board           | :heavy_check_mark: |
+| 2      | Figure          | :heavy_check_mark: |
+| 3      | FigureType      | :heavy_check_mark: |
+| 4      | FigureColor     | :heavy_check_mark: |
+| 5      | Bishop          | :heavy_check_mark: |
+| 6      | King            | :heavy_check_mark: |
+| 7      | Knight          | :heavy_check_mark: |
+| 8      | Pawn            | :heavy_check_mark: |
+| 9      | Queen           | :heavy_check_mark: |
+| 10     | Rook            | :heavy_check_mark: |
+| 11     | Figure Movement | :heavy_check_mark: |
+| 12     | Cell            | :heavy_check_mark: |
+| 13     | CellDirection   | :x:                |
+| 14     | ChessGame       | :x:                |
+
+### CLI
+
+| Number | Feature             | Tests              |
+|--------|---------------------|--------------------|
+| 1      | Create Game         | :x:                |
+| 2      | Show Help           | :heavy_check_mark: |
+| 3      | Show Board          | :heavy_check_mark: |
+| 4      | Move Figure         | :x:                |
+| 5      | Promotion           | :x:                |
+| 6      | Show Possible Moves | :x:                |
+
+### Persistence
+
+| Number | Feature      | Tests              |
+|--------|--------------|--------------------|
+| 1      | Player       | :heavy_check_mark: |
+| 2      | FEN Notation | :heavy_check_mark: |
+| 3      | Save Game    | :x:                |
+| 4      | Load Game    | :x:                |
 
 ## Additional Dependencies
 

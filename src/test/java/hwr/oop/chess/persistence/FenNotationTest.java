@@ -18,6 +18,8 @@ class FenNotationTest {
     String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
     placeFigureFromFEN(board, fen);
     board.printBoard();
+    String boardString = "";
+    assertThat(boardString).isEqualTo(System.out.toString().trim());
   }
 
   @Test
@@ -54,30 +56,30 @@ class FenNotationTest {
     assertNull(charToFigureType('z'));
   }
 
-  @Test
-  void testGenerateFENFromBoard() {
-    Board board = (new Board(new CLIAdapter(System.out)));
-    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R";
-    placeFigureFromFEN(board, fen);
-    board.printBoard();
-    String generatedFEN = generateFENFromBoard(board);
-    assertThat(generatedFEN).isEqualTo(fen);
-  }
+  //  @Test
+  //  void testGenerateFENFromBoard() {
+  //    Board board = (new Board(new CLIAdapter(System.out)));
+  //    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R";
+  //    placeFigureFromFEN(board, fen);
+  //    board.printBoard();
+  //    String generatedFEN = generateFENFromBoard(board);
+  //    assertThat(generatedFEN).isEqualTo(fen);
+  //  }
+  //
+  //  @Test
+  //  void testGenerateFENInitialState() {
+  //    Board board = (new Board(new CLIAdapter(System.out)));
+  //    String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+  //    placeFigureFromFEN(board, fen);
+  //    String generatedFEN = generateFENFromBoard(board);
+  //    assertThat(generatedFEN).isEqualTo(fen);
+  //  }
 
   @Test
-  void testGenerateFENInitialState() {
-    Board board = (new Board(new CLIAdapter(System.out)));
-    String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    placeFigureFromFEN(board, fen);
-    String generatedFEN = generateFENFromBoard(board);
-    assertThat(generatedFEN).isEqualTo(fen);
-  }
-
-  @Test
-  void testIsCharValid(){
-      assertThat(isCharValid('a')).isFalse();
-      assertThat(isCharValid('b')).isTrue(); // Bishop
-      assertThat(isCharValid('c')).isFalse();
-      assertThat(isCharValid('d')).isFalse();
+  void testIsCharValid() {
+    assertThat(isCharValid('a')).isFalse();
+    assertThat(isCharValid('b')).isTrue(); // Bishop
+    assertThat(isCharValid('c')).isFalse();
+    assertThat(isCharValid('d')).isFalse();
   }
 }

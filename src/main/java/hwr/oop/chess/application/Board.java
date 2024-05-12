@@ -257,9 +257,6 @@ public class Board {
     }
   }
 
-  // TODO make check
-  // TODO make checkmate
-
   public Cell cellWithKingOfColor(FigureColor playerColor) {
     List<Cell> cells = allCells();
     for (Cell cell : cells) {
@@ -315,9 +312,4 @@ public class Board {
     cells.removeIf(cell -> cell.figure().color() != myColor);
     return cells;
   }
-
-  // TODO make castling
-  // TODO make enpassnt
-  // TODO count move
-  // TODO write Compare, CompareTo
 }

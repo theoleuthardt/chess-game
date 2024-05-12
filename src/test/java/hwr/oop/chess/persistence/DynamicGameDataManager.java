@@ -39,5 +39,3 @@ public class DynamicGameDataManager {
     saveGameMethod.invoke(gameDataManagerInstance, gameId);
   }
 }
-
-//  TODO Elo calculation test

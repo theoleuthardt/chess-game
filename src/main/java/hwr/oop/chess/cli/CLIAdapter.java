@@ -122,7 +122,7 @@ public class CLIAdapter {
     return requireCellHasFigure(cell);
   }
 
-  public FigureType requireArgumentIsFigureType(Board board, String figure) {
+  public FigureType requireArgumentIsFigureType(String figure) {
     return FigureType.fromString(figure);
   }
 
@@ -175,7 +175,7 @@ public class CLIAdapter {
           "On the cell " + from.toCoordinates() + " there is no pawn!");
     }
 
-    FigureType promoteToType = requireArgumentIsFigureType(board, arguments.removeFirst());
+    FigureType promoteToType = requireArgumentIsFigureType(arguments.removeFirst());
     printlnAction(
         "Promote "
             + figure.color().name()

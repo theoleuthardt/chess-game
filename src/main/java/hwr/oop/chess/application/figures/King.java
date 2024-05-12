@@ -13,7 +13,6 @@ public class King implements Figure {
   }
 
   public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-    // TODO upgrade function after writing check, checkmate
     ArrayList<Cell> cells = new ArrayList<>();
 
     // Loop though all Directions
