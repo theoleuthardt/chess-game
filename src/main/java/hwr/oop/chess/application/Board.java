@@ -7,6 +7,8 @@ import hwr.oop.chess.cli.InvalidUserInputException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static hwr.oop.chess.persistence.FenNotation.charToFigureType;
+
 public class Board {
   private CLIAdapter cli;
   private Cell firstCell;
@@ -175,20 +177,7 @@ public class Board {
     }
     int figureIndex = 0;
     for (Cell cell : allCells()) {
-      char symbol = figurePositions.charAt(figureIndex);
-      FigureColor color = Character.isUpperCase(symbol) ? FigureColor.WHITE : FigureColor.BLACK;
-      Figure figure =
-          switch (Character.toLowerCase(symbol)) {
-            case ' ' -> null;
-            case 'p' -> new Pawn(color);
-            case 'r' -> new Rook(color);
-            case 'b' -> new Bishop(color);
-            case 'k' -> new King(color);
-            case 'q' -> new Queen(color);
-            case 'n' -> new Knight(color);
-            default ->
-                throw new InvalidUserInputException("The is no figure with the type " + symbol);
-          };
+      Figure figure = charToFigureType(figurePositions.charAt(figureIndex));
       cell.setFigure(figure);
       figureIndex++;
     }

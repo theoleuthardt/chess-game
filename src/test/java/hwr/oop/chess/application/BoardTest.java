@@ -4,7 +4,6 @@ import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.cli.CLIAdapter;
 import hwr.oop.chess.cli.InvalidUserInputException;
-import hwr.oop.chess.persistence.FenNotation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,9 +13,9 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
+import static hwr.oop.chess.persistence.FenNotation.placeFigureFromFEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.InstanceOfAssertFactories.completableFuture;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
@@ -188,29 +187,26 @@ class BoardTest {
     @Test
     void testCheckMateBlackKing_h7() {
         board = (new Board(new CLIAdapter(System.out)));
-        FenNotation fen = new FenNotation();
         // Status CheckMate
         String fenString = "2K5/1B6/8/8/8/4b2N/R7/4r2k b - -";
-        fen.placeFigureFromFEN(board, fenString);
+        placeFigureFromFEN(board, fenString);
         assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
     }
 
     @Test
     void testDoesNotCheckMate() {
         board = (new Board(new CLIAdapter(System.out)));
-        FenNotation fen = new FenNotation();
         // Status No CheckMate
         String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - -";
-        fen.placeFigureFromFEN(board, fenString);
+        placeFigureFromFEN(board, fenString);
         assertThat(board.isCheckmate(FigureColor.BLACK)).isFalse();
     }
 
     // @Test TODO Update Checkmate
     void testCheckMateBlackKing_e4() {
         board = (new Board(new CLIAdapter(System.out)));
-        FenNotation fen = new FenNotation();
         String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - -";
-        fen.placeFigureFromFEN(board, fenString);
+        placeFigureFromFEN(board, fenString);
         assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
     }
 

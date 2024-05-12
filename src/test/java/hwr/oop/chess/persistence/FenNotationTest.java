@@ -5,10 +5,11 @@ import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.cli.CLIAdapter;
 import org.junit.jupiter.api.Test;
 
-import static hwr.oop.chess.persistence.FenNotation.charToFigureType;
-import static hwr.oop.chess.persistence.FenNotation.placeFigureFromFEN;
+import static hwr.oop.chess.persistence.FenNotation.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class FenNotationTest {
   @Test
@@ -51,5 +52,32 @@ class FenNotationTest {
     assertNull(charToFigureType('x'));
     assertNull(charToFigureType('y'));
     assertNull(charToFigureType('z'));
+  }
+
+  @Test
+  void testGenerateFENFromBoard() {
+    Board board = (new Board(new CLIAdapter(System.out)));
+    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R";
+    placeFigureFromFEN(board, fen);
+    board.printBoard();
+    String generatedFEN = generateFENFromBoard(board);
+    assertThat(generatedFEN).isEqualTo(fen);
+  }
+
+  @Test
+  void testGenerateFENInitialState() {
+    Board board = (new Board(new CLIAdapter(System.out)));
+    String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    placeFigureFromFEN(board, fen);
+    String generatedFEN = generateFENFromBoard(board);
+    assertThat(generatedFEN).isEqualTo(fen);
+  }
+
+  @Test
+  void testIsCharValid(){
+      assertThat(isCharValid('a')).isFalse();
+      assertThat(isCharValid('b')).isTrue(); // Bishop
+      assertThat(isCharValid('c')).isFalse();
+      assertThat(isCharValid('d')).isFalse();
   }
 }
