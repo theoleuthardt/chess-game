@@ -1,4 +1,4 @@
-# CHESS GAME by Hyejin, Aylin, Vasja, Jonas and Theo!
+# ♟️ CHESS GAME by Hyejin, Aylin, Vasja, Jonas and Theo!
 
 This repository contains a student project created for an ongoing lecture on object-oriented programming
 with Java at HWR Berlin (summer term 2024).
@@ -37,7 +37,7 @@ all of its tests:
 just build
 ```
 
-## Abstract
+## Abstract 📖
 
 Chess is a Java-based command line chess game developed as a collaborative project as part of the object-oriented
 programming course. The game offers a traditional chess experience accessible through the command line interface,
