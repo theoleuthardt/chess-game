@@ -72,7 +72,7 @@ class FenNotationTest {
   @Test
   void testGenerateFENFromBoard() {
     Board board = (new Board(new CLIAdapter(System.out)));
-    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R";
+    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 0";
     placeFigureFromFEN(board, fen);
     board.printBoard();
     String generatedFEN = generateFENFromBoard(board);
@@ -82,7 +82,7 @@ class FenNotationTest {
   @Test
   void testGenerateFENInitialState() {
     Board board = (new Board(new CLIAdapter(System.out)));
-    String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
     placeFigureFromFEN(board, fen);
     String generatedFEN = generateFENFromBoard(board);
     assertThat(generatedFEN).isEqualTo(fen);
