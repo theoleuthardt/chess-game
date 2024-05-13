@@ -179,9 +179,9 @@ class BoardTest {
   void testMoveFigureInvalidCoordinates() {
     Board board = new Board(false);
     assertThatThrownBy(() -> board.moveFigure(0, 1, 8, 8))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidUserInputException.class);
     assertThatThrownBy(() -> board.moveFigure(4, 1, 9, 9))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidUserInputException.class);
   }
 
   @Test

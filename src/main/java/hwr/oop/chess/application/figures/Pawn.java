@@ -27,7 +27,7 @@ public class Pawn implements Figure {
     List<Cell> cells = new ArrayList<>();
 
     Cell oneFieldForwards = currentCell.cellInDirection(forwards());
-    if (oneFieldForwards.isFree()) {
+    if (oneFieldForwards == null) {
       return cells;
     }
 
