@@ -69,10 +69,7 @@ public class Pawn implements Figure {
     return availableCell.contains(nextCell);
   }
 
-
   public boolean isAbleToPromote(Cell currentCell) {
-  private boolean isAbleToPromote(Cell currentCell) {
-
     return currentCell.cellInDirection(forwards()) == null;
   }
 
