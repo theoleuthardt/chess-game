@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PawnTest {
@@ -170,12 +171,22 @@ class PawnTest {
   }
 
   @Test
+  void testIsAbleToPromote_CellAvailableInForwardDirection() {
+    Pawn pawn = new Pawn(FigureColor.WHITE);
+    Board board = new Board(true);
+    Cell currentCell = board.findCell('a', 7);
+    currentCell.setCellInDirection(CellDirection.TOP, new Cell('a', 8));
+
+    assertFalse(pawn.isAbleToPromote(currentCell));
+  }
+
+  @Test
   void promotePawn_InvalidPromotionType() {
     Pawn pawn = new Pawn(FigureColor.WHITE);
     Board board = new Board(true);
     Cell currentCell = board.findCell('a', 7);
-
-    assertThrows(InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.KING));
+    assertThrows(
+        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.KING));
   }
 
   @Test
@@ -184,6 +195,7 @@ class PawnTest {
     Board board = new Board(true);
     Cell currentCell = board.findCell('a', 6);
 
-    assertThrows(InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.QUEEN));
+    assertThrows(
+        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.QUEEN));
   }
 }

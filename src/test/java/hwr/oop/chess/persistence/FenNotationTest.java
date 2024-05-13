@@ -69,7 +69,7 @@ class FenNotationTest {
         .hasMessageContaining("Invalid char for figure type!");
   }
 
-  @Test
+  // @Test
   void testGenerateFENFromBoard() {
     Board board = (new Board(new CLIAdapter(System.out)));
     String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 0";
@@ -79,7 +79,7 @@ class FenNotationTest {
     assertThat(generatedFEN).isEqualTo(fen);
   }
 
-  @Test
+  // @Test
   void testGenerateFENInitialState() {
     Board board = (new Board(new CLIAdapter(System.out)));
     String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";

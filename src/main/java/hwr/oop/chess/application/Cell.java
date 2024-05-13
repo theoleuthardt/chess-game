@@ -230,4 +230,8 @@ public class Cell {
   public String toCoordinates() {
     return (char) (x + 64) + String.valueOf(y);
   }
+
+  public void setCellInDirection(CellDirection cellDirection, Cell a) {
+  }
 }
+
