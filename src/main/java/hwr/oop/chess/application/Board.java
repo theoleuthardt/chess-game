@@ -10,6 +10,15 @@ import static hwr.oop.chess.persistence.FenNotation.charToFigureType;
 
 public class Board {
   private Cell firstCell;
+  private boolean castlingWhiteKing;
+  private boolean castlingWhiteQueen;
+  private boolean castlingBlackKing;
+  private boolean castlingBlackQueen;
+  private String enPassant;
+  private int halfmoveClockWhite;
+  private int halfmoveClockBlack;
+  private int fullmoveNumber;
+  private FigureColor turn;
 
   public Board(boolean setFigures) {
     initializeBoard();
@@ -20,6 +29,15 @@ public class Board {
 
   private void initializeBoard() {
     Cell bottomCellRowStart = null;
+    this.castlingWhiteKing = false;
+    this.castlingWhiteQueen = false;
+    this.castlingBlackKing = false;
+    this.castlingBlackQueen = false;
+    this.enPassant = "-";
+    this.halfmoveClockWhite = 0;
+    this.halfmoveClockBlack = 0;
+    this.fullmoveNumber = 0;
+    this.turn = FigureColor.WHITE;
 
     // create the board row by row
     // starts at the bottom left
@@ -212,6 +230,8 @@ public class Board {
       throw new InvalidUserInputException(
           "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
     }
+
+    this.changeTurn();
   }
 
   public Cell cellWithKingOfColor(FigureColor playerColor) {
@@ -268,5 +288,34 @@ public class Board {
     cells.removeIf(cell -> cell.figure() == null);
     cells.removeIf(cell -> cell.figure().color() != myColor);
     return cells;
+  }
+
+  private void changeTurn() {
+    this.turn = this.turn == FigureColor.BLACK ? FigureColor.WHITE : FigureColor.BLACK;
+  }
+
+  public FigureColor turn(){
+    return this.turn;
+  }
+  public boolean castlingWhiteKing(){
+    return this.castlingWhiteKing;
+  }
+  public boolean castlingWhiteQueen(){
+    return this.castlingWhiteQueen;
+  }
+  public boolean castlingBlackKing(){
+    return this.castlingBlackKing;
+  }
+  public boolean castlingBlackQueen(){
+    return this.castlingBlackQueen;
+  }
+  public String enPassant(){
+    return this.enPassant;
+  }
+  public int fullmoveNumber(){
+    return this.fullmoveNumber;
+  }
+  public int halfmoveClockBlack(){
+    return this.halfmoveClockBlack;
   }
 }

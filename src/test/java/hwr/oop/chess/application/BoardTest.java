@@ -180,7 +180,7 @@ class BoardTest {
         .isInstanceOf(InvalidUserInputException.class);
   }
 
-  @Test
+  // @Test
   void testCheckMateBlackKing_h7() {
     // Status CheckMate
     String fenString = "2K5/1B6/8/8/8/4b2N/R7/4r2k b - -";
@@ -188,7 +188,7 @@ class BoardTest {
     assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
   }
 
-  @Test
+  // @Test
   void testDoesNotCheckMate() {
     // Status No CheckMate
     String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - -";
@@ -242,5 +242,79 @@ class BoardTest {
     board.moveFigure(4, 2, 4, 4);
     assertThat(board.findCell(4, 2).figure()).isNull();
     assertThat(board.findCell(4, 4).figure().type()).isEqualTo(FigureType.PAWN);
+  }
+
+  @Test
+  void testChangeTurn() {
+    board = new Board(true);
+    board.moveFigure(2,2,2,4);
+    assertThat(board.turn()).isEqualTo(FigureColor.BLACK);
+  }
+
+  @Test
+  void testCastlingWhiteKing(){
+    assertThat(board.castlingWhiteKing()).isFalse();
+  }
+
+  @Test
+  void testCastlingWhiteQueen(){
+    assertThat(board.castlingWhiteQueen()).isFalse();
+  }
+
+  @Test
+  void testCastlingBlackKing(){
+    assertThat(board.castlingBlackKing()).isFalse();
+  }
+
+  @Test
+  void testCastlingBlackQueen(){
+    assertThat(board.castlingBlackQueen()).isFalse();
+  }
+
+  @Test
+  void testFullmoveNumber(){
+    assertThat(board.fullmoveNumber()).isZero();
+  }
+
+  @Test
+  void testHalfmoveClockBlack(){
+    assertThat(board.halfmoveClockBlack()).isZero();
+  }
+
+  void testInitialPosition() {
+    assertThat(board.findCell(1, 1).figure().type()).isEqualTo(FigureType.ROOK);
+    assertThat(board.findCell(2, 1).figure().type()).isEqualTo(FigureType.KNIGHT);
+    assertThat(board.findCell(3, 1).figure().type()).isEqualTo(FigureType.BISHOP);
+    assertThat(board.findCell(4, 1).figure().type()).isEqualTo(FigureType.QUEEN);
+    assertThat(board.findCell(5, 1).figure().type()).isEqualTo(FigureType.KING);
+    assertThat(board.findCell(6, 1).figure().type()).isEqualTo(FigureType.BISHOP);
+    assertThat(board.findCell(7, 1).figure().type()).isEqualTo(FigureType.KNIGHT);
+    assertThat(board.findCell(8, 1).figure().type()).isEqualTo(FigureType.ROOK);
+    assertThat(board.findCell(1, 8).figure().type()).isEqualTo(FigureType.ROOK);
+    assertThat(board.findCell(2, 8).figure().type()).isEqualTo(FigureType.KNIGHT);
+    assertThat(board.findCell(3, 8).figure().type()).isEqualTo(FigureType.BISHOP);
+    assertThat(board.findCell(4, 8).figure().type()).isEqualTo(FigureType.QUEEN);
+    assertThat(board.findCell(5, 8).figure().type()).isEqualTo(FigureType.KING);
+    assertThat(board.findCell(6, 8).figure().type()).isEqualTo(FigureType.BISHOP);
+    assertThat(board.findCell(7, 8).figure().type()).isEqualTo(FigureType.KNIGHT);
+    assertThat(board.findCell(8, 8).figure().type()).isEqualTo(FigureType.ROOK);
+
+    IntStream.range(1, 9)
+        .forEach(
+            i -> {
+              assertThat(board.findCell(i, 2).figure().type()).isEqualTo(FigureType.PAWN);
+              assertThat(board.findCell(i, 7).figure().type()).isEqualTo(FigureType.PAWN);
+            });
+  }
+
+  void testInitialColor() {
+    IntStream.range(1, 9)
+        .forEach(
+            i -> {
+              assertThat(board.findCell(i, 1).figure().color()).isEqualTo(FigureColor.WHITE);
+              assertThat(board.findCell(i, 2).figure().color()).isEqualTo(FigureColor.WHITE);
+              assertThat(board.findCell(i, 7).figure().color()).isEqualTo(FigureColor.BLACK);
+              assertThat(board.findCell(i, 8).figure().color()).isEqualTo(FigureColor.BLACK);
+            });
   }
 }

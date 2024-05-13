@@ -69,7 +69,7 @@ public class Pawn implements Figure {
     return availableCell.contains(nextCell);
   }
 
-  private boolean isAbleToPromote(Cell currentCell) {
+  public boolean isAbleToPromote(Cell currentCell) {
     return currentCell.cellInDirection(forwards()) == null;
   }
 
@@ -97,5 +97,9 @@ public class Pawn implements Figure {
 
   public FigureType type() {
     return type;
+  }
+
+  public List<FigureType> getPromotionTypes() {
+    return List.of(FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
   }
 }

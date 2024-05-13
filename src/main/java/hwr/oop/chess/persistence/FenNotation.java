@@ -73,9 +73,32 @@ public class FenNotation {
       }
     }
     // Delete last '/'
-    fenString.deleteCharAt(fenString.length() - 1);
+    fenString.replace(fenString.length() - 1, fenString.length(), " ");
+    fenString.append(board.turn() == FigureColor.WHITE ? 'w' : 'b');
+    fenString.append(" ");
+    if(!board.castlingWhiteKing()){
+      fenString.append('K');
+    }
+    if(!board.castlingWhiteQueen()){
+      fenString.append('Q');
+    }
+    if(!board.castlingBlackKing()){
+      fenString.append('k');
+    }
+    if(!board.castlingBlackQueen()){
+      fenString.append('q');
+    }
+
+    fenString.append(" ");
+    fenString.append(board.enPassant());
+    fenString.append(" ");
+    fenString.append(board.halfmoveClockBlack());
+    fenString.append(" ");
+    fenString.append(board.fullmoveNumber());
+
     return fenString.toString();
   }
+
 
   public static boolean isCharValid(char c) {
     c = Character.toLowerCase(c);
