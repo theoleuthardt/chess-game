@@ -92,7 +92,7 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 | 10     | Rook            | :heavy_check_mark: |
 | 11     | Figure Movement | :heavy_check_mark: |
 | 12     | Cell            | :heavy_check_mark: |
-| 13     | CellDirection   | :x:                |
+| 13     | CellDirection   | :heavy_check_mark: |
 | 14     | ChessGame       | :x:                |
 
 ### CLI
