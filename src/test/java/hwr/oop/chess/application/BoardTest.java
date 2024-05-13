@@ -272,6 +272,42 @@ class BoardTest {
     assertThat(board.findCell(4, 2).figure()).isNull();
     assertThat(board.findCell(4, 4).figure().type()).isEqualTo(FigureType.PAWN);
   }
+  @Test
+   void testChangeTurn() {
+    board = new Board(true);
+    board.moveFigure(2,2,2,4);
+    assertThat(board.turn()).isEqualTo(FigureColor.BLACK);
+  }
+
+  @Test
+  void testCastlingWhiteKing(){
+    assertThat(board.castlingWhiteKing()).isFalse();
+  }
+
+  @Test
+  void testCastlingWhiteQueen(){
+    assertThat(board.castlingWhiteQueen()).isFalse();
+  }
+
+  @Test
+  void testCastlingBlackKing(){
+    assertThat(board.castlingBlackKing()).isFalse();
+  }
+
+  @Test
+  void testCastlingBlackQueen(){
+    assertThat(board.castlingBlackQueen()).isFalse();
+  }
+
+  @Test
+  void testFullmoveNumber(){
+    assertThat(board.fullmoveNumber()).isZero();
+  }
+
+  @Test
+  void testHalfmoveClockBlack(){
+    assertThat(board.halfmoveClockBlack()).isZero();
+  }
 
   void testInitialPosition() {
     assertThat(board.findCell(1, 1).figure().type()).isEqualTo(FigureType.ROOK);
@@ -309,4 +345,4 @@ class BoardTest {
               assertThat(board.findCell(i, 8).figure().color()).isEqualTo(FigureColor.BLACK);
             });
   }
-}
+  }
