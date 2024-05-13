@@ -44,10 +44,14 @@ public class FenNotation {
         for (Cell cell : cells) {
             if (cell.figure() == null){
                 count++;
-                if (x == 8) {
+                if (x != 8) {
+                    x++;
+                } else {
                     // Add empty cells as number
                     fenString.append(count);
+                    fenString.append('/');
                     count = 0;
+                    x = 1;
                 }
                 continue;
             }
@@ -61,9 +65,9 @@ public class FenNotation {
                 // Add Figure as symbol
                 fenString.append(cell.figure().symbol());
             }
-
-            x++;
-            if (x == 9) {
+            if (x != 8) {
+                x++;
+            } else {
                 fenString.append('/');
                 x = 1;
             }
@@ -82,7 +86,7 @@ public class FenNotation {
     }
 
     public static Figure charToFigureType(char ch) {
-      return switch (ch) {
+        return switch (ch) {
             case 'b' -> new Bishop(FigureColor.BLACK);
             case 'k' -> new King(FigureColor.BLACK);
             case 'n' -> new Knight(FigureColor.BLACK);
