@@ -2,39 +2,13 @@ package hwr.oop.chess.persistence;
 
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.figures.FigureType;
-import hwr.oop.chess.cli.CLIAdapter;
-import hwr.oop.chess.cli.InvalidUserInputException;
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
 
 import static hwr.oop.chess.persistence.FenNotation.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FenNotationTest {
-  // @Test
-  void testPlaceFigureFromFEN() {
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    Board board = (new Board(new CLIAdapter(byteArrayOutputStream)));
-    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
-    placeFigureFromFEN(board, fen);
-    board.printBoard();
-    assertThat(byteArrayOutputStream.toString())
-        .containsSequence(
-            "r n b q k b n r",
-            "p p - p p p p p",
-            "- - - - - - - -",
-            "- - p - - - - -",
-            "- - - - P - - -",
-            "- - - - - N - -",
-            "P P P P - P P P",
-            "R N B Q K B - R");
-  }
-
   @Test
   void testInitialFigureFromFEN() {
     Board board = new Board(false);
