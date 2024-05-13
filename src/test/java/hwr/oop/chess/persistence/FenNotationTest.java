@@ -3,7 +3,6 @@ package hwr.oop.chess.persistence;
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.cli.CLIAdapter;
-import hwr.oop.chess.cli.InvalidUserInputException;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -81,7 +80,7 @@ class FenNotationTest {
 
   @Test
   void testGenerateFENInitialState() {
-    Board board = (new Board(new CLIAdapter(System.out)));
+    Board board = new Board(false);
     String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
     placeFigureFromFEN(board, fen);
     String generatedFEN = generateFENFromBoard(board);

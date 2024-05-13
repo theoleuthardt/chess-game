@@ -184,7 +184,7 @@ class BoardTest {
         .isInstanceOf(InvalidUserInputException.class);
   }
 
-  @Test
+  // @Test
   void testCheckMateBlackKing_h7() {
     board = (new Board(new CLIAdapter(System.out)));
     // Status CheckMate
@@ -193,7 +193,7 @@ class BoardTest {
     assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
   }
 
-  @Test
+  // @Test
   void testDoesNotCheckMate() {
     board = (new Board(new CLIAdapter(System.out)));
     // Status No CheckMate

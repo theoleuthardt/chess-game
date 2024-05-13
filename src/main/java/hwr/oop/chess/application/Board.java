@@ -36,6 +36,15 @@ public class Board {
 
   private void initializeBoard() {
     Cell bottomCellRowStart = null;
+    this.castlingWhiteKing = false;
+    this.castlingWhiteQueen = false;
+    this.castlingBlackKing = false;
+    this.castlingBlackQueen = false;
+    this.enPassant = "-";
+    this.halfmoveClockWhite = 0;
+    this.halfmoveClockBlack = 0;
+    this.fullmoveNumber = 0;
+    this.turn = FigureColor.WHITE;
 
     // create the board row by row
     // starts at the bottom left

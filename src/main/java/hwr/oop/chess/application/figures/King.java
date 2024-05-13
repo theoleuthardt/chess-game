@@ -5,12 +5,21 @@ import hwr.oop.chess.application.CellDirection;
 import java.util.ArrayList;
 import java.util.List;
 
+import static hwr.oop.chess.application.Cell.findNextCell;
+import static hwr.oop.chess.application.Cell.isEmptyBetweenCells;
+
 public class King implements Figure {
   private static final FigureType type = FigureType.KING;
   private final FigureColor color;
+  private boolean castlingKing;
+  private boolean castlingQueen;
+  private boolean hasMoved;
 
   public King(FigureColor color) {
     this.color = color;
+    this.castlingKing = false;
+    this.castlingQueen = false;
+    this.hasMoved = false;
   }
 
   public List<Cell> getAvailableCells(Cell currentCell) {
@@ -22,6 +31,21 @@ public class King implements Figure {
       if (neighbourCell != null
           && (neighbourCell.isFree() || neighbourCell.figure().color() != color())) {
         cells.add(neighbourCell);
+      }
+    }
+
+    // Add cells for castling King
+    if (!castlingKing && !hasMoved && isEmptyBetweenCells(currentCell, CellDirection.RIGHT, 2)) {
+      Cell rook = findNextCell(currentCell, CellDirection.RIGHT, 3);
+      if(rook.figure().type() == FigureType.ROOK){
+        cells.add(rook);
+      }
+    }
+    // Add cells for castling Queen
+    if(!castlingQueen && !hasMoved && isEmptyBetweenCells(currentCell, CellDirection.LEFT, 3)) {
+      Cell rook = findNextCell(currentCell, CellDirection.LEFT, 4);
+      if(rook.figure().type() == FigureType.ROOK){
+        cells.add(rook);
       }
     }
 
