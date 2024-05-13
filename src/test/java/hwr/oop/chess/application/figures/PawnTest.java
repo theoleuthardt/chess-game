@@ -142,6 +142,7 @@ class PawnTest {
     pawnDiagonalTest(FigureColor.WHITE, null, false);
     pawnDiagonalTest(FigureColor.BLACK, null, false);
   }
+<<<<<<< HEAD
 
   @Test
   void isAbleToPromote_WhitePawn() {
@@ -166,4 +167,5 @@ class PawnTest {
 
     assertThat(result).isTrue();
   }
+
 }

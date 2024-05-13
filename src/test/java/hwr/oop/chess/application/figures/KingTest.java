@@ -65,6 +65,4 @@ class KingTest {
     assertThat(king.type()).isEqualTo(FigureType.KING);
     assertThat(king.canMoveTo(from, to)).isFalse();
   }
-
-  // TODO update Tests after writing functions for check, checkmate
 }

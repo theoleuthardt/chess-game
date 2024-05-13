@@ -1,7 +1,7 @@
 package hwr.oop.chess.cli;
 
-public class InvalidUserInputException extends IllegalArgumentException {
-    public InvalidUserInputException(String e) {
-        super(e);
-    }
+public class InvalidUserInputException extends RuntimeException {
+  public InvalidUserInputException(String e) {
+    super(e);
+  }
 }

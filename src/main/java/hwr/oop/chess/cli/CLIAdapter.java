@@ -6,7 +6,7 @@ import hwr.oop.chess.application.ChessGame;
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.application.figures.Pawn;
-import hwr.oop.chess.persistence.GameDataManager;
+import hwr.oop.chess.persistence.Persistence;
 import hwr.oop.chess.persistence.NoPersistence;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -17,7 +17,7 @@ public class CLIAdapter {
   private static final String RESET_TEXT = "\033[0m";
 
   private final PrintStream printStream;
-  private final GameDataManager persistence;
+  private final Persistence persistence;
   private final List<Cell> cellHighlight = new ArrayList<>();
   private int gameId = -1;
   private ChessGame game;
@@ -26,7 +26,7 @@ public class CLIAdapter {
     this(outputStream, new NoPersistence());
   }
 
-  public CLIAdapter(OutputStream outputStream, GameDataManager persistence) {
+  public CLIAdapter(OutputStream outputStream, Persistence persistence) {
     this.printStream = new PrintStream(outputStream);
     this.persistence = persistence;
   }
@@ -77,7 +77,7 @@ public class CLIAdapter {
     printStream.println(" " + message);
   }
 
-  public GameDataManager persistence() {
+  public Persistence persistence() {
     return persistence;
   }
 
@@ -122,7 +122,7 @@ public class CLIAdapter {
     return requireCellHasFigure(cell);
   }
 
-  public FigureType requireArgumentIsFigureType(Board board, String figure) {
+  public FigureType requireArgumentIsFigureType(String figure) {
     return FigureType.fromString(figure);
   }
 
@@ -175,7 +175,7 @@ public class CLIAdapter {
           "On the cell " + from.toCoordinates() + " there is no pawn!");
     }
 
-    FigureType promoteToType = requireArgumentIsFigureType(board, arguments.removeFirst());
+    FigureType promoteToType = requireArgumentIsFigureType(arguments.removeFirst());
     printlnAction(
         "Promote "
             + figure.color().name()

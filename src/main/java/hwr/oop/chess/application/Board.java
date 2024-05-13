@@ -7,9 +7,20 @@ import hwr.oop.chess.cli.InvalidUserInputException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static hwr.oop.chess.persistence.FenNotation.charToFigureType;
+
 public class Board {
   private CLIAdapter cli;
   private Cell firstCell;
+  private boolean castlingWhiteKing;
+  private boolean castlingWhiteQueen;
+  private boolean castlingBlackKing;
+  private boolean castlingBlackQueen;
+  private String enPassant;
+  private int halfmoveClockWhite;
+  private int halfmoveClockBlack;
+  private int fullmoveNumber;
+  private FigureColor turn;
 
   public Board(CLIAdapter cli) {
     this.cli = cli;
@@ -175,21 +186,13 @@ public class Board {
     }
     int figureIndex = 0;
     for (Cell cell : allCells()) {
-      char symbol = figurePositions.charAt(figureIndex);
-      FigureColor color = Character.isUpperCase(symbol) ? FigureColor.WHITE : FigureColor.BLACK;
-      Figure figure =
-          switch (Character.toLowerCase(symbol)) {
-            case ' ' -> null;
-            case 'p' -> new Pawn(color);
-            case 'r' -> new Rook(color);
-            case 'b' -> new Bishop(color);
-            case 'k' -> new King(color);
-            case 'q' -> new Queen(color);
-            case 'n' -> new Knight(color);
-            default ->
-                throw new InvalidUserInputException("The is no figure with the type " + symbol);
-          };
-      cell.setFigure(figure);
+      char figureType = figurePositions.charAt(figureIndex);
+      if (figureType == ' ') {
+        cell.setFigure(null);
+      } else {
+        Figure figure = charToFigureType(figureType);
+        cell.setFigure(figure);
+      }
       figureIndex++;
     }
   }
@@ -266,10 +269,9 @@ public class Board {
     if (isCheck(FigureColor.BLACK)) {
       this.cli.printlnError("The black king is in check!");
     }
-  }
 
-  // TODO make check
-  // TODO make checkmate
+    this.changeTurn();
+  }
 
   public Cell cellWithKingOfColor(FigureColor playerColor) {
     List<Cell> cells = allCells();
@@ -327,8 +329,32 @@ public class Board {
     return cells;
   }
 
-  // TODO make castling
-  // TODO make enpassnt
-  // TODO count move
-  // TODO write Compare, CompareTo
+  private void changeTurn() {
+    this.turn = this.turn == FigureColor.BLACK ? FigureColor.WHITE : FigureColor.BLACK;
+  }
+
+  public FigureColor turn(){
+    return this.turn;
+  }
+  public boolean castlingWhiteKing(){
+    return this.castlingWhiteKing;
+  }
+  public boolean castlingWhiteQueen(){
+    return this.castlingWhiteQueen;
+  }
+  public boolean castlingBlackKing(){
+    return this.castlingBlackKing;
+  }
+  public boolean castlingBlackQueen(){
+    return this.castlingBlackQueen;
+  }
+  public String enPassant(){
+    return this.enPassant;
+  }
+  public int fullmoveNumber(){
+    return this.fullmoveNumber;
+  }
+  public int halfmoveClockBlack(){
+    return this.halfmoveClockBlack;
+  }
 }

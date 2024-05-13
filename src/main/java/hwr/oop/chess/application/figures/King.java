@@ -3,6 +3,7 @@ package hwr.oop.chess.application.figures;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 import java.util.ArrayList;
+import java.util.List;
 
 public class King implements Figure {
   private static final FigureType type = FigureType.KING;
@@ -12,15 +13,14 @@ public class King implements Figure {
     this.color = color;
   }
 
-  public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-    // TODO upgrade function after writing check, checkmate
-    ArrayList<Cell> cells = new ArrayList<>();
+  public List<Cell> getAvailableCells(Cell currentCell) {
+    List<Cell> cells = new ArrayList<>();
 
     // Loop though all Directions
     for (CellDirection direction : CellDirection.values()) {
       Cell neighbourCell = currentCell.cellInDirection(direction);
       if (neighbourCell != null
-          && (neighbourCell.figure() == null || neighbourCell.figure().color() != color())) {
+          && (neighbourCell.isFree() || neighbourCell.figure().color() != color())) {
         cells.add(neighbourCell);
       }
     }
@@ -29,7 +29,7 @@ public class King implements Figure {
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    ArrayList<Cell> availableCell = getAvailableCells(prevCell);
+    List<Cell> availableCell = getAvailableCells(prevCell);
     return availableCell.contains(nextCell);
   }
 
