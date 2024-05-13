@@ -1,15 +1,15 @@
-//import static org.junit.Assert.assertEquals;
-//import static org.mockito.Mockito.*;
+// import static org.junit.Assert.assertEquals;
+// import static org.mockito.Mockito.*;
 //
-//import java.io.IOException;
+// import java.io.IOException;
 //
-//import org.junit.Test;
+// import org.junit.Test;
 //
-//public class GameDataManagerTest {
+// public class GameDataManagerTest {
 //
 //  @Test
 //  public void testLoadGame() {
-//    CsvGameRepository repository = new CsvGameRepository();
+//    CSVFilePersistence repository = new CSVFilePersistence();
 //    // One can assert the behavior of loading game data from CSV
 //  }
 //
@@ -30,7 +30,7 @@
 //      e.printStackTrace();
 //    }
 //
-//    CsvGameRepository repository = new CsvGameRepository();
+//    CSVFilePersistence repository = new CSVFilePersistence();
 //    repository.saveGame(1);
 //
 //    // Verify that FileWriter was called with the correct file name
@@ -40,7 +40,7 @@
 //      e.printStackTrace();
 //    }
 //  }
-//}
+// }
 //
 //// the code above does not test dynamically:
-///* dynamic version ??
+/// * dynamic version ??
