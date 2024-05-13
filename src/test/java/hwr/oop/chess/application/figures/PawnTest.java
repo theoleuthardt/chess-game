@@ -3,12 +3,15 @@ package hwr.oop.chess.application.figures;
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
+import hwr.oop.chess.cli.InvalidUserInputException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PawnTest {
   private Board board;
@@ -153,6 +156,9 @@ class PawnTest {
     boolean result = pawn.isAbleToPromote(cell);
 
     assertThat(result).isTrue();
+    assertThat(pawn.getPromotionTypes())
+        .containsExactlyInAnyOrder(
+            FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
   }
 
   @Test
@@ -165,5 +171,37 @@ class PawnTest {
     boolean result = pawn.isAbleToPromote(cell);
 
     assertThat(result).isTrue();
+    assertThat(pawn.getPromotionTypes())
+        .containsExactlyInAnyOrder(
+            FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
+  }
+
+  @Test
+  void isAbleToPromote_CellAvailableInForwardDirection() {
+    Pawn pawn = new Pawn(FigureColor.WHITE);
+    Board board = new Board(true);
+    Cell currentCell = board.findCell('a', 7);
+    currentCell.setCellInDirection(CellDirection.TOP, new Cell('a', 8));
+
+    assertFalse(pawn.isAbleToPromote(currentCell));
+  }
+
+  @Test
+  void promotePawn_InvalidPromotionType() {
+    Pawn pawn = new Pawn(FigureColor.WHITE);
+    Board board = new Board(true);
+    Cell currentCell = board.findCell('a', 7);
+    assertThrows(
+        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.KING));
+  }
+
+  @Test
+  void promotePawn_PawnNotEligibleForPromotion() {
+    Pawn pawn = new Pawn(FigureColor.WHITE);
+    Board board = new Board(true);
+    Cell currentCell = board.findCell('a', 1);
+
+    assertThrows(
+        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.QUEEN));
   }
 }

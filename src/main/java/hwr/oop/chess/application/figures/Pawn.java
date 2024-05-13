@@ -98,4 +98,8 @@ public class Pawn implements Figure {
   public FigureType type() {
     return type;
   }
+
+  public List<FigureType> getPromotionTypes() {
+    return List.of(FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
+  }
 }
