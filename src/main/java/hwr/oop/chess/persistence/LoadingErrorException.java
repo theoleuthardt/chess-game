@@ -1,9 +1,7 @@
 package hwr.oop.chess.persistence;
 
-import java.io.IOException;
-
-public class LoadingErrorException extends IOException {
-  public LoadingErrorException(String e) {
+public class LoadingErrorException extends RuntimeException {
+  public LoadingErrorException(Throwable e) {
     super(e);
   }
 }

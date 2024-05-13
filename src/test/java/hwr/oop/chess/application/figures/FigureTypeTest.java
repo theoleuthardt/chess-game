@@ -20,8 +20,8 @@ class FigureTypeTest {
   @Test
   void testInvalidValues() {
     String invalidFigure = "BOAT";
-    IllegalArgumentException exception =
-        assertThrows(IllegalArgumentException.class, () -> FigureType.fromString(invalidFigure));
+    InvalidUserInputException exception =
+        assertThrows(InvalidUserInputException.class, () -> FigureType.fromString(invalidFigure));
 
     String expectedMessage = "The figure type '" + invalidFigure + "' is not valid.";
     assertThat(exception.getMessage()).contains(expectedMessage);
