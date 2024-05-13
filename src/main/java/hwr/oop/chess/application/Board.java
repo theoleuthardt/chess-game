@@ -177,8 +177,13 @@ public class Board {
     }
     int figureIndex = 0;
     for (Cell cell : allCells()) {
-      Figure figure = charToFigureType(figurePositions.charAt(figureIndex));
-      cell.setFigure(figure);
+      char figureType = figurePositions.charAt(figureIndex);
+      if (figureType == ' ') {
+        cell.setFigure(null);
+      } else {
+        Figure figure = charToFigureType(figureType);
+        cell.setFigure(figure);
+      }
       figureIndex++;
     }
   }
