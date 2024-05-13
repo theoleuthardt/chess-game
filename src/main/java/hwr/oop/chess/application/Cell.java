@@ -231,7 +231,5 @@ public class Cell {
     return (char) (x + 64) + String.valueOf(y);
   }
 
-  public void setCellInDirection(CellDirection cellDirection, Cell a) {
-  }
+  public void setCellInDirection(CellDirection cellDirection, Cell a) {}
 }
-

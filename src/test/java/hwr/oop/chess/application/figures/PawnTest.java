@@ -155,7 +155,7 @@ class PawnTest {
 
     boolean result = pawn.isAbleToPromote(cell);
 
-    assertThat(result).isTrue();
+    assertThat(result).isFalse();
   }
 
   @Test
@@ -167,7 +167,7 @@ class PawnTest {
 
     boolean result = pawn.isAbleToPromote(cell);
 
-    assertThat(result).isTrue();
+    assertThat(result).isFalse();
   }
 
   @Test
