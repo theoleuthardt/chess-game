@@ -1,7 +1,6 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.*;
-import hwr.oop.chess.cli.CLIAdapter;
 import hwr.oop.chess.cli.InvalidUserInputException;
 
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.List;
 import static hwr.oop.chess.persistence.FenNotation.charToFigureType;
 
 public class Board {
-  private CLIAdapter cli;
   private Cell firstCell;
   private boolean castlingWhiteKing;
   private boolean castlingWhiteQueen;
@@ -21,11 +19,6 @@ public class Board {
   private int halfmoveClockBlack;
   private int fullmoveNumber;
   private FigureColor turn;
-
-  public Board(CLIAdapter cli) {
-    this.cli = cli;
-    initializeBoard();
-  }
 
   public Board(boolean setFigures) {
     initializeBoard();
@@ -129,38 +122,7 @@ public class Board {
     return null;
   }
 
-  public void printBoard() {
-    printBoard(null);
-  }
-
-  public void printBoard(List<Cell> highlightCell) {
-    List<Cell> cells = allCells();
-    cli.println();
-    for (Cell cell : cells) {
-      if (cell.leftCell() == null) {
-        cli.printGray(cell.y() + " | ");
-      }
-
-      Figure figure = cell.figure();
-      String cellText = String.valueOf(figure == null ? '-' : figure.symbol());
-
-      // Print figure if it exists, otherwise print empty position
-      if (highlightCell != null && highlightCell.contains(cell)) {
-        cli.printBlue(cellText);
-      } else {
-        cli.print(cellText);
-      }
-
-      cli.print(" ");
-      if (cell.rightCell() == null) {
-        cli.println("");
-      }
-    }
-    cli.printlnGray("  \\________________");
-    cli.printlnGray("    A B C D E F G H");
-  }
-
-  private void addFiguresToBoard() {
+  public void addFiguresToBoard() {
     List<Cell> cells = allCells();
     for (Cell cell : cells) {
       FigureColor figureColor = cell.y() <= 2 ? FigureColor.WHITE : FigureColor.BLACK;
@@ -252,9 +214,6 @@ public class Board {
       throw new InvalidUserInputException("The game is over as you are in Checkmate!");
     }
 
-    // After this move the king is not allowed to be in check anymore
-    boolean wasInCheck = isCheck(figure.color());
-
     if (!figure.canMoveTo(startCell, endCell)) {
       throw new InvalidUserInputException("The figure can't move to that cell");
     }
@@ -263,20 +222,13 @@ public class Board {
     startCell.setFigure(null);
     endCell.setFigure(figure);
 
-    if (wasInCheck && isCheck(figure.color())) {
+    if (isCheck(figure.color())) {
       // After this move the king is not allowed to be in check anymore.
       // As the king is still in check, we undo this action
       startCell.setFigure(figure);
       endCell.setFigure(figureOnEndCell);
       throw new InvalidUserInputException(
-          "This move is not allowed as your king is in check! Move a figure so that your king is not in check anymore.");
-    }
-
-    if (isCheck(FigureColor.WHITE)) {
-      this.cli.printlnError("The white king is in check!");
-    }
-    if (isCheck(FigureColor.BLACK)) {
-      this.cli.printlnError("The black king is in check!");
+          "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
     }
 
     this.changeTurn();

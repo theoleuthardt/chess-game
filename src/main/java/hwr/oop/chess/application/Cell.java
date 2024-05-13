@@ -19,7 +19,7 @@ public class Cell {
   private Cell bottomRightCell;
 
   public Cell(int x, int y) {
-    if (!isValidCoordinate(x, y)) {
+    if (isInvalidCoordinate(x, y)) {
       throw new InvalidUserInputException("Invalid Position");
     }
     this.x = x;
@@ -156,16 +156,13 @@ public class Cell {
   public void addAvailableCellsInDirectionToList(List<Cell> list, CellDirection direction) {
     Cell current = this;
     while ((current = current.cellInDirection(direction)) != null) {
-      boolean cellIsEmpty = current.figure() == null;
-      boolean enemyIsOnField = false;
-      if (!cellIsEmpty) {
-        enemyIsOnField = current.figure().color() != figure().color();
-      }
+      boolean enemyIsOnField =
+          current.isOccupied() && (current.figure().color() != figure().color());
 
-      if (cellIsEmpty || enemyIsOnField) {
+      if (current.isFree() || enemyIsOnField) {
         list.add(current);
       }
-      if (!cellIsEmpty) {
+      if (current.isOccupied()) {
         break;
       }
     }

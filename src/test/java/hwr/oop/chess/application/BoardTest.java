@@ -2,7 +2,6 @@ package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
-import hwr.oop.chess.cli.CLIAdapter;
 import hwr.oop.chess.cli.InvalidUserInputException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,37 +9,37 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import static hwr.oop.chess.persistence.FenNotation.placeFigureFromFEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class BoardTest {
-  Logger logger = Logger.getLogger(BoardTest.class.getName());
   private Board board;
 
   @BeforeEach
   void setUp() {
-    // Initialize the board
-    board = (new Board(new CLIAdapter(System.out)));
+    board = new Board(false);
   }
 
   void assertThatFigureOnCellHasSymbol(int x, int y, char symbol) {
     Cell cell = board.findCell(x, y);
-    assertThat(cell.figure()).isNotNull();
+    assertThat(cell.isFree()).isFalse();
     assertThat(cell.figure().symbol()).isEqualTo(symbol);
   }
 
-  @Test
-  void initialBoard_withCorrectSymbolOnEachPosition() {
-    board.addFiguresToBoard(null);
+  void assertThatAllFiguresAreInDefaultPosition() {
     for (int x = 1; x <= 8; x++) {
       // row of black figures
       assertThatFigureOnCellHasSymbol(x, 8, " rnbqkbnr ".charAt(x));
       assertThatFigureOnCellHasSymbol(x, 7, " pppppppp ".charAt(x));
+
+      assertThat(board.findCell(x, 6).isFree()).isTrue();
+      assertThat(board.findCell(x, 5).isFree()).isTrue();
+      assertThat(board.findCell(x, 4).isFree()).isTrue();
+      assertThat(board.findCell(x, 3).isFree()).isTrue();
 
       // row of white figures
       assertThatFigureOnCellHasSymbol(x, 2, " PPPPPPPP ".charAt(x));
@@ -49,26 +48,23 @@ class BoardTest {
   }
 
   @Test
-  void initialBoard_onlyMiddleIsFree() {
-    board.addFiguresToBoard(null);
-    List<Cell> cells = board.allCells();
-    assertThat(cells).hasSize(64);
-    for (Cell cell : cells) {
-      if (cell.y() != 1 && cell.y() != 2 && cell.y() != 7 && cell.y() != 8) {
-        assertThat(cell.figure()).isNull();
-      } else {
-        assertThat(cell.figure()).isNotNull();
-      }
-    }
+  void boardConstructorWithFigures() {
+    board = new Board(true);
+    assertThatAllFiguresAreInDefaultPosition();
+  }
+
+  @Test
+  void boardAddFiguresToBoardWithDefaultPositions() {
+    board.addFiguresToBoard();
+    assertThatAllFiguresAreInDefaultPosition();
   }
 
   @Test
   void initialBoard_withoutFiguresIsEmpty() {
-    Board boardNoFigure = new Board(false);
-    List<Cell> cells = boardNoFigure.allCells();
+    List<Cell> cells = board.allCells();
     assertThat(cells).hasSize(64);
     for (Cell cell : cells) {
-      assertThat(cell.figure()).isNull();
+      assertThat(cell.isFree()).isTrue();
     }
   }
 
@@ -123,8 +119,8 @@ class BoardTest {
   @ParameterizedTest
   @EnumSource(CellDirection.class)
   void innerCells_hasNeighbourCellInEveryDirection(CellDirection direction) {
-    for (int x : IntStream.range(2, 8).toArray()) {
-      for (int y : IntStream.range(2, 8).toArray()) {
+    for (int x : List.of(2, 3, 4, 5, 6, 7)) {
+      for (int y : List.of(2, 3, 4, 5, 6, 7)) {
         Cell cell = board.findCell(x, y);
         assertThat(cell).isNotNull();
         assertThat(cell.cellInDirection(direction)).isNotNull();
@@ -186,7 +182,6 @@ class BoardTest {
 
   // @Test
   void testCheckMateBlackKing_h7() {
-    board = (new Board(new CLIAdapter(System.out)));
     // Status CheckMate
     String fenString = "2K5/1B6/8/8/8/4b2N/R7/4r2k b - -";
     placeFigureFromFEN(board, fenString);
@@ -195,7 +190,6 @@ class BoardTest {
 
   // @Test
   void testDoesNotCheckMate() {
-    board = (new Board(new CLIAdapter(System.out)));
     // Status No CheckMate
     String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - -";
     placeFigureFromFEN(board, fenString);
@@ -204,7 +198,6 @@ class BoardTest {
 
   // @Test
   void testCheckMateBlackKing_e4() {
-    board = (new Board(new CLIAdapter(System.out)));
     String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - -";
     placeFigureFromFEN(board, fenString);
     assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
@@ -213,53 +206,31 @@ class BoardTest {
   @Test
   void testFindCellWithString() {
     // invalid Value
-    assertThrows(
-        InvalidUserInputException.class,
-        () -> {
-          board.findCell("c3d");
-        });
-    assertThrows(
-        InvalidUserInputException.class,
-        () -> {
-          board.findCell("a");
-        });
+    assertThatThrownBy(() -> board.findCell("c3d")).isInstanceOf(InvalidUserInputException.class);
+    assertThatThrownBy(() -> board.findCell("a")).isInstanceOf(InvalidUserInputException.class);
     assertNotNull(board.findCell("a1"));
     assertNotNull(board.findCell("e5"));
   }
 
   @Test
   void testAddFiguresToBoard() {
-    board = (new Board(new CLIAdapter(System.out)));
     // Initial Status as string
     String string = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR";
     board.addFiguresToBoard(string);
-    testInitialPosition();
-    testInitialColor();
+    assertThatAllFiguresAreInDefaultPosition();
   }
 
   @Test
   void testAddFiguresToBoardWithLongString() {
-    board = (new Board(new CLIAdapter(System.out)));
     // Initial Status as string
     String string = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR_aaa";
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          board.addFiguresToBoard(string);
-        });
-  }
-
-  @Test
-  void testAddFiguresToBoardNoParams() {
-    board = (new Board(new CLIAdapter(System.out)));
-    board.addFiguresToBoard(null);
-    testInitialPosition();
-    testInitialColor();
+    assertThatThrownBy(() -> board.addFiguresToBoard(string))
+        .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void testFiguresOnBoard() {
-    board = new Board(true);
+    board.addFiguresToBoard();
     String initial = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR";
     String string = board.figuresOnBoard();
     assertThat(string).isEqualTo(initial);
@@ -267,7 +238,7 @@ class BoardTest {
 
   @Test
   void testMoveFigureWithInteger() {
-    board = new Board(true);
+    board.addFiguresToBoard();
     board.moveFigure(4, 2, 4, 4);
     assertThat(board.findCell(4, 2).figure()).isNull();
     assertThat(board.findCell(4, 4).figure().type()).isEqualTo(FigureType.PAWN);
