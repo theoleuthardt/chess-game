@@ -155,7 +155,10 @@ class PawnTest {
 
     boolean result = pawn.isAbleToPromote(cell);
 
-    assertThat(result).isFalse();
+    assertThat(result).isTrue();
+    assertThat(pawn.getPromotionTypes())
+        .containsExactlyInAnyOrder(
+            FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
   }
 
   @Test
@@ -167,11 +170,14 @@ class PawnTest {
 
     boolean result = pawn.isAbleToPromote(cell);
 
-    assertThat(result).isFalse();
+    assertThat(result).isTrue();
+    assertThat(pawn.getPromotionTypes())
+        .containsExactlyInAnyOrder(
+            FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
   }
 
   @Test
-  void testIsAbleToPromote_CellAvailableInForwardDirection() {
+  void isAbleToPromote_CellAvailableInForwardDirection() {
     Pawn pawn = new Pawn(FigureColor.WHITE);
     Board board = new Board(true);
     Cell currentCell = board.findCell('a', 7);
@@ -193,7 +199,7 @@ class PawnTest {
   void promotePawn_PawnNotEligibleForPromotion() {
     Pawn pawn = new Pawn(FigureColor.WHITE);
     Board board = new Board(true);
-    Cell currentCell = board.findCell('a', 6);
+    Cell currentCell = board.findCell('a', 1);
 
     assertThrows(
         InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.QUEEN));
