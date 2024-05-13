@@ -7,7 +7,7 @@ import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.ChessGame;
 import hwr.oop.chess.application.figures.FigureType;
-import hwr.oop.chess.persistence.CsvGameRepository;
+import hwr.oop.chess.persistence.CSVFilePersistence;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
@@ -22,7 +22,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class CLIAdapterTest {
   private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
   private final CLIAdapter cliAdapter =
-      new CLIAdapter(new PrintStream(outputStream), new CsvGameRepository());
+      new CLIAdapter(new PrintStream(outputStream), new CSVFilePersistence());
 
   @BeforeEach
   void setUp() {

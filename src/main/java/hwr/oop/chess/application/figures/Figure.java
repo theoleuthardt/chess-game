@@ -2,10 +2,10 @@ package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Cell;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface Figure {
-  ArrayList<Cell> getAvailableCells(Cell currentRook);
+  List<Cell> getAvailableCells(Cell currentRook);
 
   boolean canMoveTo(Cell prevCell, Cell nextCell);
 

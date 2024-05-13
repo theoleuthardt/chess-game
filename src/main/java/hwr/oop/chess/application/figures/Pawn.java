@@ -23,33 +23,33 @@ public class Pawn implements Figure {
     return color() == FigureColor.WHITE ? CellDirection.TOP : CellDirection.BOTTOM;
   }
 
-  public ArrayList<Cell> getAvailableCells(Cell currentCell) {
-    ArrayList<Cell> cells = new ArrayList<>();
+  public List<Cell> getAvailableCells(Cell currentCell) {
+    List<Cell> cells = new ArrayList<>();
 
     Cell oneFieldForwards = currentCell.cellInDirection(forwards());
-    if (oneFieldForwards == null) {
+    if (oneFieldForwards.isFree()) {
       return cells;
     }
 
     Cell twoFieldForwards = oneFieldForwards.cellInDirection(forwards());
 
     // move one field forwards
-    if (oneFieldForwards.figure() == null) {
+    if (oneFieldForwards.isFree()) {
       cells.add(oneFieldForwards);
     }
 
     // move two fields forwards
     if (isInStartPosition(currentCell)
         && twoFieldForwards != null
-        && oneFieldForwards.figure() == null
-        && twoFieldForwards.figure() == null) {
+        && oneFieldForwards.isFree()
+        && twoFieldForwards.isFree()) {
       cells.add(twoFieldForwards);
     }
 
     // move one field diagonally left
     Cell diagonalLeftCell = oneFieldForwards.leftCell();
     if (diagonalLeftCell != null
-        && diagonalLeftCell.figure() != null
+        && diagonalLeftCell.isOccupied()
         && diagonalLeftCell.figure().color() != color()) {
       cells.add(diagonalLeftCell);
     }
@@ -57,7 +57,7 @@ public class Pawn implements Figure {
     // move one field diagonally right
     Cell diagonalRightCell = oneFieldForwards.rightCell();
     if (diagonalRightCell != null
-        && diagonalRightCell.figure() != null
+        && diagonalRightCell.isOccupied()
         && diagonalRightCell.figure().color() != color()) {
       cells.add(diagonalRightCell);
     }
@@ -65,7 +65,7 @@ public class Pawn implements Figure {
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    ArrayList<Cell> availableCell = getAvailableCells(prevCell);
+    List<Cell> availableCell = getAvailableCells(prevCell);
     return availableCell.contains(nextCell);
   }
 
