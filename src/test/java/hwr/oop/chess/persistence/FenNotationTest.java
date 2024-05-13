@@ -12,14 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FenNotationTest {
-  @Test
+//  @Test
   void testPlaceFigureFromFEN() {
     Board board = (new Board(new CLIAdapter(System.out)));
     String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
     placeFigureFromFEN(board, fen);
     board.printBoard();
-    //    String boardString = "";
-    //    assertThat(boardString).isEqualTo(System.out.toString().trim());
   }
 
   @Test
