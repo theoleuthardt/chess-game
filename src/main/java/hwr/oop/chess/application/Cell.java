@@ -3,6 +3,7 @@ package hwr.oop.chess.application;
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.cli.InvalidUserInputException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Cell {
@@ -226,5 +227,26 @@ public class Cell {
 
   public String toCoordinates() {
     return (char) (x + 64) + String.valueOf(y);
+  }
+
+  public static boolean isEmptyBetweenCells(Cell currentCell, CellDirection direction, int move) {
+    List<Cell> cells = new ArrayList<>();
+    while (move > 0) {
+      Cell targetCell = currentCell.cellInDirection(direction);
+      cells.add(targetCell);
+      currentCell = targetCell;
+      move--;
+    }
+
+    return cells.stream().noneMatch(Cell::isOccupied);
+  }
+
+  public static Cell findNextCell(Cell currentCell, CellDirection direction, int move) {
+    Cell nextCell = currentCell;
+    while (move > 0) {
+      nextCell = nextCell.cellInDirection(direction);
+      move--;
+    }
+    return nextCell;
   }
 }
