@@ -84,7 +84,7 @@ class KingTest {
     assertThat(isEmptyBetweenCells(king, CellDirection.LEFT, 3)).isFalse();
 
     List<Cell> cells = king.figure().getAvailableCells(king);
-    assertThat(cells).contains(board.findCell(8,1));
+    assertThat(cells).contains(board.findCell(7,1));
   }
 
   @Test
@@ -100,6 +100,6 @@ class KingTest {
     assertThat(isEmptyBetweenCells(king, CellDirection.LEFT, 3)).isTrue();
 
     List<Cell> cells = king.figure().getAvailableCells(king);
-    assertThat(cells).contains(board.findCell(1,1));
+    assertThat(cells).contains(board.findCell(3,1));
   }
 }

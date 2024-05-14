@@ -237,7 +237,6 @@ public class Cell {
       currentCell = targetCell;
       move--;
     }
-
     return cells.stream().noneMatch(Cell::isOccupied);
   }
 

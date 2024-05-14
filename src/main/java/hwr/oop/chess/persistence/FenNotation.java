@@ -74,21 +74,26 @@ public class FenNotation {
     }
     // Delete last '/'
     fenString.replace(fenString.length() - 1, fenString.length(), " ");
+
+    // Add turn
     fenString.append(board.turn() == FigureColor.WHITE ? 'w' : 'b');
     fenString.append(" ");
-    if(!board.castlingWhiteKing()){
+
+    // Add castling
+    if(board.canCastlingWhiteKing()){
       fenString.append('K');
     }
-    if(!board.castlingWhiteQueen()){
+    if(board.canCastlingWhiteQueen()){
       fenString.append('Q');
     }
-    if(!board.castlingBlackKing()){
+    if(board.canCastlingBlackKing()){
       fenString.append('k');
     }
-    if(!board.castlingBlackQueen()){
+    if(board.canCastlingBlackQueen()){
       fenString.append('q');
     }
 
+    // Add rest
     fenString.append(" ");
     fenString.append(board.enPassant());
     fenString.append(" ");

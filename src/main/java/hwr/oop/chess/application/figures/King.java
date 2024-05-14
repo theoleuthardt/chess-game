@@ -11,14 +11,10 @@ import static hwr.oop.chess.application.Cell.isEmptyBetweenCells;
 public class King implements Figure {
   private static final FigureType type = FigureType.KING;
   private final FigureColor color;
-  private boolean castlingKing;
-  private boolean castlingQueen;
   private boolean hasMoved;
 
   public King(FigureColor color) {
     this.color = color;
-    this.castlingKing = false;
-    this.castlingQueen = false;
     this.hasMoved = false;
   }
 
@@ -35,22 +31,38 @@ public class King implements Figure {
     }
 
     // Add cells for castling King
-    if (!castlingKing && !hasMoved && isEmptyBetweenCells(currentCell, CellDirection.RIGHT, 2)) {
-      Cell rook = findNextCell(currentCell, CellDirection.RIGHT, 3);
-      if(rook.figure().type() == FigureType.ROOK){
-        cells.add(rook);
-      }
+    if(canCastlingKing(currentCell)){
+      Cell kingAfterCastling = findNextCell(currentCell, CellDirection.RIGHT, 2);
+      cells.add(kingAfterCastling);
     }
+
     // Add cells for castling Queen
-    if(!castlingQueen && !hasMoved && isEmptyBetweenCells(currentCell, CellDirection.LEFT, 3)) {
-      Cell rook = findNextCell(currentCell, CellDirection.LEFT, 4);
-      if(rook.figure().type() == FigureType.ROOK){
-        cells.add(rook);
-      }
+    if (canCastlingQueen(currentCell)) {
+      Cell kingAfterCastling = findNextCell(currentCell, CellDirection.LEFT, 2);
+      cells.add(kingAfterCastling);
     }
 
     return cells;
   }
+
+  public boolean canCastlingKing(Cell currentCell) {
+    if (!hasMoved && isEmptyBetweenCells(currentCell, CellDirection.RIGHT, 2)) {
+      Cell rookCell = findNextCell(currentCell, CellDirection.RIGHT, 3);
+      Rook rook = (Rook) rookCell.figure();
+      return rookCell.figure().type() == FigureType.ROOK && !rook.hasMoved();
+    }
+    return false;
+  }
+
+  public boolean canCastlingQueen(Cell currentCell) {
+    if(!hasMoved && isEmptyBetweenCells(currentCell, CellDirection.LEFT, 3)) {
+      Cell rookCell = findNextCell(currentCell, CellDirection.LEFT, 4);
+      Rook rook = (Rook) rookCell.figure();
+      return rookCell.figure().type() == FigureType.ROOK && !rook.hasMoved();
+    }
+    return false;
+  }
+
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
     List<Cell> availableCell = getAvailableCells(prevCell);
@@ -61,11 +73,15 @@ public class King implements Figure {
     return color == FigureColor.WHITE ? 'K' : 'k';
   }
 
-  public FigureColor color() {
-    return color;
-  }
+  public FigureColor color() { return color; }
 
-  public FigureType type() {
-    return type;
+  public FigureType type() { return type; }
+
+  public boolean hasMoved() { return this.hasMoved; }
+
+  public void figureMoved() {
+    if (!this.hasMoved) {
+      this.hasMoved = true;
+    }
   }
 }

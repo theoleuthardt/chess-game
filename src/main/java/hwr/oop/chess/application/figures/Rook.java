@@ -9,9 +9,11 @@ import java.util.List;
 public class Rook implements Figure {
   private static final FigureType type = FigureType.ROOK;
   private final FigureColor color;
+  private boolean hasMoved;
 
   public Rook(FigureColor color) {
     this.color = color;
+    this.hasMoved = false;
   }
 
   public List<Cell> getAvailableCells(Cell currentCell) {
@@ -41,5 +43,13 @@ public class Rook implements Figure {
 
   public FigureType type() {
     return type;
+  }
+
+  public boolean hasMoved() { return this.hasMoved; }
+
+  public void figureMoved() {
+    if (!this.hasMoved) {
+      this.hasMoved = true;
+    }
   }
 }

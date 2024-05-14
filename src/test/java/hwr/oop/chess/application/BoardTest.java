@@ -2,6 +2,8 @@ package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
+import hwr.oop.chess.application.figures.King;
+import hwr.oop.chess.application.figures.Rook;
 import hwr.oop.chess.cli.InvalidUserInputException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static hwr.oop.chess.persistence.FenNotation.generateFENFromBoard;
 import static hwr.oop.chess.persistence.FenNotation.placeFigureFromFEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -253,22 +256,22 @@ class BoardTest {
 
   @Test
   void testCastlingWhiteKing(){
-    assertThat(board.castlingWhiteKing()).isFalse();
+    assertThat(board.canCastlingWhiteKing()).isTrue();
   }
 
   @Test
   void testCastlingWhiteQueen(){
-    assertThat(board.castlingWhiteQueen()).isFalse();
+    assertThat(board.canCastlingWhiteQueen()).isTrue();
   }
 
   @Test
   void testCastlingBlackKing(){
-    assertThat(board.castlingBlackKing()).isFalse();
+    assertThat(board.canCastlingBlackKing()).isTrue();
   }
 
   @Test
   void testCastlingBlackQueen(){
-    assertThat(board.castlingBlackQueen()).isFalse();
+    assertThat(board.canCastlingBlackQueen()).isTrue();
   }
 
   @Test
@@ -316,5 +319,68 @@ class BoardTest {
               assertThat(board.findCell(i, 7).figure().color()).isEqualTo(FigureColor.BLACK);
               assertThat(board.findCell(i, 8).figure().color()).isEqualTo(FigureColor.BLACK);
             });
+  }
+
+  /*
+  Chess Match: Spasski–Fischer 0:1 Reykjavík, 20. Juli 1972
+  */
+  @Test
+  void testChessGameSpasskiFischer() {
+    board = new Board(true);
+    board.moveFigure('d', 2, 'd', 4); // 1. d4
+    board.moveFigure('g', 8, 'f', 6); // 1... Nf6
+    board.moveFigure('c', 2, 'c', 4); // 2. c4
+    board.moveFigure('e', 7, 'e', 6); // 2... e6
+    board.moveFigure('b', 1, 'c', 3); // 3. Nc3
+    board.moveFigure('f', 8, 'b', 4); // 3... Bb4
+    board.moveFigure('g', 1, 'f', 3); // 4. Nf3
+    board.moveFigure('c', 7, 'c', 5); // 4... c5
+    board.moveFigure('e', 2, 'e', 3); // 5. e3
+    board.moveFigure('b', 8, 'c', 6); // 5... Nc6
+    board.moveFigure('f', 1, 'd', 3); // 6. Bd3
+    board.moveFigure('b', 4, 'c', 3); // 6... Bxc3+
+    // Black Bishop catches White Knight and White is checked
+    assertThat(board.isCheck(FigureColor.WHITE)).isTrue();
+    assertThat(board.cellsWithColor(FigureColor.WHITE)).hasSize(15);
+    assertThat(board.cellsWithColor(FigureColor.BLACK)).hasSize(16);
+
+    board.moveFigure('b', 2, 'c', 3); // 7. bxc3
+    assertThat(board.cellsWithColor(FigureColor.BLACK)).hasSize(15);
+
+    board.moveFigure('d', 7, 'd', 6); // 7... d6
+    board.moveFigure('e', 3, 'e', 4); // 8. e4
+    board.moveFigure('e', 6, 'e', 5); // 8... e5
+    board.moveFigure('d', 4, 'd', 5); // 9. d5
+    board.moveFigure('c', 6, 'e', 7); // 9... Ne7
+    board.moveFigure('f', 3, 'h', 4); // 10. Nh4
+    board.moveFigure('h', 7, 'h', 6); // 10... h6
+    board.moveFigure('f', 2, 'f', 4); // 11. f4
+    board.moveFigure('e', 7, 'g', 6); // 11... Ng6
+    board.moveFigure('h', 4, 'g', 6); // 12. Bxg6
+    board.moveFigure('f', 7, 'g', 6); // 12... fxg6
+    board.moveFigure('f', 4, 'e', 5); // 13. fxe5
+    board.moveFigure('d', 6, 'e', 5); // 13... dxe5
+    board.moveFigure('c', 1, 'e', 3); // 14. Be3
+    board.moveFigure('b', 7, 'b', 6); // 14... b6
+
+    String fen = generateFENFromBoard(board);
+    assertThat(fen).isEqualTo("r1bqk2r/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2QK2R w KQkq - 0 28");
+    assertThat(((King)board.findCell(5,1).figure()).hasMoved()).isFalse();
+    assertThat(((King)board.findCell(5,8).figure()).hasMoved()).isFalse();
+
+    board.moveFigure('e', 1, 'g', 1); // 15. O-O White King Castling
+    fen = generateFENFromBoard(board);
+    assertThat(fen).isEqualTo("r1bqk2r/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 b kq - 0 29");
+    assertThat(board.canCastlingWhiteKing()).isFalse();
+    assertThat(board.canCastlingBlackKing()).isTrue();
+    assertThat(((Rook)board.findCell(6,1).figure()).hasMoved()).isTrue();
+    assertThat(((King)board.findCell(7,1).figure()).hasMoved()).isTrue();
+
+    board.moveFigure('e', 8, 'g', 8); // 15. O-O Black King Castling
+    fen = generateFENFromBoard(board);
+    assertThat(fen).isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w  - 0 30");
+    assertThat(board.canCastlingWhiteKing()).isFalse();
+    assertThat(((Rook)board.findCell(6,8).figure()).hasMoved()).isTrue();
+    assertThat(((King)board.findCell(7,8).figure()).hasMoved()).isTrue();
   }
 }

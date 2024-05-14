@@ -10,10 +10,10 @@ import static hwr.oop.chess.persistence.FenNotation.charToFigureType;
 
 public class Board {
   private Cell firstCell;
-  private boolean castlingWhiteKing;
-  private boolean castlingWhiteQueen;
-  private boolean castlingBlackKing;
-  private boolean castlingBlackQueen;
+  private boolean canCastlingWhiteKing;
+  private boolean canCastlingWhiteQueen;
+  private boolean canCastlingBlackKing;
+  private boolean canCastlingBlackQueen;
   private String enPassant;
   private int halfmoveClockWhite;
   private int halfmoveClockBlack;
@@ -29,10 +29,10 @@ public class Board {
 
   private void initializeBoard() {
     Cell bottomCellRowStart = null;
-    this.castlingWhiteKing = false;
-    this.castlingWhiteQueen = false;
-    this.castlingBlackKing = false;
-    this.castlingBlackQueen = false;
+    this.canCastlingWhiteKing = true;
+    this.canCastlingWhiteQueen = true;
+    this.canCastlingBlackKing = true;
+    this.canCastlingBlackQueen = true;
     this.enPassant = "-";
     this.halfmoveClockWhite = 0;
     this.halfmoveClockBlack = 0;
@@ -113,7 +113,7 @@ public class Board {
   }
 
   public Cell findCell(int x, int y) {
-    List<Cell> cells = allCells();
+    List<Cell> cells = this.allCells();
     for (Cell cell : cells) {
       if (cell.x() == x && cell.y() == y) {
         return cell;
@@ -218,9 +218,18 @@ public class Board {
       throw new InvalidUserInputException("The figure can't move to that cell");
     }
 
+    MoveType moveType = moveType(startX, startY, endX, endY);
+    if(moveType == MoveType.NORMAL){
+      startCell.setFigure(null);
+      endCell.setFigure(figure);
+      // Check Status
+      checkMoveKing(startX, startY);
+      checkMoveRook(startX, startY);
+    }else{
+      handleCastling(findCell(startX, startY), moveType);
+    }
+
     Figure figureOnEndCell = endCell.figure();
-    startCell.setFigure(null);
-    endCell.setFigure(figure);
 
     if (isCheck(figure.color())) {
       // After this move the king is not allowed to be in check anymore.
@@ -231,6 +240,7 @@ public class Board {
           "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
     }
 
+    this.fullmoveNumber++;
     this.changeTurn();
   }
 
@@ -294,26 +304,151 @@ public class Board {
     this.turn = this.turn == FigureColor.BLACK ? FigureColor.WHITE : FigureColor.BLACK;
   }
 
+  private void handleCastling(Cell kingCell, MoveType type) {
+    if (type == MoveType.KING_CASTLING) {
+      castlingKing(kingCell);
+    }
+    if (type == MoveType.QUEEN_CASTLING) {
+      castlingQueen(kingCell);
+    }
+  }
+
+  private MoveType moveType(int startX, int startY, int endX, int endY) {
+    int diffX = endX - startX;
+    int diffY = endY - startY;
+
+    if(startX == 5 && startY == 1 || startX == 5 && startY == 8){
+      Cell kingCell = findCell(startX, startY);
+      if (kingCell.figure().type() == FigureType.KING) {
+        King king = (King) kingCell.figure();
+        if (diffX == 2 && diffY == 0 && king.canCastlingKing(kingCell)) {
+          return MoveType.KING_CASTLING;
+        }
+        if (diffX == -2 && diffY == 0 && king.canCastlingQueen(kingCell)) {
+          return MoveType.QUEEN_CASTLING;
+        }
+      }
+    }
+    return MoveType.NORMAL;
+  }
+
+  private void castlingKing(Cell kingCell){
+    // Mark King as moved
+    ((King)kingCell.figure()).figureMoved();
+    handleCastingValueWithKing(kingCell.figure().color());
+
+    // Mark Rook as moved
+    Rook newRook = new Rook(kingCell.figure().color());
+    newRook.figureMoved();
+
+    int row = 0;
+    if(kingCell.figure().color() == FigureColor.WHITE){
+      row = 1;
+    } else{
+      row = 8;
+    }
+    // Move Rook
+    findCell(8, row).setFigure(null);
+    findCell(7, row).setFigure(kingCell.figure());
+    findCell(6, row).setFigure(newRook);
+    findCell(5, row).setFigure(null);
+  }
+
+  private void castlingQueen(Cell kingCell){
+    // Mark King as moved
+    ((King)kingCell.figure()).figureMoved();
+    handleCastingValueWithKing(kingCell.figure().color());
+
+    // Mark Rook as moved
+    Rook newRook = new Rook(kingCell.figure().color());
+    newRook.figureMoved();
+
+    int row = 0;
+    if(kingCell.figure().color() == FigureColor.WHITE){
+      row = 1;
+    } else{
+      row = 8;
+    }
+    // Move Rook
+    findCell(1, row).setFigure(null);
+    findCell(3, row).setFigure(kingCell.figure());
+    findCell(4, row).setFigure(newRook);
+    findCell(5, row).setFigure(null);
+  }
+
+  private void checkMoveKing(int startX, int startY){
+    if(startX == 5 && startY == 1 || startX == 5 && startY == 8){
+      Cell kingCell = findCell(startX, startY);
+      if (kingCell.figure().type() == FigureType.KING) {
+        King king = (King) kingCell.figure();
+        king.figureMoved();
+        handleCastingValueWithKing(king.color());
+      }
+    }
+  }
+
+  private void checkMoveRook(int startX, int startY){
+    if (startX == 1 && startY == 1 || startX == 8 && startY == 1 || startX == 1 && startY == 8 || startX == 8 && startY == 8) {
+      Cell rookCell = findCell(startX, startY);
+      if(rookCell.figure().type() == FigureType.ROOK){
+        Rook rook = (Rook) rookCell.figure();
+        rook.figureMoved();
+        handleCastingValueWithRook(startX, startY);
+      }
+    }
+  }
+
+  private void handleCastingValueWithKing(FigureColor color){
+    if (color == FigureColor.WHITE) {
+      this.canCastlingWhiteKing = false;
+      this.canCastlingWhiteQueen = false;
+    } else {
+      this.canCastlingBlackKing = false;
+      this.canCastlingBlackQueen = false;
+    }
+  }
+
+  private void handleCastingValueWithRook(int startX, int startY) {
+    if(startY == 1){
+      if (startX == 1) {
+        this.canCastlingWhiteQueen = false;
+      } else {
+        // startX == 8
+        this.canCastlingWhiteKing = false;
+      }
+    } else {
+      if (startX == 1) {
+        this.canCastlingBlackQueen = false;
+      } else {
+        // startX == 8
+        this.canCastlingBlackKing = false;
+      }
+    }
+  }
+
   public FigureColor turn(){
     return this.turn;
   }
-  public boolean castlingWhiteKing(){
-    return this.castlingWhiteKing;
+  public boolean canCastlingWhiteKing(){
+    return this.canCastlingWhiteKing;
   }
-  public boolean castlingWhiteQueen(){
-    return this.castlingWhiteQueen;
+  public boolean canCastlingWhiteQueen(){
+    return this.canCastlingWhiteQueen;
   }
-  public boolean castlingBlackKing(){
-    return this.castlingBlackKing;
+  public boolean canCastlingBlackKing(){
+    return this.canCastlingBlackKing;
   }
-  public boolean castlingBlackQueen(){
-    return this.castlingBlackQueen;
+  public boolean canCastlingBlackQueen(){
+    return this.canCastlingBlackQueen;
   }
   public String enPassant(){
     return this.enPassant;
   }
   public int fullmoveNumber(){
     return this.fullmoveNumber;
+  }
+  public int halfmoveClockWhite(){
+    return this.halfmoveClockWhite;
   }
   public int halfmoveClockBlack(){
     return this.halfmoveClockBlack;
