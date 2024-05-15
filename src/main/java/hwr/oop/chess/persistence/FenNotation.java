@@ -40,6 +40,7 @@ public class FenNotation {
     Cell kingWhite = board.findKing(FigureColor.WHITE);
     if (!isKingInitialPosition(kingWhite)) {
       ((King)kingWhite.figure()).figureMoved();
+      // TODO
     }
     Cell kingBlack = board.findKing(FigureColor.BLACK);
     if (!isKingInitialPosition(kingBlack)) {

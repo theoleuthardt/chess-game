@@ -1,5 +1,6 @@
 package hwr.oop.chess.cli;
 
+import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.ChessGame;
 import hwr.oop.chess.persistence.NoPersistence;
 import hwr.oop.chess.persistence.Persistence;
@@ -32,6 +33,10 @@ public class CLIAdapter {
 
   public void printBoard() {
     printer.print(game.board());
+  }
+
+  public void printBoard(Board board) {
+    printer.print(board);
   }
 
   public Persistence persistence() {

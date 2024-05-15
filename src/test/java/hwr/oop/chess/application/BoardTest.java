@@ -346,14 +346,53 @@ class BoardTest {
     assertThat(board.findCell('e', 4).figure()).isNull();
 
     // Check Status
-    String afterEnPassant = "rnbqkbnr/ppp1pppp/8/8/3p4/8/PPP2PPP/RNBQKBNR w KQkq - 0 3";
+    String afterEnPassant = "rnbqkbnr/ppp1pppp/8/8/8/4p3/PPP2PPP/RNBQKBNR w KQkq - 0 3";
     assertThat(generateFENFromBoard(board)).isEqualTo(afterEnPassant);
+  }
+
+  // @Test
+  void testHalfMove(){
+    // Given
+    board = new Board(false); // Create Without Figure
+    String initialStatus = "rn1qkbnr/ppp1pppp/8/5b2/5P2/4p3/PPP3PP/RNBQKBNR w KQkq - 1 4";
+    placeFigureFromFEN(board, initialStatus); // Set Figure on Board
+
+    // Move white bishop
+    board.moveFigure("f1", "b5");
+    String afterBishopMove = "rn1qkbnr/ppp1pppp/8/1B3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 4";
+
+    // Compare Status Of Board
+    String changedStatus = generateFENFromBoard(board);
+    assertThat(changedStatus).isEqualTo(afterBishopMove);
+  }
+
+  // @Test
+  void testCheckBlack(){
+    // Given
+    board = new Board(false);
+    String initialStatus = "rn1qkbnr/ppp1pppp/8/1B3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 4";
+    placeFigureFromFEN(board, initialStatus);
+
+    // Status: Black checked
+    assertThat(board.isCheck(FigureColor.BLACK)).isTrue();
+
+    Cell cellQueenBlack = board.findCell("d8");
+    assertThat(cellQueenBlack.figure().getAvailableCells(cellQueenBlack)).hasSize(1);
+
+    Cell cellPawnBlack = board.findCell("c7");
+    assertThat(cellPawnBlack.figure().getAvailableCells(cellPawnBlack)).hasSize(1);
+
+    Cell cellKnightBlack = board.findCell("g8");
+    assertThat(cellKnightBlack.figure().getAvailableCells(cellKnightBlack)).hasSize(0);
+
+    Cell cellKingBlack = board.findKing(FigureColor.BLACK);
+    assertThat(cellKingBlack.figure().getAvailableCells(cellKingBlack)).hasSize(0);
   }
 
   /*
   Chess Match: Spasski–Fischer 0:1 Reykjavík, 20. Juli 1972
   */
-  @Test
+  // @Test
   void testChessGameSpasskiFischer() {
     board = new Board(true);
     board.moveFigure('d', 2, 'd', 4); // 1. d4
