@@ -222,11 +222,13 @@ public class Board {
 
     MoveType moveType = moveType(startX, startY, endX, endY);
     if(moveType == MoveType.NORMAL){
-      startCell.setFigure(null);
-      endCell.setFigure(figure);
       // Check Status
       checkMoveKing(startX, startY);
       checkMoveRook(startX, startY);
+
+      // Move Figure
+      startCell.setFigure(null);
+      endCell.setFigure(figure);
     }else{
       handleCastling(findCell(startX, startY), moveType);
     }

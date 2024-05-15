@@ -74,7 +74,7 @@ class KingTest {
   @Test
   void testCastlingKingWhite(){
     Board board = new Board(false);
-    String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R";
+    String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 10";
     placeFigureFromFEN(board, fenString);
     Cell king = board.findCell(5,1);
     // Expected only available castling King
@@ -90,7 +90,7 @@ class KingTest {
   @Test
   void testCastlingQueenWhite(){
     Board board = new Board(false);
-    String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR";
+    String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w KQkq - 0 10";
     placeFigureFromFEN(board, fenString);
     Cell king = board.findCell(5,1);
     // Expected only available castling King
