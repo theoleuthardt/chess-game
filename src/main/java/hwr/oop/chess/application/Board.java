@@ -17,9 +17,8 @@ public class Board {
   private boolean canCastlingBlackKing;
   private boolean canCastlingBlackQueen;
   private String enPassant;
-  private int halfmoveClockWhite;
-  private int halfmoveClockBlack;
-  private int fullmoveNumber;
+  private int halfMove;
+  private int fullMove;
   private FigureColor turn;
 
   public Board(boolean setFigures) {
@@ -36,9 +35,8 @@ public class Board {
     this.canCastlingBlackKing = true;
     this.canCastlingBlackQueen = true;
     this.enPassant = "-";
-    this.halfmoveClockWhite = 0;
-    this.halfmoveClockBlack = 0;
-    this.fullmoveNumber = 0;
+    this.halfMove = 0;
+    this.fullMove = 0;
     this.turn = FigureColor.WHITE;
 
     // create the board row by row
@@ -269,7 +267,7 @@ public class Board {
           "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
     }
     if(endCell.figure().color() == FigureColor.BLACK){
-      this.fullmoveNumber++;
+      this.fullMove++;
     }
     this.changeTurn();
   }
@@ -458,13 +456,11 @@ public class Board {
   public String enPassant(){
     return this.enPassant;
   }
-  public int fullmoveNumber(){
-    return this.fullmoveNumber;
+  public int fullMove(){
+    return this.fullMove;
   }
-  public int halfmoveClockWhite(){
-    return this.halfmoveClockWhite;
+  public int halfMove(){
+    return this.halfMove;
   }
-  public int halfmoveClockBlack(){
-    return this.halfmoveClockBlack;
-  }
+
 }

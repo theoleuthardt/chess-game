@@ -85,6 +85,17 @@ class KingTest {
 
     List<Cell> cells = king.figure().getAvailableCells(king);
     assertThat(cells).contains(board.findCell(7,1));
+
+    // Move king
+    board.moveFigure("e1","g1");
+    assertThat(board.findCell(7,1).figure().symbol()).isEqualTo('K');
+    assertThat(board.findCell(6,1).figure().symbol()).isEqualTo('R');
+    assertThat(board.findCell(8,1).figure()).isNull();
+    assertThat(board.findCell(5,1).figure()).isNull();
+
+    // Check board status
+    assertThat(board.canCastlingWhiteKing()).isFalse();
+    assertThat(((Rook) board.findCell(6,1).figure()).hasMoved()).isTrue();
   }
 
   @Test
@@ -101,5 +112,16 @@ class KingTest {
 
     List<Cell> cells = king.figure().getAvailableCells(king);
     assertThat(cells).contains(board.findCell(3,1));
+
+    // Move king
+    board.moveFigure("e1","c1");
+    assertThat(board.findCell(3,1).figure().symbol()).isEqualTo('K');
+    assertThat(board.findCell(4,1).figure().symbol()).isEqualTo('R');
+    assertThat(board.findCell(1,1).figure()).isNull();
+    assertThat(board.findCell(5,1).figure()).isNull();
+
+    // Check board status
+    assertThat(board.canCastlingWhiteKing()).isFalse();
+    assertThat(((Rook) board.findCell(4,1).figure()).hasMoved()).isTrue();
   }
 }

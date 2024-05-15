@@ -284,15 +284,17 @@ class BoardTest {
 
   @Test
   void testFullmoveNumber(){
-    assertThat(board.fullmoveNumber()).isZero();
+    assertThat(board.fullMove()).isZero();
   }
 
   @Test
   void testHalfmoveClockBlack(){
-    assertThat(board.halfmoveClockBlack()).isZero();
+    assertThat(board.halfMove()).isZero();
   }
 
+  @Test
   void testInitialPosition() {
+    board = new Board(true);
     assertThat(board.findCell(1, 1).figure().type()).isEqualTo(FigureType.ROOK);
     assertThat(board.findCell(2, 1).figure().type()).isEqualTo(FigureType.KNIGHT);
     assertThat(board.findCell(3, 1).figure().type()).isEqualTo(FigureType.BISHOP);
@@ -368,13 +370,23 @@ class BoardTest {
 
   // @Test
   void testCheckBlack(){
-    // Given
+    // Given: Black checked
     board = new Board(false);
-    String initialStatus = "rn1qkbnr/ppp1pppp/8/1B3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 4";
+    String initialStatus = "rn1qkbnr/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 5";
     placeFigureFromFEN(board, initialStatus);
 
-    // Status: Black checked
     assertThat(board.isCheck(FigureColor.BLACK)).isTrue();
+  }
+
+  // @Test
+  void testAvailableCellsIfCheckBlack(){
+    // Given: Black checked
+    board = new Board(false);
+    String initialStatus = "rn1qkbnr/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 5";
+    placeFigureFromFEN(board, initialStatus);
+
+    Cell cellKingBlack = board.findKing(FigureColor.BLACK);
+    assertThat(cellKingBlack.figure().getAvailableCells(cellKingBlack)).hasSize(0);
 
     Cell cellQueenBlack = board.findCell("d8");
     assertThat(cellQueenBlack.figure().getAvailableCells(cellQueenBlack)).hasSize(1);
@@ -382,17 +394,20 @@ class BoardTest {
     Cell cellPawnBlack = board.findCell("c7");
     assertThat(cellPawnBlack.figure().getAvailableCells(cellPawnBlack)).hasSize(1);
 
+    Cell cellBishopBlack = board.findCell("a8");
+    assertThat(cellBishopBlack.figure().getAvailableCells(cellBishopBlack)).hasSize(1);
+
     Cell cellKnightBlack = board.findCell("g8");
     assertThat(cellKnightBlack.figure().getAvailableCells(cellKnightBlack)).hasSize(0);
 
-    Cell cellKingBlack = board.findKing(FigureColor.BLACK);
-    assertThat(cellKingBlack.figure().getAvailableCells(cellKingBlack)).hasSize(0);
+    Cell cellRookBlack = board.findCell("a8");
+    assertThat(cellRookBlack.figure().getAvailableCells(cellRookBlack)).hasSize(0);
   }
 
   /*
   Chess Match: Spasski–Fischer 0:1 Reykjavík, 20. Juli 1972
   */
-  // @Test
+  @Test
   void testChessGameSpasskiFischer() {
     board = new Board(true);
     board.moveFigure('d', 2, 'd', 4); // 1. d4
@@ -432,13 +447,13 @@ class BoardTest {
     board.moveFigure('b', 7, 'b', 6); // 14... b6
 
     String fen = generateFENFromBoard(board);
-    assertThat(fen).isEqualTo("r1bqk2r/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2QK2R w KQkq - 0 28");
+    assertThat(fen).isEqualTo("r1bqk2r/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2QK2R w KQkq - 0 14");
     assertThat(((King)board.findCell(5,1).figure()).hasMoved()).isFalse();
     assertThat(((King)board.findCell(5,8).figure()).hasMoved()).isFalse();
 
     board.moveFigure('e', 1, 'g', 1); // 15. O-O White King Castling
     fen = generateFENFromBoard(board);
-    assertThat(fen).isEqualTo("r1bqk2r/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 b kq - 0 29");
+    assertThat(fen).isEqualTo("r1bqk2r/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 b kq - 0 14");
     assertThat(board.canCastlingWhiteKing()).isFalse();
     assertThat(board.canCastlingBlackKing()).isTrue();
     assertThat(((Rook)board.findCell(6,1).figure()).hasMoved()).isTrue();
@@ -446,7 +461,7 @@ class BoardTest {
 
     board.moveFigure('e', 8, 'g', 8); // 15. O-O Black King Castling
     fen = generateFENFromBoard(board);
-    assertThat(fen).isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w  - 0 30");
+    assertThat(fen).isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w  - 0 15");
     assertThat(board.canCastlingWhiteKing()).isFalse();
     assertThat(((Rook)board.findCell(6,8).figure()).hasMoved()).isTrue();
     assertThat(((King)board.findCell(7,8).figure()).hasMoved()).isTrue();

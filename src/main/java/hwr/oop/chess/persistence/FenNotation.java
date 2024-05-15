@@ -124,9 +124,9 @@ public class FenNotation {
     fenString.append(" ");
     fenString.append(board.enPassant());
     fenString.append(" ");
-    fenString.append(board.halfmoveClockBlack());
+    fenString.append(board.halfMove());
     fenString.append(" ");
-    fenString.append(board.fullmoveNumber());
+    fenString.append(board.fullMove());
 
     return fenString.toString();
   }
