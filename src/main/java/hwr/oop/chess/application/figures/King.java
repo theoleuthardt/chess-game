@@ -4,9 +4,12 @@ import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static hwr.oop.chess.application.Cell.findNextCell;
 import static hwr.oop.chess.application.Cell.isEmptyBetweenCells;
+import static java.util.Objects.requireNonNull;
 
 public class King implements Figure {
   private static final FigureType type = FigureType.KING;
@@ -29,19 +32,19 @@ public class King implements Figure {
         cells.add(neighbourCell);
       }
     }
+    if(!hasMoved){
+      // Add cells for castling King
+      if(canCastlingKing(currentCell)){
+        Cell kingAfterCastling = findNextCell(currentCell, CellDirection.RIGHT, 2);
+        cells.add(kingAfterCastling);
+      }
 
-    // Add cells for castling King
-    if(canCastlingKing(currentCell)){
-      Cell kingAfterCastling = findNextCell(currentCell, CellDirection.RIGHT, 2);
-      cells.add(kingAfterCastling);
+      // Add cells for castling Queen
+      if (canCastlingQueen(currentCell)) {
+        Cell kingAfterCastling = findNextCell(currentCell, CellDirection.LEFT, 2);
+        cells.add(kingAfterCastling);
+      }
     }
-
-    // Add cells for castling Queen
-    if (canCastlingQueen(currentCell)) {
-      Cell kingAfterCastling = findNextCell(currentCell, CellDirection.LEFT, 2);
-      cells.add(kingAfterCastling);
-    }
-
     return cells;
   }
 

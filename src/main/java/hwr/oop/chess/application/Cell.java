@@ -1,10 +1,13 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.Figure;
+import hwr.oop.chess.application.figures.FigureColor;
+import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.cli.InvalidUserInputException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Cell {
   private final int y;
@@ -237,7 +240,7 @@ public class Cell {
       currentCell = targetCell;
       move--;
     }
-    return cells.stream().noneMatch(Cell::isOccupied);
+    return cells.stream().filter(Objects::nonNull).noneMatch(Cell::isOccupied);
   }
 
   public static Cell findNextCell(Cell currentCell, CellDirection direction, int move) {
@@ -247,5 +250,27 @@ public class Cell {
       move--;
     }
     return nextCell;
+  }
+
+  public static boolean isKingInitialPosition(Cell kingCell){
+    if(kingCell.figure().type() == FigureType.KING){
+      if (kingCell.figure().color() == FigureColor.WHITE) {
+        return kingCell.x() == 5 && kingCell.y() == 1;
+      } else {
+        return kingCell.x() == 5 && kingCell.y() == 8;
+      }
+    }
+    return false;
+  }
+
+  public static boolean isRookInitialPosition(Cell rookCell){
+    if(rookCell.figure().type() == FigureType.ROOK){
+      if (rookCell.figure().color() == FigureColor.WHITE) {
+        return rookCell.x() == 1 && rookCell.y() == 1 || rookCell.x() == 8 && rookCell.y() == 1;
+      } else {
+        return rookCell.x() == 1 && rookCell.y() == 8 || rookCell.x() == 8 && rookCell.y() == 8;
+      }
+    }
+    return false;
   }
 }

@@ -183,7 +183,7 @@ class BoardTest {
         .isInstanceOf(InvalidUserInputException.class);
   }
 
-  // @Test
+  @Test
   void testCheckMateBlackKing_h7() {
     // Status CheckMate
     String fenString = "2K5/1B6/8/8/8/4b2N/R7/4r2k b - -";
@@ -193,10 +193,18 @@ class BoardTest {
 
   // @Test
   void testDoesNotCheckMate() {
-    // Status No CheckMate
-    String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - -";
+    // Given
+    String fenString = "rnb1kb1r/pppp1Qpp/5n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4";
     placeFigureFromFEN(board, fenString);
+
+    // Status: Black is checked, but no checkmated
+    assertThat(board.isCheck(FigureColor.BLACK)).isTrue();
     assertThat(board.isCheckmate(FigureColor.BLACK)).isFalse();
+
+    // King can only move to "d8"
+    Cell kingCell = board.findKing(FigureColor.BLACK);
+    List<Cell> availableCells = kingCell.figure().getAvailableCells(kingCell);
+    assertThat(availableCells).hasSize(1); // TODO Fix: King's getAvailableCells
   }
 
   // @Test
@@ -319,6 +327,27 @@ class BoardTest {
               assertThat(board.findCell(i, 7).figure().color()).isEqualTo(FigureColor.BLACK);
               assertThat(board.findCell(i, 8).figure().color()).isEqualTo(FigureColor.BLACK);
             });
+  }
+  // @Test TODO write EnPassant
+  void testEnPassant() {
+    // given
+    board = new Board(false);
+    String fen = "rnbqkbnr/ppp1pppp/8/8/3p4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2";
+    placeFigureFromFEN(board, fen);
+
+    // White Pawn two field moved
+    board.moveFigure("e2", "e4");
+    String availableEnPassant = "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2";
+    assertThat(generateFENFromBoard(board)).isEqualTo(availableEnPassant);
+
+    // Black Pawn catch white pawn using en passnt
+    board.moveFigure("d4", "e3");
+    assertThat(board.findCell('e', 3).figure().type()).isEqualTo(FigureType.PAWN);
+    assertThat(board.findCell('e', 4).figure()).isNull();
+
+    // Check Status
+    String afterEnPassant = "rnbqkbnr/ppp1pppp/8/8/3p4/8/PPP2PPP/RNBQKBNR w KQkq - 0 3";
+    assertThat(generateFENFromBoard(board)).isEqualTo(afterEnPassant);
   }
 
   /*

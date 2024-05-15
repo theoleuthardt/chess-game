@@ -6,6 +6,8 @@ import hwr.oop.chess.application.figures.*;
 
 import java.util.List;
 
+import static hwr.oop.chess.application.Cell.isKingInitialPosition;
+
 public class FenNotation {
   private FenNotation() {}
 
@@ -31,6 +33,29 @@ public class FenNotation {
           board.findCell(x, y).setFigure(charToFigureType(c));
           x++;
         }
+      }
+    }
+
+    Cell kingWhite = board.findKing(FigureColor.WHITE);
+    if (!isKingInitialPosition(kingWhite)) {
+      ((King)kingWhite.figure()).figureMoved();
+    }
+    Cell kingBlack = board.findKing(FigureColor.BLACK);
+    if (!isKingInitialPosition(kingBlack)) {
+      ((King)kingBlack.figure()).figureMoved();
+    }
+
+    List<Cell> rooksWhite = board.findRook(FigureColor.WHITE);
+    for (Cell rookWhite : rooksWhite) {
+      if (!isKingInitialPosition(rookWhite)) {
+        ((Rook)rookWhite.figure()).figureMoved();
+      }
+    }
+
+    List<Cell> rooksBlack= board.findRook(FigureColor.BLACK);
+    for (Cell rookBlack : rooksBlack) {
+      if (!isKingInitialPosition(rookBlack)) {
+        ((Rook)rookBlack.figure()).figureMoved();
       }
     }
   }

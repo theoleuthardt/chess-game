@@ -6,6 +6,8 @@ import hwr.oop.chess.cli.InvalidUserInputException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static hwr.oop.chess.application.Cell.isKingInitialPosition;
+import static hwr.oop.chess.application.Cell.isRookInitialPosition;
 import static hwr.oop.chess.persistence.FenNotation.charToFigureType;
 
 public class Board {
@@ -244,7 +246,7 @@ public class Board {
     this.changeTurn();
   }
 
-  public Cell cellWithKingOfColor(FigureColor playerColor) {
+  public Cell findKing(FigureColor playerColor) {
     List<Cell> cells = allCells();
     for (Cell cell : cells) {
       if (cell.figure() != null
@@ -255,9 +257,21 @@ public class Board {
     }
     throw new InvalidUserInputException("Impossible state! There is no king on the field.");
   }
+  public List<Cell> findRook(FigureColor playerColor) {
+    List<Cell> rooks = new ArrayList<>();
+    List<Cell> cells = allCells();
+    for (Cell cell : cells) {
+      if (cell.figure() != null
+              && cell.figure().type() == FigureType.ROOK
+              && cell.figure().color() == playerColor) {
+        rooks.add(cell);
+      }
+    }
+    return rooks;
+  }
 
   public boolean isCheck(FigureColor playerColor) {
-    Cell kingCell = cellWithKingOfColor(playerColor);
+    Cell kingCell = findKing(playerColor);
     List<Cell> opponentCells =
         cellsWithColor(playerColor == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE);
     for (Cell cell : opponentCells) {
@@ -272,7 +286,7 @@ public class Board {
     if (!isCheck(playerColor)) {
       return false;
     }
-    Cell kingCell = cellWithKingOfColor(playerColor);
+    Cell kingCell = findKing(playerColor);
     List<Cell> kingCanMoveTo = kingCell.figure().getAvailableCells(kingCell);
     List<Cell> opponentCells =
         cellsWithColor(playerColor == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE);
@@ -377,24 +391,20 @@ public class Board {
   }
 
   private void checkMoveKing(int startX, int startY){
-    if(startX == 5 && startY == 1 || startX == 5 && startY == 8){
-      Cell kingCell = findCell(startX, startY);
-      if (kingCell.figure().type() == FigureType.KING) {
-        King king = (King) kingCell.figure();
-        king.figureMoved();
-        handleCastingValueWithKing(king.color());
-      }
+    Cell kingCell = findCell(startX, startY);
+    if (isKingInitialPosition(kingCell)) {
+      King king = (King) kingCell.figure();
+      king.figureMoved();
+      handleCastingValueWithKing(king.color());
     }
   }
 
   private void checkMoveRook(int startX, int startY){
-    if (startX == 1 && startY == 1 || startX == 8 && startY == 1 || startX == 1 && startY == 8 || startX == 8 && startY == 8) {
-      Cell rookCell = findCell(startX, startY);
-      if(rookCell.figure().type() == FigureType.ROOK){
-        Rook rook = (Rook) rookCell.figure();
-        rook.figureMoved();
-        handleCastingValueWithRook(startX, startY);
-      }
+    Cell rookCell = findCell(startX, startY);
+    if(isRookInitialPosition(rookCell)){
+      Rook rook = (Rook) rookCell.figure();
+      rook.figureMoved();
+      handleCastingValueWithRook(startX, startY);
     }
   }
 
