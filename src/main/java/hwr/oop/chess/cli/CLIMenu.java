@@ -177,7 +177,7 @@ public class CLIMenu {
             + " on "
             + from.toCoordinates()
             + " can move to.");
-    cli.printer().setHighlightOnBoard(figure.getAvailableCells(from));
+    cli.printer().setHighlightOnBoard(board.availableCellsWithoutCheckMoves(from));
     cli.printBoard();
   }
 

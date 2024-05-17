@@ -14,7 +14,7 @@ public class Knight implements Figure {
     this.color = color;
   }
 
-  public List<Cell> getAvailableCells(Cell currentCell) {
+  public List<Cell> availableCells(Cell currentCell) {
     List<Cell> cells = new ArrayList<>();
 
     if (currentCell.hasTopCell()) {
@@ -44,7 +44,7 @@ public class Knight implements Figure {
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    List<Cell> availableCell = getAvailableCells(prevCell);
+    List<Cell> availableCell = availableCells(prevCell);
     return availableCell.contains(nextCell);
   }
 

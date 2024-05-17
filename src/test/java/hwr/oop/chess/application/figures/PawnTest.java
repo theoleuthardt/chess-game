@@ -101,10 +101,14 @@ class PawnTest {
   void movePawn_noCellAvailableOnLastRow() {
     Board board = new Board(false);
     Figure blackPawn = new Pawn(FigureColor.BLACK);
-    assertThat(blackPawn.getAvailableCells(board.findCell(3, 1))).isEmpty();
+    Cell blackPawnCell = board.findCell(3, 1);
+    blackPawnCell.setFigure(blackPawn);
+    assertThat(board.availableCellsWithoutCheckMoves(blackPawnCell)).isEmpty();
 
     Figure whitePawn = new Pawn(FigureColor.WHITE);
-    assertThat(whitePawn.getAvailableCells(board.findCell(3, 8))).isEmpty();
+    Cell whitePawnCell = board.findCell(3, 8);
+    whitePawnCell.setFigure(whitePawn);
+    assertThat(board.availableCellsWithoutCheckMoves(whitePawnCell)).isEmpty();
   }
 
   void pawnDiagonalTest(FigureColor pawnColor, FigureColor diagonalColor, boolean expectedResult) {

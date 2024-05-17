@@ -187,7 +187,7 @@ class BoardTest {
     assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
   }
 
-  // @Test
+  @Test
   void testDoesNotCheckMate() {
     // Given
     String fenString = "rnb1kb1r/pppp1Qpp/5n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4";
@@ -199,11 +199,11 @@ class BoardTest {
 
     // King can only move to "d8"
     Cell kingCell = board.findKing(FigureColor.BLACK);
-    List<Cell> availableCells = kingCell.figure().getAvailableCells(kingCell);
+    List<Cell> availableCells = board.availableCellsWithoutCheckMoves(kingCell);
     assertThat(availableCells).hasSize(1); // TODO Fix: King's getAvailableCells
   }
 
-  // @Test
+  @Test
   void testCheckMateBlackKing_e4() {
     String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8";
     FenNotation.parseFENOnlyPiecePlacement(board, fenString);
@@ -311,7 +311,9 @@ class BoardTest {
             });
   }
 
+  @Test
   void testInitialColor() {
+    board.addFiguresToBoard();
     IntStream.range(1, 9)
         .forEach(
             i -> {
@@ -344,7 +346,7 @@ class BoardTest {
     assertThat(FenNotation.generateFen(board)).isEqualTo(afterEnPassant);
   }
 
-  // @Test
+  @Test
   void testHalfMove() {
     // Given
     board = new Board(false); // Create Without Figure
@@ -370,7 +372,7 @@ class BoardTest {
     assertThat(board.isCheck(FigureColor.BLACK)).isTrue();
   }
 
-  // @Test
+  @Test
   void testAvailableCellsIfCheckBlack() {
     // Given: Black checked
     board = new Board(false);
@@ -378,22 +380,22 @@ class BoardTest {
     FenNotation.parseFEN(board, initialStatus);
 
     Cell cellKingBlack = board.findKing(FigureColor.BLACK);
-    assertThat(cellKingBlack.figure().getAvailableCells(cellKingBlack)).isEmpty();
+    assertThat(board.availableCellsWithoutCheckMoves(cellKingBlack)).isEmpty();
 
     Cell cellQueenBlack = board.findCell("d8");
-    assertThat(cellQueenBlack.figure().getAvailableCells(cellQueenBlack)).hasSize(1);
+    assertThat(board.availableCellsWithoutCheckMoves(cellQueenBlack)).hasSize(1);
 
     Cell cellPawnBlack = board.findCell("c7");
-    assertThat(cellPawnBlack.figure().getAvailableCells(cellPawnBlack)).hasSize(1);
+    assertThat(board.availableCellsWithoutCheckMoves(cellPawnBlack)).hasSize(1);
 
     Cell cellBishopBlack = board.findCell("a8");
-    assertThat(cellBishopBlack.figure().getAvailableCells(cellBishopBlack)).hasSize(1);
+    assertThat(board.availableCellsWithoutCheckMoves(cellBishopBlack)).isEmpty();
 
     Cell cellKnightBlack = board.findCell("g8");
-    assertThat(cellKnightBlack.figure().getAvailableCells(cellKnightBlack)).isEmpty();
+    assertThat(board.availableCellsWithoutCheckMoves(cellKnightBlack)).isEmpty();
 
     Cell cellRookBlack = board.findCell("a8");
-    assertThat(cellRookBlack.figure().getAvailableCells(cellRookBlack)).isEmpty();
+    assertThat(board.availableCellsWithoutCheckMoves(cellRookBlack)).isEmpty();
   }
 
   /*
@@ -445,7 +447,7 @@ class BoardTest {
 
     board.moveFigure('e', 1, 'g', 1); // 15. O-O White King Castling
     fen = FenNotation.generateFen(board);
-    assertThat(fen).isEqualTo("r1bqk2r/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 b kq - 0 14");
+    assertThat(fen).isEqualTo("r1bqk2r/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 b kq - 1 14");
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
     assertThat(board.canPerformKingSideCastling(FigureColor.BLACK)).isTrue();
     assertThat(((Rook) board.findCell(6, 1).figure()).hasMoved()).isTrue();
@@ -453,7 +455,7 @@ class BoardTest {
 
     board.moveFigure('e', 8, 'g', 8); // 15. O-O Black King Castling
     fen = FenNotation.generateFen(board);
-    assertThat(fen).isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w  - 0 15");
+    assertThat(fen).isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w  - 2 15");
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
     assertThat(((Rook) board.findCell(6, 8).figure()).hasMoved()).isTrue();
     assertThat(((King) board.findCell(7, 8).figure()).hasMoved()).isTrue();

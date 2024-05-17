@@ -81,7 +81,7 @@ class KingTest {
     assertThat(king.isFreeInDirection(2, CellDirection.LEFT)).isFalse();
     assertThat(king.isFreeInDirection(3, CellDirection.LEFT)).isFalse();
 
-    List<Cell> cells = king.figure().getAvailableCells(king);
+    List<Cell> cells = board.availableCellsWithoutCheckMoves(king);
     assertThat(cells).contains(board.findCell(7, 1));
 
     // Move king
@@ -108,7 +108,7 @@ class KingTest {
     assertThat(king.isFreeInDirection(4, CellDirection.LEFT)).isFalse();
     assertThat(king.isFreeInDirection(3, CellDirection.LEFT)).isTrue();
 
-    List<Cell> cells = king.figure().getAvailableCells(king);
+    List<Cell> cells = board.availableCellsWithoutCheckMoves(king);
     assertThat(cells).contains(board.findCell(3, 1));
 
     // Move king

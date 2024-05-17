@@ -23,7 +23,7 @@ public class Pawn implements Figure {
     return color() == FigureColor.WHITE ? CellDirection.TOP : CellDirection.BOTTOM;
   }
 
-  public List<Cell> getAvailableCells(Cell currentCell) {
+  public List<Cell> availableCells(Cell currentCell) {
     List<Cell> cells = new ArrayList<>();
 
     Cell oneFieldForwards = currentCell.cellInDirection(forwards());
@@ -61,7 +61,7 @@ public class Pawn implements Figure {
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    List<Cell> availableCell = getAvailableCells(prevCell);
+    List<Cell> availableCell = availableCells(prevCell);
     return availableCell.contains(nextCell);
   }
 

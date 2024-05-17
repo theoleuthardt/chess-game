@@ -217,10 +217,17 @@ public class Board {
       throw new InvalidUserInputException("The figure can't move to that cell");
     }
 
+    if (wouldBeCheckAfterMove(startCell, endCell)) {
+      throw new InvalidUserInputException(
+          "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
+    }
+
     MoveType moveType = moveType(figure, startCell, endCell);
+    boolean resetHalfMove = false;
+
     switch (moveType) {
       case NORMAL -> {
-        // Move Figure
+        resetHalfMove = endCell.isOccupied() || figure.type() == FigureType.PAWN;
         startCell.setFigure(null);
         endCell.setFigure(figure);
       }
@@ -231,20 +238,32 @@ public class Board {
           throw new UnsupportedOperationException("This type of move is not implemented yet.");
     }
 
-    Figure figureOnEndCell = endCell.figure();
-
-    if (isCheck(figure.color())) {
-      // After this move the king is not allowed to be in check anymore.
-      // As the king is still in check, we undo this action
-      startCell.setFigure(figure);
-      endCell.setFigure(figureOnEndCell);
-      throw new InvalidUserInputException(
-          "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
+    if (resetHalfMove) {
+      this.halfMove = -1;
     }
+    this.halfMove++;
     if (turn == FigureColor.BLACK) {
       this.fullMove++;
     }
     this.changeTurn();
+  }
+
+  public List<Cell> availableCellsWithoutCheckMoves(Cell startCell) {
+    Figure figure = startCell.figure();
+    List<Cell> availableCells = figure.availableCells(startCell);
+    availableCells.removeIf(cell -> wouldBeCheckAfterMove(startCell, cell));
+    return availableCells;
+  }
+
+  public boolean wouldBeCheckAfterMove(Cell startCell, Cell endCell) {
+    Figure figure = startCell.figure();
+    Figure figureOnEndCell = endCell.figure();
+    startCell.setFigure(null);
+    endCell.setFigure(figure);
+    boolean isCheck = isCheck(figure.color());
+    startCell.setFigure(figure);
+    endCell.setFigure(figureOnEndCell);
+    return isCheck;
   }
 
   public boolean isCheck(FigureColor playerColor) {
@@ -264,26 +283,10 @@ public class Board {
       return false;
     }
 
-    // try to move every single figure to every single possible cell and check if the king is still
-    // in check
     for (Cell startCell : cellsWithColor(playerColor)) {
-      Figure startFigure = startCell.figure();
-      List<Cell> availableCells = startFigure.getAvailableCells(startCell);
-      for (Cell endCell : availableCells) {
-        Figure endFigure = endCell.figure();
-
-        // Simulate move and check if it is still check
-        startCell.setFigure(null);
-        endCell.setFigure(startFigure);
-        boolean isCheck = isCheck(playerColor);
-
-        // Undo move
-        startCell.setFigure(startFigure);
-        endCell.setFigure(endFigure);
-
-        if (!isCheck) {
-          return false;
-        }
+      List<Cell> availableCells = availableCellsWithoutCheckMoves(startCell);
+      if (!availableCells.isEmpty()) {
+        return false;
       }
     }
     return true;

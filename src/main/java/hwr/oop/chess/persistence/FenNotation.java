@@ -26,6 +26,7 @@ public class FenNotation {
 
     FenNotation fen = new FenNotation(board);
     fen.parsePiecePlacement(parts.getFirst());
+    fen.setCastlingImpossibleIfKingIsNotOnStartField();
   }
 
   public static void parseFEN(Board board, String fenString) {
@@ -43,6 +44,7 @@ public class FenNotation {
     fen.parseEnPassant(parts.get(3));
     fen.parseHalfMove(parts.get(4));
     fen.parseFullMove(parts.getLast());
+    fen.setCastlingImpossibleIfKingIsNotOnStartField();
 
     board.initializeWith(fen.turn, fen.enPassant, fen.halfMove, fen.fullMove);
   }
@@ -141,19 +143,15 @@ public class FenNotation {
     }
   }
 
-  private void parseCastlingForKing(String castling){
-    if(!castling.contains("Q") && !castling.contains("K")){
-      Cell kingCell = board.findCell(5, 1);
-      if (kingCell.isOccupiedBy(FigureColor.WHITE, FigureType.KING)) {
-        ((King) kingCell.figure()).figureMoved();
-      }
+  private void parseCastlingForKing(String castling) {
+    if (!castling.contains("Q") && !castling.contains("K")) {
+      Cell kingCell = board.findKing(FigureColor.WHITE);
+      ((King) kingCell.figure()).figureMoved();
     }
 
-    if(!castling.contains("q") && !castling.contains("k")){
-      Cell kingCell = board.findCell(5, 8);
-      if (kingCell.isOccupiedBy(FigureColor.WHITE, FigureType.KING)) {
-        ((King) kingCell.figure()).figureMoved();
-      }
+    if (!castling.contains("q") && !castling.contains("k")) {
+      Cell kingCell = board.findKing(FigureColor.BLACK);
+      ((King) kingCell.figure()).figureMoved();
     }
   }
 
@@ -175,6 +173,17 @@ public class FenNotation {
       }
     }
     return castling.toString();
+  }
+
+  private void setCastlingImpossibleIfKingIsNotOnStartField() {
+    Cell whiteKingCell = board.findKing(FigureColor.WHITE);
+    if (whiteKingCell.x() != 5 || whiteKingCell.y() != 1) {
+      ((King) whiteKingCell.figure()).figureMoved();
+    }
+    Cell blackKingCell = board.findKing(FigureColor.BLACK);
+    if (blackKingCell.x() != 5 || blackKingCell.y() != 8) {
+      ((King) blackKingCell.figure()).figureMoved();
+    }
   }
 
   private void parseEnPassant(String enPassant) {
