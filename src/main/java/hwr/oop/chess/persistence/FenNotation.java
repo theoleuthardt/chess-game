@@ -38,7 +38,8 @@ public class FenNotation {
     FenNotation fen = new FenNotation(board);
     fen.parsePiecePlacement(parts.getFirst());
     fen.parseTurn(parts.get(1));
-    fen.parseCastling(parts.get(2));
+    fen.parseCastlingForRook(parts.get(2));
+    fen.parseCastlingForKing(parts.get(2));
     fen.parseEnPassant(parts.get(3));
     fen.parseHalfMove(parts.get(4));
     fen.parseFullMove(parts.getLast());
@@ -124,7 +125,7 @@ public class FenNotation {
     return board.turn().equals(FigureColor.WHITE) ? "w" : "b";
   }
 
-  private void parseCastling(String castling) {
+  private void parseCastlingForRook(String castling) {
     for (char c : List.of('Q', 'K', 'q', 'k')) {
       if (castling.indexOf(c) > -1) {
         continue;
@@ -136,6 +137,22 @@ public class FenNotation {
       Cell rookCell = board.findCell(x, y);
       if (rookCell.isOccupiedBy(color, FigureType.ROOK)) {
         ((Rook) rookCell.figure()).figureMoved();
+      }
+    }
+  }
+
+  private void parseCastlingForKing(String castling){
+    if(!castling.contains("Q") && !castling.contains("K")){
+      Cell kingCell = board.findCell(5, 1);
+      if (kingCell.isOccupiedBy(FigureColor.WHITE, FigureType.KING)) {
+        ((King) kingCell.figure()).figureMoved();
+      }
+    }
+
+    if(!castling.contains("q") && !castling.contains("k")){
+      Cell kingCell = board.findCell(5, 8);
+      if (kingCell.isOccupiedBy(FigureColor.WHITE, FigureType.KING)) {
+        ((King) kingCell.figure()).figureMoved();
       }
     }
   }
