@@ -9,7 +9,6 @@ import java.util.*;
 public class FenNotation {
   private final Board board;
   private FigureColor turn;
-  private String enPassant;
   private int halfMove;
   private int fullMove;
 
@@ -46,7 +45,7 @@ public class FenNotation {
     fen.parseFullMove(parts.getLast());
     fen.setCastlingImpossibleIfKingIsNotOnStartField();
 
-    board.initializeWith(fen.turn, fen.enPassant, fen.halfMove, fen.fullMove);
+    board.initializeWith(fen.turn, fen.halfMove, fen.fullMove);
   }
 
   public static String generateFen(Board board) {
@@ -186,12 +185,18 @@ public class FenNotation {
     }
   }
 
-  private void parseEnPassant(String enPassant) {
-    // This is not implemented yet
-    this.enPassant = enPassant;
+  private void parseEnPassant(String enPassantStr) {
+    if (!enPassantStr.equals("-")) {
+      board.findCell(enPassantStr).setIsEnPassant(true);
+    }
   }
 
   private String generateEnPassant() {
+    for (Cell cell : board.allCells()) {
+      if (cell.isEnPassant()) {
+        return cell.toCoordinates().toLowerCase();
+      }
+    }
     return "-";
   }
 

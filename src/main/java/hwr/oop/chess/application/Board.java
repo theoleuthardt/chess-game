@@ -8,7 +8,6 @@ import java.util.List;
 
 public class Board {
   private Cell firstCell;
-  private String enPassant = "-";
   private int halfMove = 0;
   private int fullMove = 0;
   private FigureColor turn = FigureColor.WHITE;
@@ -53,9 +52,8 @@ public class Board {
     }
   }
 
-  public void initializeWith(FigureColor turn, String enPassant, int halfMove, int fullMove) {
+  public void initializeWith(FigureColor turn, int halfMove, int fullMove) {
     this.turn = turn;
-    this.enPassant = enPassant;
     this.halfMove = halfMove;
     this.fullMove = fullMove;
   }
@@ -204,10 +202,6 @@ public class Board {
     }
 
     Figure figure = startCell.figure();
-    if (isCheckmate(figure.color())) {
-      throw new InvalidUserInputException("The game is over as you are in Checkmate!");
-    }
-
     if (figure.color() != turn) {
       throw new InvalidUserInputException(
           "It is not your turn! Try to move a figure of color " + turn.name() + ".");
@@ -222,30 +216,16 @@ public class Board {
           "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
     }
 
-    MoveType moveType = moveType(figure, startCell, endCell);
-    boolean resetHalfMove = false;
-
+    MoveType moveType = moveType(startCell, endCell);
     switch (moveType) {
-      case NORMAL -> {
-        resetHalfMove = endCell.isOccupied() || figure.type() == FigureType.PAWN;
-        startCell.setFigure(null);
-        endCell.setFigure(figure);
-      }
-
+      case NORMAL -> handleNormalMove(startCell, endCell);
+      case EN_PASSANT -> handleEnPassant(startCell, endCell);
       case KING_CASTLING, QUEEN_CASTLING -> handleCastling(startCell, endCell, moveType);
-
       default ->
           throw new UnsupportedOperationException("This type of move is not implemented yet.");
     }
 
-    if (resetHalfMove) {
-      this.halfMove = -1;
-    }
-    this.halfMove++;
-    if (turn == FigureColor.BLACK) {
-      this.fullMove++;
-    }
-    this.changeTurn();
+    changeTurnAndCountMoves();
   }
 
   public List<Cell> availableCellsWithoutCheckMoves(Cell startCell) {
@@ -298,11 +278,16 @@ public class Board {
     return cells;
   }
 
-  private void changeTurn() {
+  private void changeTurnAndCountMoves() {
+    if (turn == FigureColor.BLACK) {
+      this.fullMove++;
+    }
+    this.halfMove++;
     this.turn = turn.opposite();
   }
 
-  private MoveType moveType(Figure figure, Cell startCell, Cell endCell) {
+  private MoveType moveType(Cell startCell, Cell endCell) {
+    Figure figure = startCell.figure();
     if (figure.type() == FigureType.KING) {
       King king = (King) figure;
       if (king.canPerformKingSideCastling(startCell)
@@ -315,7 +300,40 @@ public class Board {
       }
     }
 
+    if (figure.type() == FigureType.PAWN
+        && ((Pawn) figure).canPerformEnPassant(startCell, endCell)) {
+      return MoveType.EN_PASSANT;
+    } else {
+      // reset EN_PASSANT because the next move is not an en passant move
+      allCells().forEach(cell -> cell.setIsEnPassant(false));
+    }
+
     return MoveType.NORMAL;
+  }
+
+  private void handleNormalMove(Cell startCell, Cell endCell) {
+    Figure figure = startCell.figure();
+    if (endCell.isOccupied() || figure.type() == FigureType.PAWN) {
+      this.halfMove = -1;
+    }
+    startCell.setFigure(null);
+    endCell.setFigure(figure);
+
+    if (figure.type() == FigureType.PAWN && Math.abs(startCell.y() - endCell.y()) == 2) {
+      startCell.cellInDirection(((Pawn) figure).forwards()).setIsEnPassant(true);
+    }
+  }
+
+  private void handleEnPassant(Cell startCell, Cell endCell) {
+    Figure figure = startCell.figure();
+    this.halfMove = -1;
+    startCell.setFigure(null);
+    endCell.setFigure(figure);
+
+    CellDirection backwards =
+        ((Pawn) figure).forwards() == CellDirection.TOP ? CellDirection.BOTTOM : CellDirection.TOP;
+    Cell cellWithOpponentPawn = endCell.cellInDirection(backwards);
+    cellWithOpponentPawn.setFigure(null);
   }
 
   public void handleCastling(Cell startKingCell, Cell endKingCell, MoveType type) {
@@ -360,10 +378,6 @@ public class Board {
   public boolean canPerformKingSideCastling(FigureColor color) {
     Cell kingCell = findKing(color);
     return ((King) kingCell.figure()).canPerformKingSideCastling(kingCell);
-  }
-
-  public String enPassant() {
-    return this.enPassant;
   }
 
   public int fullMove() {

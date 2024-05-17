@@ -20,6 +20,7 @@ public class Cell {
   private Cell topRightCell;
   private Cell bottomLeftCell;
   private Cell bottomRightCell;
+  private boolean isEnPassant = false;
 
   public Cell(int x, int y) {
     if (isInvalidCoordinate(x, y)) {
@@ -280,5 +281,13 @@ public class Cell {
       }
     }
     return false;
+  }
+
+  public boolean isEnPassant() {
+    return isEnPassant;
+  }
+
+  public void setIsEnPassant(boolean enPassant) {
+    isEnPassant = enPassant;
   }
 }

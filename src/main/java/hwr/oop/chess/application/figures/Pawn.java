@@ -19,7 +19,7 @@ public class Pawn implements Figure {
     return cell.y() == (color == FigureColor.WHITE ? 2 : 7);
   }
 
-  private CellDirection forwards() {
+  public CellDirection forwards() {
     return color() == FigureColor.WHITE ? CellDirection.TOP : CellDirection.BOTTOM;
   }
 
@@ -45,16 +45,16 @@ public class Pawn implements Figure {
     // move one field diagonally left
     Cell diagonalLeftCell = oneFieldForwards.leftCell();
     if (oneFieldForwards.hasLeftCell()
-        && diagonalLeftCell.isOccupied()
-        && diagonalLeftCell.figure().color() != color()) {
+        && (diagonalLeftCell.isOccupiedByOpponentOf(color())
+            || canPerformEnPassant(currentCell, diagonalLeftCell))) {
       cells.add(diagonalLeftCell);
     }
 
     // move one field diagonally right
     Cell diagonalRightCell = oneFieldForwards.rightCell();
     if (oneFieldForwards.hasRightCell()
-        && diagonalRightCell.isOccupied()
-        && diagonalRightCell.figure().color() != color()) {
+        && (diagonalRightCell.isOccupiedByOpponentOf(color())
+            || canPerformEnPassant(currentCell, diagonalRightCell))) {
       cells.add(diagonalRightCell);
     }
     return cells;
@@ -100,5 +100,24 @@ public class Pawn implements Figure {
 
   public List<FigureType> getPromotionTypes() {
     return List.of(FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
+  }
+
+  public boolean canPerformEnPassant(Cell startCell, Cell endCell) {
+    if (!endCell.isEnPassant()) {
+      return false;
+    }
+
+    Cell forwardsCell = startCell.cellInDirection(forwards());
+    CellDirection direction;
+    if (endCell == forwardsCell.leftCell()) {
+      direction = CellDirection.LEFT;
+    } else if (endCell == forwardsCell.rightCell()) {
+      direction = CellDirection.RIGHT;
+    } else {
+      return false;
+    }
+
+    Cell opponentPawnCell = startCell.cellInDirection(direction);
+    return opponentPawnCell.isOccupiedBy(color().opposite(), FigureType.PAWN);
   }
 }
