@@ -27,11 +27,9 @@ public class Pawn implements Figure {
     List<Cell> cells = new ArrayList<>();
 
     Cell oneFieldForwards = currentCell.cellInDirection(forwards());
-    if (oneFieldForwards == null) {
+    if (!currentCell.hasCellInDirection(forwards())) {
       return cells;
     }
-
-    Cell twoFieldForwards = oneFieldForwards.cellInDirection(forwards());
 
     // move one field forwards
     if (oneFieldForwards.isFree()) {
@@ -39,16 +37,14 @@ public class Pawn implements Figure {
     }
 
     // move two fields forwards
-    if (isInStartPosition(currentCell)
-        && twoFieldForwards != null
-        && oneFieldForwards.isFree()
-        && twoFieldForwards.isFree()) {
+    Cell twoFieldForwards = oneFieldForwards.cellInDirection(forwards());
+    if (isInStartPosition(currentCell) && oneFieldForwards.isFree() && twoFieldForwards.isFree()) {
       cells.add(twoFieldForwards);
     }
 
     // move one field diagonally left
     Cell diagonalLeftCell = oneFieldForwards.leftCell();
-    if (diagonalLeftCell != null
+    if (oneFieldForwards.hasLeftCell()
         && diagonalLeftCell.isOccupied()
         && diagonalLeftCell.figure().color() != color()) {
       cells.add(diagonalLeftCell);
@@ -56,7 +52,7 @@ public class Pawn implements Figure {
 
     // move one field diagonally right
     Cell diagonalRightCell = oneFieldForwards.rightCell();
-    if (diagonalRightCell != null
+    if (oneFieldForwards.hasRightCell()
         && diagonalRightCell.isOccupied()
         && diagonalRightCell.figure().color() != color()) {
       cells.add(diagonalRightCell);
@@ -79,12 +75,15 @@ public class Pawn implements Figure {
       throw new InvalidUserInputException(
           "The pawn is not allowed to be promoted as it has not reached the end.");
     }
-    List<FigureType> canPromoteTo =
-        List.of(FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
+    List<FigureType> canPromoteTo = getPromotionTypes();
     if (!canPromoteTo.contains(toType)) {
       throw new InvalidUserInputException("The pawn cannot become a " + toType.name() + ".");
     }
-    currentCell.setFigure(getFigureFromTypeAndColor(toType, color()));
+    Figure promoteTo = Figure.fromTypeAndColor(toType, color());
+    if (promoteTo.type() == FigureType.ROOK) {
+      ((Rook) promoteTo).figureMoved();
+    }
+    currentCell.setFigure(promoteTo);
   }
 
   public char symbol() {

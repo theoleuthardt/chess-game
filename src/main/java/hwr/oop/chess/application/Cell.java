@@ -7,7 +7,6 @@ import hwr.oop.chess.cli.InvalidUserInputException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Cell {
   private final int y;
@@ -60,45 +59,32 @@ public class Cell {
     return figure;
   }
 
+  public boolean isOccupiedBy(FigureColor color) {
+    return isOccupied() && figure.color() == color;
+  }
+
+  public boolean isOccupiedByOpponentOf(FigureColor color) {
+    return isOccupied() && figure.color() != color;
+  }
+
+  public boolean isOccupiedByOpponentOf(Figure figure) {
+    return isOccupiedByOpponentOf(figure.color());
+  }
+
+  public boolean isOccupiedBy(FigureType type) {
+    return isOccupied() && figure.type() == type;
+  }
+
+  public boolean isOccupiedBy(FigureColor color, FigureType type) {
+    return isOccupiedBy(color) && isOccupiedBy(type);
+  }
+
   public boolean isFree() {
     return figure == null;
   }
 
   public boolean isOccupied() {
     return figure != null;
-  }
-
-  // Methods to set adjacent positions
-  public void setTopCell(Cell position) {
-    this.topCell = position;
-  }
-
-  public void setBottomCell(Cell position) {
-    this.bottomCell = position;
-  }
-
-  public void setLeftCell(Cell position) {
-    this.leftCell = position;
-  }
-
-  public void setRightCell(Cell position) {
-    this.rightCell = position;
-  }
-
-  public void setTopLeftCell(Cell position) {
-    this.topLeftCell = position;
-  }
-
-  public void setTopRightCell(Cell position) {
-    this.topRightCell = position;
-  }
-
-  public void setBottomLeftCell(Cell position) {
-    this.bottomLeftCell = position;
-  }
-
-  public void setBottomRightCell(Cell position) {
-    this.bottomRightCell = position;
   }
 
   // Methods to get adjacent positions
@@ -134,6 +120,38 @@ public class Cell {
     return bottomRightCell;
   }
 
+  public boolean hasTopCell() {
+    return topCell != null;
+  }
+
+  public boolean hasBottomCell() {
+    return bottomCell != null;
+  }
+
+  public boolean hasLeftCell() {
+    return leftCell != null;
+  }
+
+  public boolean hasRightCell() {
+    return rightCell != null;
+  }
+
+  public boolean hasTopLeftCell() {
+    return topLeftCell != null;
+  }
+
+  public boolean hasTopRightCell() {
+    return topRightCell != null;
+  }
+
+  public boolean hasBottomLeftCell() {
+    return bottomLeftCell != null;
+  }
+
+  public boolean hasBottomRightCell() {
+    return bottomRightCell != null;
+  }
+
   // Method to return the index of the column to which the position belongs
   public int x() {
     return x;
@@ -157,16 +175,16 @@ public class Cell {
     };
   }
 
-  public void addAvailableCellsInDirectionToList(List<Cell> list, CellDirection direction) {
-    Cell current = this;
-    while ((current = current.cellInDirection(direction)) != null) {
-      boolean enemyIsOnField =
-          current.isOccupied() && (current.figure().color() != figure().color());
+  public boolean hasCellInDirection(CellDirection direction) {
+    return cellInDirection(direction) != null;
+  }
 
-      if (current.isFree() || enemyIsOnField) {
-        list.add(current);
+  public void addAvailableCellsInDirectionToList(List<Cell> list, CellDirection direction) {
+    for (Cell cell : allCellsInDirection(direction)) {
+      if (cell.isFree() || cell.isOccupiedByOpponentOf(figure)) {
+        list.add(cell);
       }
-      if (current.isOccupied()) {
+      if (cell.isOccupied()) {
         break;
       }
     }
@@ -196,27 +214,27 @@ public class Cell {
       case 0 -> {
         // anotherCell is above or below currentCell
         switch (diffY) {
-          case 1 -> setTopCell(anotherCell);
+          case 1 -> topCell = anotherCell;
           case 0 -> throw new IllegalArgumentException("The cells are identical");
-          case -1 -> setBottomCell(anotherCell);
+          case -1 -> bottomCell = anotherCell;
           default -> throw new IllegalArgumentException(notNeighboursError);
         }
       }
       case 1 -> {
         // anotherCell is right of currentCell
         switch (diffY) {
-          case 1 -> setTopRightCell(anotherCell);
-          case 0 -> setRightCell(anotherCell);
-          case -1 -> setBottomRightCell(anotherCell);
+          case 1 -> topRightCell = anotherCell;
+          case 0 -> rightCell = anotherCell;
+          case -1 -> bottomRightCell = anotherCell;
           default -> throw new IllegalArgumentException(notNeighboursError);
         }
       }
       case -1 -> {
         // anotherCell is left of currentCell
         switch (diffY) {
-          case 1 -> setTopLeftCell(anotherCell);
-          case 0 -> setLeftCell(anotherCell);
-          case -1 -> setBottomLeftCell(anotherCell);
+          case 1 -> topLeftCell = anotherCell;
+          case 0 -> leftCell = anotherCell;
+          case -1 -> bottomLeftCell = anotherCell;
           default -> throw new IllegalArgumentException(notNeighboursError);
         }
       }
@@ -225,50 +243,40 @@ public class Cell {
   }
 
   public String toString() {
-    return "Cell_" + toCoordinates() + "(" + (figure == null ? "-" : figure.symbol()) + ")";
+    return "Cell_" + toCoordinates() + "(" + (isFree() ? "-" : figure.symbol()) + ")";
   }
 
   public String toCoordinates() {
     return (char) (x + 64) + String.valueOf(y);
   }
 
-  public static boolean isEmptyBetweenCells(Cell currentCell, CellDirection direction, int move) {
+  public List<Cell> allCellsInDirection(CellDirection direction) {
     List<Cell> cells = new ArrayList<>();
-    while (move > 0) {
-      Cell targetCell = currentCell.cellInDirection(direction);
-      cells.add(targetCell);
-      currentCell = targetCell;
-      move--;
+    Cell cell = this;
+    while (cell.hasCellInDirection(direction)) {
+      cell = cell.cellInDirection(direction);
+      cells.add(cell);
     }
-    return cells.stream().filter(Objects::nonNull).noneMatch(Cell::isOccupied);
+    return cells;
   }
 
-  public static Cell findNextCell(Cell currentCell, CellDirection direction, int move) {
-    Cell nextCell = currentCell;
-    while (move > 0) {
-      nextCell = nextCell.cellInDirection(direction);
-      move--;
-    }
-    return nextCell;
-  }
-
-  public static boolean isKingInitialPosition(Cell kingCell){
-    if(kingCell.figure().type() == FigureType.KING){
-      if (kingCell.figure().color() == FigureColor.WHITE) {
-        return kingCell.x() == 5 && kingCell.y() == 1;
-      } else {
-        return kingCell.x() == 5 && kingCell.y() == 8;
+  public Cell findCellInDirection(int count, CellDirection direction) {
+    for (Cell cell : allCellsInDirection(direction)) {
+      if (--count == 0) {
+        return cell;
       }
     }
-    return false;
+    throw new IllegalArgumentException(
+        "The cell is not reachable in direction " + direction.name());
   }
 
-  public static boolean isRookInitialPosition(Cell rookCell){
-    if(rookCell.figure().type() == FigureType.ROOK){
-      if (rookCell.figure().color() == FigureColor.WHITE) {
-        return rookCell.x() == 1 && rookCell.y() == 1 || rookCell.x() == 8 && rookCell.y() == 1;
-      } else {
-        return rookCell.x() == 1 && rookCell.y() == 8 || rookCell.x() == 8 && rookCell.y() == 8;
+  public boolean isFreeInDirection(int count, CellDirection direction) {
+    for (Cell cell : allCellsInDirection(direction)) {
+      if (cell.isOccupied()) {
+        return false;
+      }
+      if (--count == 0) {
+        return true;
       }
     }
     return false;

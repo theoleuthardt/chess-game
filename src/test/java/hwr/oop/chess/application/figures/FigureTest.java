@@ -14,18 +14,16 @@ class FigureTest {
       value = FigureType.class,
       names = {"BISHOP", "KNIGHT", "QUEEN", "ROOK"})
   void getFigure(FigureType type) {
-    Pawn pawn = new Pawn(FigureColor.BLACK);
-    Figure testFigure = pawn.getFigureFromTypeAndColor(type, FigureColor.BLACK);
+    Figure testFigure = Figure.fromTypeAndColor(type, FigureColor.BLACK);
     Assertions.assertThat(testFigure.type()).isEqualTo(type);
   }
 
   @Test
   void getFigureException() {
-    Pawn pawn = new Pawn(FigureColor.BLACK);
     RuntimeException exception =
         assertThrows(
             RuntimeException.class,
-            () -> pawn.getFigureFromTypeAndColor(FigureType.KING, FigureColor.BLACK));
+            () -> Figure.fromTypeAndColor(FigureType.KING, FigureColor.BLACK));
 
     String expectedMessage = "This is not a valid FigureType";
     assertThat(exception.getMessage()).contains(expectedMessage);

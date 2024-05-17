@@ -4,12 +4,6 @@ import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import static hwr.oop.chess.application.Cell.findNextCell;
-import static hwr.oop.chess.application.Cell.isEmptyBetweenCells;
-import static java.util.Objects.requireNonNull;
 
 public class King implements Figure {
   private static final FigureType type = FigureType.KING;
@@ -26,46 +20,54 @@ public class King implements Figure {
 
     // Loop though all Directions
     for (CellDirection direction : CellDirection.values()) {
-      Cell neighbourCell = currentCell.cellInDirection(direction);
-      if (neighbourCell != null
-          && (neighbourCell.isFree() || neighbourCell.figure().color() != color())) {
-        cells.add(neighbourCell);
+      if (currentCell.hasCellInDirection(direction)) {
+        Cell neighbourCell = currentCell.cellInDirection(direction);
+        if (neighbourCell.isFree() || neighbourCell.isOccupiedByOpponentOf(color())) {
+          cells.add(neighbourCell);
+        }
       }
     }
-    if(!hasMoved){
-      // Add cells for castling King
-      if(canCastlingKing(currentCell)){
-        Cell kingAfterCastling = findNextCell(currentCell, CellDirection.RIGHT, 2);
-        cells.add(kingAfterCastling);
-      }
 
-      // Add cells for castling Queen
-      if (canCastlingQueen(currentCell)) {
-        Cell kingAfterCastling = findNextCell(currentCell, CellDirection.LEFT, 2);
-        cells.add(kingAfterCastling);
-      }
+    // Add cells for castling King
+    if (canPerformKingSideCastling(currentCell)) {
+      cells.add(kingSideCastlingCell(currentCell));
     }
+
+    // Add cells for castling Queen
+    if (canPerformQueenSideCastling(currentCell)) {
+      cells.add(queenSideCastlingCell(currentCell));
+    }
+
     return cells;
   }
 
-  public boolean canCastlingKing(Cell currentCell) {
-    if (!hasMoved && isEmptyBetweenCells(currentCell, CellDirection.RIGHT, 2)) {
-      Cell rookCell = findNextCell(currentCell, CellDirection.RIGHT, 3);
-      Rook rook = (Rook) rookCell.figure();
-      return rookCell.figure().type() == FigureType.ROOK && !rook.hasMoved();
-    }
-    return false;
+  public Cell kingSideCastlingCell(Cell currentCell) {
+    return currentCell.findCellInDirection(2, CellDirection.RIGHT);
   }
 
-  public boolean canCastlingQueen(Cell currentCell) {
-    if(!hasMoved && isEmptyBetweenCells(currentCell, CellDirection.LEFT, 3)) {
-      Cell rookCell = findNextCell(currentCell, CellDirection.LEFT, 4);
-      Rook rook = (Rook) rookCell.figure();
-      return rookCell.figure().type() == FigureType.ROOK && !rook.hasMoved();
-    }
-    return false;
+  public Cell queenSideCastlingCell(Cell currentCell) {
+    return currentCell.findCellInDirection(2, CellDirection.LEFT);
   }
 
+  public boolean canPerformKingSideCastling(Cell currentCell) {
+    if (hasMoved || !currentCell.isFreeInDirection(2, CellDirection.RIGHT)) {
+      return false;
+    }
+
+    Cell rookCell = currentCell.findCellInDirection(3, CellDirection.RIGHT);
+    return rookCell.isOccupiedBy(color(), FigureType.ROOK)
+        && !((Rook) rookCell.figure()).hasMoved();
+  }
+
+  public boolean canPerformQueenSideCastling(Cell currentCell) {
+    if (hasMoved || !currentCell.isFreeInDirection(3, CellDirection.LEFT)) {
+      return false;
+    }
+
+    Cell rookCell = currentCell.findCellInDirection(4, CellDirection.LEFT);
+    return rookCell.isOccupiedBy(color(), FigureType.ROOK)
+        && !((Rook) rookCell.figure()).hasMoved();
+  }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
     List<Cell> availableCell = getAvailableCells(prevCell);
@@ -76,11 +78,17 @@ public class King implements Figure {
     return color == FigureColor.WHITE ? 'K' : 'k';
   }
 
-  public FigureColor color() { return color; }
+  public FigureColor color() {
+    return color;
+  }
 
-  public FigureType type() { return type; }
+  public FigureType type() {
+    return type;
+  }
 
-  public boolean hasMoved() { return this.hasMoved; }
+  public boolean hasMoved() {
+    return this.hasMoved;
+  }
 
   public void figureMoved() {
     if (!this.hasMoved) {

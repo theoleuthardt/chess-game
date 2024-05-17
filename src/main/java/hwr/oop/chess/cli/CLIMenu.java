@@ -135,6 +135,7 @@ public class CLIMenu {
             + ".");
 
     board.moveFigure(from, to);
+    checkForCheck();
     cli.game().saveGame();
     cli.printBoard();
   }

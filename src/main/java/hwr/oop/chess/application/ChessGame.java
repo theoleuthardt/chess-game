@@ -1,5 +1,6 @@
 package hwr.oop.chess.application;
 
+import hwr.oop.chess.persistence.FenNotation;
 import hwr.oop.chess.persistence.Persistence;
 
 public class ChessGame {
@@ -22,11 +23,11 @@ public class ChessGame {
 
   private void loadGame() {
     persistence.loadGame();
-    board.addFiguresToBoard(persistence.loadState("figures"));
+    FenNotation.parseFEN(board, persistence.loadState("fen"));
   }
 
   public void saveGame() {
-    persistence.storeState("figures", board.figuresOnBoard());
+    persistence.storeState("fen", FenNotation.generateFen(board));
     persistence.saveGame();
   }
 
