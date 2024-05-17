@@ -143,7 +143,7 @@ public class CLIMenu {
   private void performPromotePawnOnBoard() {
     Board board = cli.game().board();
     Cell from = argumentToCoordinate(board);
-    if (from.isFree() || from.figure().type() != FigureType.PAWN) {
+    if (!from.isOccupiedBy(FigureType.PAWN)) {
       throw new InvalidUserInputException(
           "On the cell " + from.toCoordinates() + " there is no pawn!");
     }
@@ -241,7 +241,7 @@ public class CLIMenu {
     if (actuallyHasCount < shouldHaveCount) {
       throw new InvalidUserInputException(
           "Your command '"
-              + initialCommand
+              + String.join(" ", initialCommand)
               + "' is missing "
               + (shouldHaveCount - actuallyHasCount)
               + " argument(s)");
@@ -249,7 +249,7 @@ public class CLIMenu {
     if (actuallyHasCount > shouldHaveCount) {
       throw new InvalidUserInputException(
           "Your command '"
-              + initialCommand
+              + String.join(" ", initialCommand)
               + "' has "
               + (actuallyHasCount - shouldHaveCount)
               + " argument(s) more than needed.");
