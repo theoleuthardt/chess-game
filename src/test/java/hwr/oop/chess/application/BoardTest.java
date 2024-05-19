@@ -261,16 +261,21 @@ class BoardTest {
   @Test
   void testCastlingKingAndQueen() {
     board = new Board(true);
+
     // only keep Kings and Rooks on the board
-    for (Cell cell : board.allCells()) {
-      if (!cell.isOccupiedBy(FigureType.KING) && !cell.isOccupiedBy(FigureType.ROOK)) {
-        cell.setFigure(null);
-      }
-    }
+    String fenString = "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 10";
+    FenNotation.parseFEN(board, fenString);
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isTrue();
     assertThat(board.canPerformQueenSideCastling(FigureColor.WHITE)).isTrue();
     assertThat(board.canPerformKingSideCastling(FigureColor.BLACK)).isTrue();
     assertThat(board.canPerformQueenSideCastling(FigureColor.BLACK)).isTrue();
+
+    fenString = "r3k2r/8/8/8/8/8/8/R3K2R w - - 0 10";
+    FenNotation.parseFEN(board, fenString);
+    assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
+    assertThat(board.canPerformQueenSideCastling(FigureColor.WHITE)).isFalse();
+    assertThat(board.canPerformKingSideCastling(FigureColor.BLACK)).isFalse();
+    assertThat(board.canPerformQueenSideCastling(FigureColor.BLACK)).isFalse();
   }
 
   @Test

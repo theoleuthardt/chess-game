@@ -72,4 +72,12 @@ class FenNotationTest {
     assertThat(isCharValid('c')).isFalse();
     assertThat(isCharValid('d')).isFalse();
   }
+
+  @Test
+  void testGenerateFenByCastling() {
+    Board board = new Board(false);
+    String initialStatus = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
+    FenNotation.parseFEN(board, initialStatus);
+    assertThat(FenNotation.generateFen(board)).isEqualTo(initialStatus);
+  }
 }
