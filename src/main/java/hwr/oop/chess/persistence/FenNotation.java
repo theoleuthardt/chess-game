@@ -171,6 +171,9 @@ public class FenNotation {
         castling.append(c);
       }
     }
+    if (castling.isEmpty()) {
+      return "-";
+    }
     return castling.toString();
   }
 
