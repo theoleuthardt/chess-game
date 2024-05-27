@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
   private Board board;
@@ -220,30 +220,6 @@ class BoardTest {
   }
 
   @Test
-  void testAddFiguresToBoard() {
-    // Initial Status as string
-    String string = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR";
-    board.addFiguresToBoard(string);
-    assertThatAllFiguresAreInDefaultPosition();
-  }
-
-  @Test
-  void testAddFiguresToBoardWithLongString() {
-    // Initial Status as string
-    String string = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR_aaa";
-    assertThatThrownBy(() -> board.addFiguresToBoard(string))
-        .isInstanceOf(IllegalArgumentException.class);
-  }
-
-  @Test
-  void testFiguresOnBoard() {
-    board.addFiguresToBoard();
-    String initial = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR";
-    String string = board.figuresOnBoard();
-    assertThat(string).isEqualTo(initial);
-  }
-
-  @Test
   void testMoveFigureWithInteger() {
     board.addFiguresToBoard();
     board.moveFigure(4, 2, 4, 4);
@@ -329,7 +305,7 @@ class BoardTest {
             });
   }
 
-  @Test // TODO Fix En Passant
+  @Test
   void testEnPassant() {
     // given
     board = new Board(false);
@@ -401,8 +377,76 @@ class BoardTest {
 
     Cell cellRookBlack = board.findCell("a8");
     assertThat(board.availableCellsWithoutCheckMoves(cellRookBlack)).isEmpty();
+
+    assertThat(assertThrows(InvalidUserInputException.class, () -> {
+      board.moveFigure("d8", "c8");
+    }).getMessage()).isEqualTo("This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
   }
 
+  @Test
+  void testNotCheckMateState(){
+    Board board = new Board(false);
+    String initialStatus = "rnb1kb1r/ppp1pppp/3q1np1/3p4/2P5/2N2N1B/PP1PPP1P/R1BQK2R b KQkq - 3 5";
+    FenNotation.parseFEN(board, initialStatus);
+
+    assertThat(board.isCheckmate(FigureColor.WHITE)).isFalse();
+    board.moveFigure("b8", "c6");
+    assertThat(board.isCheckmate(FigureColor.BLACK)).isFalse();
+  }
+
+  @Test
+  void testNotExistKing(){
+    Board board = new Board(false);
+    String initialStatus = "rn1q1bnr/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/RNBQ2NR b - - 2 10";
+
+    Exception exceptionBlackKing = assertThrows(InvalidUserInputException.class, () -> {
+      FenNotation.parseFEN(board, initialStatus);
+    });
+
+    String expectedMessage = "Impossible state! There is no king on the field.";
+    String actualMessage = exceptionBlackKing.getMessage();
+    assertThat(actualMessage.contains(expectedMessage)).isTrue();
+  }
+
+  @Test
+  void testInvalidMoveFigure(){
+    Board board = new Board(false);
+    String initialStatus = "rnbqkbnr/ppp1pppp/8/3p4/2P5/8/PP1PPPPP/RNBQKBNR w KQkq d6 0 3";
+    FenNotation.parseFEN(board, initialStatus);
+
+    assertThat(board.isCheck(FigureColor.WHITE)).isFalse();
+
+    assertThat(assertThrows(InvalidUserInputException.class, () -> {
+      board.moveFigure(0,1,1,1);
+    }).getMessage().contains("Invalid coordinates. Coordinates must be between 1 and 8.")).isTrue();
+
+    assertThat(assertThrows(InvalidUserInputException.class, () -> {
+      board.moveFigure("e4", "d5");
+    }).getMessage().contains("On the starting cell is no figure")).isTrue();
+
+    assertThat(assertThrows(InvalidUserInputException.class, () -> {
+      board.moveFigure("d5", "c4");
+    }).getMessage().contains("It is not your turn! Try to move a figure of color")).isTrue();
+
+    assertThat(assertThrows(InvalidUserInputException.class, () -> {
+      board.moveFigure("c4", "c6");
+    }).getMessage().contains("The figure can't move to that cell")).isTrue();
+  }
+
+  @Test
+  void testInValidCastling(){
+    Board board = new Board(false);
+    String initialState= "rnb1kb1r/ppp1pppp/3q1np1/3p4/2P5/2N2N1B/PP1PPP1P/R1BQK2R b KQkq - 3 5";
+    FenNotation.parseFEN(board, initialState);
+
+    assertThat(assertThrows(UnsupportedOperationException.class, () -> {
+      board.handleCastling(board.findCell("f1"), board.findCell("g1"), MoveType.KING_CASTLING);
+    }).getMessage()).isEqualTo("A castling move can only be done by a king.");
+
+    assertThat(assertThrows(UnsupportedOperationException.class, () -> {
+      board.handleCastling(board.findCell("e1"), board.findCell("g1"), MoveType.EN_PASSANT);
+    }).getMessage()).isEqualTo("This is not a valid castling move.");
+  }
   /*
   Chess Match: Spasski–Fischer 0:1 Reykjavík, 20. Juli 1972
   */

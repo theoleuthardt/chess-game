@@ -127,7 +127,6 @@ public class Board {
           case 3, 6 -> cell.setFigure(new Bishop(figureColor));
           case 4 -> cell.setFigure(new Queen(figureColor));
           case 5 -> cell.setFigure(new King(figureColor));
-          default -> throw new IllegalStateException("Unexpected value: " + cell.x());
         }
       }
 
@@ -135,42 +134,6 @@ public class Board {
         cell.setFigure(new Pawn(figureColor));
       }
     }
-  }
-
-  public void addFiguresToBoard(String figurePositions) {
-    if (figurePositions == null) {
-      addFiguresToBoard();
-      return;
-    }
-    if (figurePositions.length() != 64) {
-      throw new IllegalArgumentException(
-          "The figurePositions should be a 64 character long string, but it is "
-              + figurePositions.length()
-              + " characters long.");
-    }
-    int figureIndex = 0;
-    for (Cell cell : allCells()) {
-      char figureType = figurePositions.charAt(figureIndex);
-      if (figureType == ' ') {
-        cell.setFigure(null);
-      } else {
-        Figure figure = Figure.fromChar(figureType);
-        cell.setFigure(figure);
-      }
-      figureIndex++;
-    }
-  }
-
-  public String figuresOnBoard() {
-    StringBuilder figurePositions = new StringBuilder();
-    for (Cell cell : allCells()) {
-      if (cell.figure() == null) {
-        figurePositions.append(' ');
-      } else {
-        figurePositions.append(cell.figure().symbol());
-      }
-    }
-    return figurePositions.toString();
   }
 
   // Method to move a piece on the board
@@ -218,12 +181,10 @@ public class Board {
 
     MoveType moveType = moveType(startCell, endCell);
     switch (moveType) {
-      case NORMAL -> handleNormalMove(startCell, endCell);
       case EN_PASSANT -> handleEnPassant(startCell, endCell);
       case KING_CASTLING, QUEEN_CASTLING -> handleCastling(startCell, endCell, moveType);
-      default ->
-          throw new UnsupportedOperationException("This type of move is not implemented yet.");
-    }
+      default -> handleNormalMove(startCell, endCell);
+   }
 
     changeTurnAndCountMoves();
   }
