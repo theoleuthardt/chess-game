@@ -203,7 +203,7 @@ class BoardTest {
     // King can only move to "d8"
     Cell kingCell = board.findKing(FigureColor.BLACK);
     List<Cell> availableCells = board.availableCellsWithoutCheckMoves(kingCell);
-    assertThat(availableCells).hasSize(1); // TODO Fix: King's getAvailableCells
+    assertThat(availableCells).hasSize(1);
   }
 
   @Test
