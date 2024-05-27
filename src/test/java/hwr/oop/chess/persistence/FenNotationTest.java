@@ -91,7 +91,7 @@ class FenNotationTest {
     String fenString = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
 
     List<String> parts = List.of(fenString.split(" "));
-    assertThatThrownBy(() -> parseFEN(board, parts.get(1))).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("This is an invalid FEN string, as it should have 6 parts!");
+    assertThatThrownBy(() -> parseFEN(board, parts.getFirst())).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("This is an invalid FEN string, as it should have 6 parts!");
 
     parseFEN(board, fenString);
     assertThat(generateFen(board)).isEqualTo(fenString);
@@ -185,5 +185,15 @@ class FenNotationTest {
       assertThat(((King)board.findKing(color).figure()).hasMoved()).isTrue();
     }
     assertThat(generateFen(board)).isEqualTo(kingIsNotStartPosition);
+  }
+
+  @Test
+  void testInValidFenString(){
+    Board board = new Board(false);
+    String whiteKingIsNotStartPosition = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R2K3R w KkQq - 2 10";
+    assertThatThrownBy(() -> parseFEN(board, whiteKingIsNotStartPosition)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Cannot load position because it is invalid.");
+
+    String blackKingIsNotStartPosition = "r2k3r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10";
+    assertThatThrownBy(() -> parseFEN(board, blackKingIsNotStartPosition)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Cannot load position because it is invalid.");
   }
 }

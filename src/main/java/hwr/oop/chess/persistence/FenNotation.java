@@ -31,7 +31,6 @@ public class FenNotation {
     fen.parseEnPassant(parts.get(3));
     fen.parseHalfMove(parts.get(4));
     fen.parseFullMove(parts.getLast());
-//    fen.setCastlingImpossibleIfKingIsNotOnStartField();
 
     board.initializeWith(fen.turn, fen.halfMove, fen.fullMove);
   }
@@ -141,6 +140,16 @@ public class FenNotation {
       Cell kingCell = board.findKing(FigureColor.BLACK);
       ((King) kingCell.figure()).figureMoved();
     }
+
+    if (this.isKingNotOnStartField(FigureColor.WHITE) && (castling.contains("K") || castling.contains("Q"))){
+      throw new IllegalArgumentException(
+          "Cannot load position because it is invalid.");
+    }
+
+    if (this.isKingNotOnStartField(FigureColor.BLACK) && (castling.contains("k") || castling.contains("q"))){
+      throw new IllegalArgumentException(
+          "Cannot load position because it is invalid.");
+    }
   }
 
   private String generateCastling() {
@@ -163,16 +172,15 @@ public class FenNotation {
     return castling.isEmpty() ? "-" : castling.toString();
   }
 
-//  private void setCastlingImpossibleIfKingIsNotOnStartField() {
-//    Cell whiteKingCell = board.findKing(FigureColor.WHITE);
-//    if (whiteKingCell.x() != 5 || whiteKingCell.y() != 1) {
-//      ((King) whiteKingCell.figure()).figureMoved();
-//    }
-//    Cell blackKingCell = board.findKing(FigureColor.BLACK);
-//    if (blackKingCell.x() != 5 || blackKingCell.y() != 8) {
-//      ((King) blackKingCell.figure()).figureMoved();
-//    }
-//  }
+  private boolean isKingNotOnStartField(FigureColor color) {
+    Cell kingCell = board.findKing(color);
+
+    if (color == FigureColor.WHITE) {
+      return kingCell.x() != 5 || kingCell.y() != 1;
+    } else {
+      return kingCell.x() != 5 || kingCell.y() != 8;
+    }
+  }
 
   private void parseEnPassant(String enPassantStr) {
     if (!enPassantStr.equals("-")) {
