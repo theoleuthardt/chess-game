@@ -18,8 +18,8 @@ class FenNotationTest {
   @Test
   void testInitialFigureFromFEN() {
     Board board = new Board(false);
-    String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    FenNotation.parseFENOnlyPiecePlacement(board, fenString);
+    String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
+    FenNotation.parseFEN(board, fenString);
     assertThat(board.findCell(1, 1).figure().type()).isEqualTo(FigureType.ROOK);
     assertThat(board.findCell(2, 1).figure().type()).isEqualTo(FigureType.KNIGHT);
     assertThat(board.findCell(3, 1).figure().type()).isEqualTo(FigureType.BISHOP);
@@ -52,9 +52,9 @@ class FenNotationTest {
   @Test
   void testGenerateFENFromBoard() {
     Board board = new Board(false);
-    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R";
+    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 0 5";
 
-    FenNotation.parseFENOnlyPiecePlacement(board, fen);
+    FenNotation.parseFEN(board, fen);
     String generatedFEN = FenNotation.generateFen(board);
     assertThat(generatedFEN).startsWith(fen);
   }
@@ -89,7 +89,6 @@ class FenNotationTest {
   void testParseFEN() {
     Board board = new Board(false);
     String fenString = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
-    assertThatThrownBy(() -> parseFENOnlyPiecePlacement(board, fenString)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("This is an invalid FEN string, as it should have 1 part!");
 
     List<String> parts = List.of(fenString.split(" "));
     assertThatThrownBy(() -> parseFEN(board, parts.get(1))).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("This is an invalid FEN string, as it should have 6 parts!");

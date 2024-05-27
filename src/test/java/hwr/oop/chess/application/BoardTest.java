@@ -208,8 +208,8 @@ class BoardTest {
 
   @Test
   void testCheckMateBlackKing_e4() {
-    String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8";
-    FenNotation.parseFENOnlyPiecePlacement(board, fenString);
+    String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - - 0 4";
+    FenNotation.parseFEN(board, fenString);
     assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
   }
 

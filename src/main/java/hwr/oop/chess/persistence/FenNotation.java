@@ -16,18 +16,6 @@ public class FenNotation {
     this.board = board;
   }
 
-  public static void parseFENOnlyPiecePlacement(Board board, String fenString) {
-    List<String> parts = List.of(fenString.split(" "));
-    if (parts.size() != 1) {
-      throw new IllegalArgumentException(
-          "This is an invalid FEN string, as it should have 1 part!");
-    }
-
-    FenNotation fen = new FenNotation(board);
-    fen.parsePiecePlacement(parts.getFirst());
-    fen.setCastlingImpossibleIfKingIsNotOnStartField();
-  }
-
   public static void parseFEN(Board board, String fenString) {
     List<String> parts = List.of(fenString.split(" "));
     if (parts.size() != 6) {
@@ -43,6 +31,7 @@ public class FenNotation {
     fen.parseEnPassant(parts.get(3));
     fen.parseHalfMove(parts.get(4));
     fen.parseFullMove(parts.getLast());
+//    fen.setCastlingImpossibleIfKingIsNotOnStartField();
 
     board.initializeWith(fen.turn, fen.halfMove, fen.fullMove);
   }
@@ -174,16 +163,16 @@ public class FenNotation {
     return castling.isEmpty() ? "-" : castling.toString();
   }
 
-  private void setCastlingImpossibleIfKingIsNotOnStartField() {
-    Cell whiteKingCell = board.findKing(FigureColor.WHITE);
-    if (whiteKingCell.x() != 5 || whiteKingCell.y() != 1) {
-      ((King) whiteKingCell.figure()).figureMoved();
-    }
-    Cell blackKingCell = board.findKing(FigureColor.BLACK);
-    if (blackKingCell.x() != 5 || blackKingCell.y() != 8) {
-      ((King) blackKingCell.figure()).figureMoved();
-    }
-  }
+//  private void setCastlingImpossibleIfKingIsNotOnStartField() {
+//    Cell whiteKingCell = board.findKing(FigureColor.WHITE);
+//    if (whiteKingCell.x() != 5 || whiteKingCell.y() != 1) {
+//      ((King) whiteKingCell.figure()).figureMoved();
+//    }
+//    Cell blackKingCell = board.findKing(FigureColor.BLACK);
+//    if (blackKingCell.x() != 5 || blackKingCell.y() != 8) {
+//      ((King) blackKingCell.figure()).figureMoved();
+//    }
+//  }
 
   private void parseEnPassant(String enPassantStr) {
     if (!enPassantStr.equals("-")) {
