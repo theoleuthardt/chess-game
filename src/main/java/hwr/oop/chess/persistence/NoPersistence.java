@@ -1,10 +1,14 @@
 package hwr.oop.chess.persistence;
 
+import java.util.Arrays;
+
 public class NoPersistence implements Persistence {
   public enum GameIdType {
     NO_GAME,
     PAWN_PROMOTION,
-    DEFAULT_POSITIONS
+    DEFAULT_POSITIONS,
+    WHITE_CHECK_POSSIBLE,
+    BLACK_CHECK_POSSIBLE,
   }
 
   private int gameId;
@@ -22,11 +26,15 @@ public class NoPersistence implements Persistence {
   }
 
   public String loadState(String key) {
-    if (gameId == GameIdType.PAWN_PROMOTION.ordinal() && key.equals("fen")) {
-      return "2PP4/8/8/8/7k/8/PP6/7K w - - 0 1";
-    }
-    if (gameId == GameIdType.DEFAULT_POSITIONS.ordinal() && key.equals("fen")) {
-      return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    GameIdType type = Arrays.stream(GameIdType.values()).filter(x -> x.ordinal() == gameId).findFirst().orElse(null);
+    if(key.equals("fen")) {
+      return switch (type) {
+        case GameIdType.PAWN_PROMOTION -> "2PP4/8/8/8/7k/8/PP6/7K w - - 0 1";
+        case GameIdType.DEFAULT_POSITIONS -> "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        case GameIdType.WHITE_CHECK_POSSIBLE -> "8/8/k7/8/8/8/PP3q2/1K6 b - - 0 1";
+        case GameIdType.BLACK_CHECK_POSSIBLE -> "8/8/K7/8/8/8/pp3Q2/1k6 w - - 0 1";
+        case null, default -> null;
+      };
     }
     return null;
   }
