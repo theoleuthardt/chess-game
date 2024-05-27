@@ -460,7 +460,7 @@ class BoardTest {
 
     board.moveFigure('e', 8, 'g', 8); // 15. O-O Black King Castling
     fen = FenNotation.generateFen(board);
-    assertThat(fen).isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w  - 2 15");
+    assertThat(fen).isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w - - 2 15");
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
     assertThat(((Rook) board.findCell(6, 8).figure()).hasMoved()).isTrue();
     assertThat(((King) board.findCell(7, 8).figure()).hasMoved()).isTrue();

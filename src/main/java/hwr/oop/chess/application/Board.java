@@ -329,6 +329,7 @@ public class Board {
     this.halfMove = -1;
     startCell.setFigure(null);
     endCell.setFigure(figure);
+    endCell.setIsEnPassant(false);
 
     CellDirection backwards =
         ((Pawn) figure).forwards() == CellDirection.TOP ? CellDirection.BOTTOM : CellDirection.TOP;
