@@ -236,13 +236,20 @@ class PawnTest {
     Board board = new Board(false);
     FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - e6 0 1");
     Cell from = board.findCell('f', 5);
+    Pawn pawn = (Pawn) from.figure();
     Cell opponent = board.findCell('e', 5);
     Cell to = board.findCell('e', 6);
 
+    assertThat(pawn.canPerformEnPassant(from, to)).isTrue();
+    assertThat(pawn.canPerformEnPassant(from, board.findCell('f', 6))).isFalse();
+    assertThat(pawn.canPerformEnPassant(from, board.findCell('f', 4))).isFalse();
+    assertThat(pawn.canPerformEnPassant(from, board.findCell('g', 6))).isFalse();
     assertThat(from.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
     assertThat(opponent.isOccupiedBy(FigureColor.BLACK, FigureType.PAWN)).isTrue();
     assertThat(to.isFree()).isTrue();
+
     board.moveFigure(from, to);
+
     assertThat(from.isFree()).isTrue();
     assertThat(opponent.isFree()).isTrue();
     assertThat(to.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
@@ -253,9 +260,14 @@ class PawnTest {
     Board board = new Board(false);
     FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - - 0 1");
     Cell from = board.findCell('f', 5);
+    Pawn pawn = (Pawn) from.figure();
     Cell opponent = board.findCell('e', 5);
     Cell to = board.findCell('e', 6);
 
+    assertThat(pawn.canPerformEnPassant(from, to)).isFalse();
+    assertThat(pawn.canPerformEnPassant(from, board.findCell('f', 6))).isFalse();
+    assertThat(pawn.canPerformEnPassant(from, board.findCell('f', 4))).isFalse();
+    assertThat(pawn.canPerformEnPassant(from, board.findCell('g', 6))).isFalse();
     assertThat(from.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
     assertThat(opponent.isOccupiedBy(FigureColor.BLACK, FigureType.PAWN)).isTrue();
     assertThat(to.isFree()).isTrue();
