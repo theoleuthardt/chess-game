@@ -88,4 +88,26 @@ class KnightTest {
     assertThat(knight.type()).isEqualTo(FigureType.KNIGHT);
     assertThat(knight.canMoveTo(from, to)).isFalse();
   }
+
+  @Test
+  void moveWhiteKnight_cannotMoveIntoVoid1() {
+    Cell from = board.findCell('b', 1);
+    Cell to = board.findCell('a', 3);
+
+    Figure knight = from.figure();
+    assertThat(knight.type()).isEqualTo(FigureType.KNIGHT);
+    assertThat(knight.canMoveTo(from, to)).isTrue();
+    board.moveFigure(from, to);
+    assertThat(knight.canMoveTo(to, from)).isTrue();
+  }
+
+  @Test
+  void moveWhiteKnight_ifOccupied() {
+    Cell from = board.findCell('b', 1);
+    Cell to = board.findCell('d',2);
+
+    Figure knight = from.figure();
+    assertThat(knight.type()).isEqualTo(FigureType.KNIGHT);
+    assertThat(knight.canMoveTo(from, to)).isFalse();
+  }
 }
