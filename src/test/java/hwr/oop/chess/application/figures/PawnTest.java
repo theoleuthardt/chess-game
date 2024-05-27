@@ -203,6 +203,8 @@ class PawnTest {
     Cell currentCell = board.findCell('a', 7);
     assertThrows(
         InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.KING));
+    assertThrows(
+        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.PAWN));
   }
 
   @Test

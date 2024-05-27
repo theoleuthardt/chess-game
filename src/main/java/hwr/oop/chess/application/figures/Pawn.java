@@ -5,6 +5,7 @@ import hwr.oop.chess.application.CellDirection;
 import hwr.oop.chess.cli.InvalidUserInputException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Pawn implements Figure {
@@ -24,13 +25,12 @@ public class Pawn implements Figure {
   }
 
   public List<Cell> availableCells(Cell currentCell) {
-    List<Cell> cells = new ArrayList<>();
 
     Cell oneFieldForwards = currentCell.cellInDirection(forwards());
     if (!currentCell.hasCellInDirection(forwards())) {
-      return cells;
+      return Collections.emptyList();
     }
-
+    List<Cell> cells = new ArrayList<>();
     // move one field forwards
     if (oneFieldForwards.isFree()) {
       cells.add(oneFieldForwards);
@@ -80,9 +80,6 @@ public class Pawn implements Figure {
       throw new InvalidUserInputException("The pawn cannot become a " + toType.name() + ".");
     }
     Figure promoteTo = Figure.fromTypeAndColor(toType, color());
-    if (promoteTo.type() == FigureType.ROOK) {
-      ((Rook) promoteTo).figureMoved();
-    }
     currentCell.setFigure(promoteTo);
   }
 
