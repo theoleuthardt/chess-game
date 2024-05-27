@@ -4,125 +4,222 @@ import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.figures.*;
 
-import java.util.List;
+import java.util.*;
 
 public class FenNotation {
-  private FenNotation() {}
+  private final Board board;
+  private FigureColor turn;
+  private int halfMove;
+  private int fullMove;
 
-  public static void placeFigureFromFEN(Board board, String fenString) {
-    int y = 8;
-    int x = 1;
+  private FenNotation(Board board) {
+    this.board = board;
+  }
 
-    for (char c : fenString.toCharArray()) {
-      if (c == ' ') {
-        break;
-      }
-      if (c == '/') {
-        // Change Row
-        y--;
-        x = 1;
-      } else {
-        // Pass without figures
+  public static void parseFENOnlyPiecePlacement(Board board, String fenString) {
+    List<String> parts = List.of(fenString.split(" "));
+    if (parts.size() != 1) {
+      throw new IllegalArgumentException(
+          "This is an invalid FEN string, as it should have 1 part!");
+    }
+
+    FenNotation fen = new FenNotation(board);
+    fen.parsePiecePlacement(parts.getFirst());
+    fen.setCastlingImpossibleIfKingIsNotOnStartField();
+  }
+
+  public static void parseFEN(Board board, String fenString) {
+    List<String> parts = List.of(fenString.split(" "));
+    if (parts.size() != 6) {
+      throw new IllegalArgumentException(
+          "This is an invalid FEN string, as it should have 6 parts!");
+    }
+
+    FenNotation fen = new FenNotation(board);
+    fen.parsePiecePlacement(parts.getFirst());
+    fen.parseTurn(parts.get(1));
+    fen.parseCastlingForRook(parts.get(2));
+    fen.parseCastlingForKing(parts.get(2));
+    fen.parseEnPassant(parts.get(3));
+    fen.parseHalfMove(parts.get(4));
+    fen.parseFullMove(parts.getLast());
+    fen.setCastlingImpossibleIfKingIsNotOnStartField();
+
+    board.initializeWith(fen.turn, fen.halfMove, fen.fullMove);
+  }
+
+  public static String generateFen(Board board) {
+    FenNotation fen = new FenNotation(board);
+    StringJoiner joiner = new StringJoiner(" ");
+
+    joiner.add(fen.generatePiecePlacement());
+    joiner.add(fen.generateTurn());
+    joiner.add(fen.generateCastling());
+    joiner.add(fen.generateEnPassant());
+    joiner.add(fen.generateHalfMove());
+    joiner.add(fen.generateFullMove());
+
+    return joiner.toString();
+  }
+
+  private void parsePiecePlacement(String pieces) {
+    List<Cell> allCells = board.allCells();
+    List<String> rows = List.of(pieces.split("/"));
+    for (String row : rows) {
+      for (char c : row.toCharArray()) {
         if (Character.isDigit(c)) {
           int emptySpaces = Character.getNumericValue(c);
-          x = x + emptySpaces;
-        } else {
-          // Place the figures
-          board.findCell(x, y).setFigure(charToFigureType(c));
-          x++;
+          for (int i = 0; i < emptySpaces; i++) {
+            Cell cell = allCells.removeFirst();
+            cell.setFigure(null);
+          }
+          continue;
         }
+
+        Cell cell = allCells.removeFirst();
+        cell.setFigure(Figure.fromChar(c));
       }
     }
   }
 
-  public static String generateFENFromBoard(Board board) {
-    List<Cell> cells = board.allCells();
-    StringBuilder fenString = new StringBuilder();
+  private String generatePiecePlacement() {
+    StringJoiner rows = new StringJoiner("/");
+    StringBuilder row = new StringBuilder();
+    int emptyCount = 0;
 
-    int count = 0; // empty cells
-    int x = 1;
-    for (Cell cell : cells) {
-      if (cell.figure() == null) {
-        count++;
-        if (x != 8) {
-          x++;
-        } else {
-          // Add empty cells as number
-          fenString.append(count);
-          fenString.append('/');
-          count = 0;
-          x = 1;
-        }
+    List<Cell> allCells = board.allCells();
+    allCells.sort(
+        (c1, c2) -> {
+          if (c1.y() == c2.y()) {
+            return Integer.compare(c1.x(), c2.x());
+          }
+          return Integer.compare(c1.y(), c2.y());
+        });
+
+    for (Cell cell : allCells) {
+      if (cell.isFree()) {
+        emptyCount++;
+      }
+
+      if (emptyCount > 0 && (cell.isOccupied() || !cell.hasRightCell())) {
+        row.append(emptyCount);
+        emptyCount = 0;
+      }
+
+      if (cell.isOccupied()) {
+        row.append(cell.figure().symbol());
+      }
+
+      if (!cell.hasRightCell()) {
+        rows.add(row.toString());
+        row.setLength(0);
+      }
+    }
+    return String.join("/", Arrays.asList(rows.toString().split("/")).reversed());
+  }
+
+  private void parseTurn(String turn) {
+    this.turn = turn.charAt(0) == 'w' ? FigureColor.WHITE : FigureColor.BLACK;
+  }
+
+  private String generateTurn() {
+    return board.turn().equals(FigureColor.WHITE) ? "w" : "b";
+  }
+
+  private void parseCastlingForRook(String castling) {
+    for (char c : List.of('Q', 'K', 'q', 'k')) {
+      if (castling.indexOf(c) > -1) {
         continue;
       }
-      // Cell has Figure
-      if (count > 0) {
-        // Add previous empty cells as number
-        fenString.append(count);
-        count = 0;
-      }
-      if (isCharValid(cell.figure().symbol())) {
-        // Add Figure as symbol
-        fenString.append(cell.figure().symbol());
-      }
-      if (x != 8) {
-        x++;
-      } else {
-        fenString.append('/');
-        x = 1;
-      }
-    }
-    // Delete last '/'
-    fenString.replace(fenString.length() - 1, fenString.length(), " ");
-    fenString.append(board.turn() == FigureColor.WHITE ? 'w' : 'b');
-    fenString.append(" ");
-    if(!board.castlingWhiteKing()){
-      fenString.append('K');
-    }
-    if(!board.castlingWhiteQueen()){
-      fenString.append('Q');
-    }
-    if(!board.castlingBlackKing()){
-      fenString.append('k');
-    }
-    if(!board.castlingBlackQueen()){
-      fenString.append('q');
-    }
+      FigureColor color = Character.isUpperCase(c) ? FigureColor.WHITE : FigureColor.BLACK;
+      int x = Character.toLowerCase(c) == 'q' ? 1 : 8;
+      int y = Character.isLowerCase(c) ? 8 : 1;
 
-    fenString.append(" ");
-    fenString.append(board.enPassant());
-    fenString.append(" ");
-    fenString.append(board.halfmoveClockBlack());
-    fenString.append(" ");
-    fenString.append(board.fullmoveNumber());
-
-    return fenString.toString();
+      Cell rookCell = board.findCell(x, y);
+      if (rookCell.isOccupiedBy(color, FigureType.ROOK)) {
+        ((Rook) rookCell.figure()).figureMoved();
+      }
+    }
   }
 
+  private void parseCastlingForKing(String castling) {
+    if (!castling.contains("Q") && !castling.contains("K")) {
+      Cell kingCell = board.findKing(FigureColor.WHITE);
+      ((King) kingCell.figure()).figureMoved();
+    }
+
+    if (!castling.contains("q") && !castling.contains("k")) {
+      Cell kingCell = board.findKing(FigureColor.BLACK);
+      ((King) kingCell.figure()).figureMoved();
+    }
+  }
+
+  private String generateCastling() {
+    StringBuilder castling = new StringBuilder();
+    for (char c : List.of('K', 'Q', 'k', 'q')) {
+      FigureColor color = Character.isUpperCase(c) ? FigureColor.WHITE : FigureColor.BLACK;
+      Cell kingCell = board.findKing(color);
+      King king = (King) kingCell.figure();
+      if (king.hasMoved()) {
+        continue;
+      }
+
+      int x = Character.toLowerCase(c) == 'q' ? 1 : 8;
+      int y = Character.isLowerCase(c) ? 8 : 1;
+      Cell rookCell = board.findCell(x, y);
+      if (rookCell.isOccupiedBy(color, FigureType.ROOK) && !((Rook) rookCell.figure()).hasMoved()) {
+        castling.append(c);
+      }
+    }
+    return castling.isEmpty() ? "-" : castling.toString();
+  }
+
+  private void setCastlingImpossibleIfKingIsNotOnStartField() {
+    Cell whiteKingCell = board.findKing(FigureColor.WHITE);
+    if (whiteKingCell.x() != 5 || whiteKingCell.y() != 1) {
+      ((King) whiteKingCell.figure()).figureMoved();
+    }
+    Cell blackKingCell = board.findKing(FigureColor.BLACK);
+    if (blackKingCell.x() != 5 || blackKingCell.y() != 8) {
+      ((King) blackKingCell.figure()).figureMoved();
+    }
+  }
+
+  private void parseEnPassant(String enPassantStr) {
+    if (!enPassantStr.equals("-")) {
+      board.findCell(enPassantStr).setIsEnPassant(true);
+    }
+  }
+
+  private String generateEnPassant() {
+    for (Cell cell : board.allCells()) {
+      if (cell.isEnPassant()) {
+        return cell.toCoordinates().toLowerCase();
+      }
+    }
+    return "-";
+  }
+
+  private void parseHalfMove(String halfMove) {
+    this.halfMove = Integer.parseInt(halfMove);
+  }
+
+  private String generateHalfMove() {
+    return String.valueOf(board.halfMove());
+  }
+
+  private void parseFullMove(String fullMove) {
+    this.fullMove = Integer.parseInt(fullMove);
+  }
+
+  private String generateFullMove() {
+    return String.valueOf(board.fullMove());
+  }
 
   public static boolean isCharValid(char c) {
-    c = Character.toLowerCase(c);
-    return switch (c) {
+    return switch (Character.toLowerCase(c)) {
       case 'b', 'k', 'n', 'p', 'q', 'r' -> true;
       default -> false;
-    };
-  }
-
-  public static Figure charToFigureType(char ch) {
-    return switch (ch) {
-      case 'b' -> new Bishop(FigureColor.BLACK);
-      case 'k' -> new King(FigureColor.BLACK);
-      case 'n' -> new Knight(FigureColor.BLACK);
-      case 'p' -> new Pawn(FigureColor.BLACK);
-      case 'q' -> new Queen(FigureColor.BLACK);
-      case 'r' -> new Rook(FigureColor.BLACK);
-      case 'B' -> new Bishop(FigureColor.WHITE);
-      case 'K' -> new King(FigureColor.WHITE);
-      case 'N' -> new Knight(FigureColor.WHITE);
-      case 'P' -> new Pawn(FigureColor.WHITE);
-      case 'Q' -> new Queen(FigureColor.WHITE);
-      case 'R' -> new Rook(FigureColor.WHITE);
-      default -> throw new IllegalArgumentException("Invalid char for figure type!");
     };
   }
 }

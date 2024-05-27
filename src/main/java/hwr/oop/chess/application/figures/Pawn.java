@@ -5,6 +5,7 @@ import hwr.oop.chess.application.CellDirection;
 import hwr.oop.chess.cli.InvalidUserInputException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Pawn implements Figure {
@@ -19,53 +20,48 @@ public class Pawn implements Figure {
     return cell.y() == (color == FigureColor.WHITE ? 2 : 7);
   }
 
-  private CellDirection forwards() {
+  public CellDirection forwards() {
     return color() == FigureColor.WHITE ? CellDirection.TOP : CellDirection.BOTTOM;
   }
 
-  public List<Cell> getAvailableCells(Cell currentCell) {
-    List<Cell> cells = new ArrayList<>();
+  public List<Cell> availableCells(Cell currentCell) {
 
     Cell oneFieldForwards = currentCell.cellInDirection(forwards());
-    if (oneFieldForwards == null) {
-      return cells;
+    if (!currentCell.hasCellInDirection(forwards())) {
+      return Collections.emptyList();
     }
-
-    Cell twoFieldForwards = oneFieldForwards.cellInDirection(forwards());
-
+    List<Cell> cells = new ArrayList<>();
     // move one field forwards
     if (oneFieldForwards.isFree()) {
       cells.add(oneFieldForwards);
     }
 
     // move two fields forwards
-    if (isInStartPosition(currentCell)
-        && twoFieldForwards != null
-        && oneFieldForwards.isFree()
-        && twoFieldForwards.isFree()) {
+    Cell twoFieldForwards = oneFieldForwards.cellInDirection(forwards());
+    if (isInStartPosition(currentCell) && oneFieldForwards.isFree() && twoFieldForwards.isFree()) {
       cells.add(twoFieldForwards);
     }
 
     // move one field diagonally left
     Cell diagonalLeftCell = oneFieldForwards.leftCell();
-    if (diagonalLeftCell != null
-        && diagonalLeftCell.isOccupied()
-        && diagonalLeftCell.figure().color() != color()) {
+    if (oneFieldForwards.hasLeftCell()
+        && (diagonalLeftCell.isOccupiedByOpponentOf(color())
+            || canPerformEnPassant(currentCell, diagonalLeftCell))) {
       cells.add(diagonalLeftCell);
     }
 
     // move one field diagonally right
     Cell diagonalRightCell = oneFieldForwards.rightCell();
-    if (diagonalRightCell != null
-        && diagonalRightCell.isOccupied()
-        && diagonalRightCell.figure().color() != color()) {
+    if (oneFieldForwards.hasRightCell()
+        && (diagonalRightCell.isOccupiedByOpponentOf(color())
+            || canPerformEnPassant(currentCell, diagonalRightCell))) {
       cells.add(diagonalRightCell);
     }
     return cells;
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    List<Cell> availableCell = getAvailableCells(prevCell);
+    List<Cell> availableCell = availableCells(prevCell);
     return availableCell.contains(nextCell);
   }
 
@@ -79,12 +75,12 @@ public class Pawn implements Figure {
       throw new InvalidUserInputException(
           "The pawn is not allowed to be promoted as it has not reached the end.");
     }
-    List<FigureType> canPromoteTo =
-        List.of(FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
+    List<FigureType> canPromoteTo = getPromotionTypes();
     if (!canPromoteTo.contains(toType)) {
       throw new InvalidUserInputException("The pawn cannot become a " + toType.name() + ".");
     }
-    currentCell.setFigure(getFigureFromTypeAndColor(toType, color()));
+    Figure promoteTo = Figure.fromTypeAndColor(toType, color());
+    currentCell.setFigure(promoteTo);
   }
 
   public char symbol() {
@@ -101,5 +97,24 @@ public class Pawn implements Figure {
 
   public List<FigureType> getPromotionTypes() {
     return List.of(FigureType.QUEEN, FigureType.ROOK, FigureType.BISHOP, FigureType.KNIGHT);
+  }
+
+  public boolean canPerformEnPassant(Cell startCell, Cell endCell) {
+    if (!endCell.isEnPassant()) {
+      return false;
+    }
+
+    Cell forwardsCell = startCell.cellInDirection(forwards());
+    CellDirection direction;
+    if (endCell.isEqualTo(forwardsCell.leftCell())) {
+      direction = CellDirection.LEFT;
+    } else if (endCell.isEqualTo(forwardsCell.rightCell())) {
+      direction = CellDirection.RIGHT;
+    } else {
+      return false;
+    }
+
+    Cell opponentPawnCell = startCell.cellInDirection(direction);
+    return opponentPawnCell.isOccupiedBy(color().opposite(), FigureType.PAWN);
   }
 }

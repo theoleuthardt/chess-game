@@ -4,12 +4,14 @@ import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 import hwr.oop.chess.cli.InvalidUserInputException;
+import hwr.oop.chess.persistence.FenNotation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -20,6 +22,12 @@ class PawnTest {
   public void setUp() {
     // Initialize the board
     board = new Board(true);
+  }
+
+  @Test
+  void pawn_hasTypePawn() {
+    Pawn pawn = new Pawn(FigureColor.WHITE);
+    assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
   }
 
   @Test
@@ -101,10 +109,14 @@ class PawnTest {
   void movePawn_noCellAvailableOnLastRow() {
     Board board = new Board(false);
     Figure blackPawn = new Pawn(FigureColor.BLACK);
-    assertThat(blackPawn.getAvailableCells(board.findCell(3, 1))).isEmpty();
+    Cell blackPawnCell = board.findCell(3, 1);
+    blackPawnCell.setFigure(blackPawn);
+    assertThat(board.availableCellsWithoutCheckMoves(blackPawnCell)).isEmpty();
 
     Figure whitePawn = new Pawn(FigureColor.WHITE);
-    assertThat(whitePawn.getAvailableCells(board.findCell(3, 8))).isEmpty();
+    Cell whitePawnCell = board.findCell(3, 8);
+    whitePawnCell.setFigure(whitePawn);
+    assertThat(board.availableCellsWithoutCheckMoves(whitePawnCell)).isEmpty();
   }
 
   void pawnDiagonalTest(FigureColor pawnColor, FigureColor diagonalColor, boolean expectedResult) {
@@ -181,7 +193,6 @@ class PawnTest {
     Pawn pawn = new Pawn(FigureColor.WHITE);
     Board board = new Board(true);
     Cell currentCell = board.findCell('a', 7);
-    currentCell.setCellInDirection(CellDirection.TOP, new Cell('a', 8));
 
     assertFalse(pawn.isAbleToPromote(currentCell));
   }
@@ -193,6 +204,8 @@ class PawnTest {
     Cell currentCell = board.findCell('a', 7);
     assertThrows(
         InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.KING));
+    assertThrows(
+        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.PAWN));
   }
 
   @Test
@@ -203,5 +216,80 @@ class PawnTest {
 
     assertThrows(
         InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.QUEEN));
+  }
+
+  @Test
+  void pawn_testHalfMove() {
+    board = new Board(false);
+    String initialStatus = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 3 1";
+    FenNotation.parseFEN(board, initialStatus);
+
+    board.moveFigure("b2", "b3");
+    String afterPawnMove = "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1";
+
+    String changedStatus = FenNotation.generateFen(board);
+    assertThat(changedStatus).isEqualTo(afterPawnMove);
+  }
+
+  @Test
+  void canPerformEnPassant_isAllowed() {
+    Board board = new Board(false);
+    FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - e6 0 1");
+    Cell from = board.findCell('f', 5);
+    Pawn pawn = (Pawn) from.figure();
+    Cell opponent = board.findCell('e', 5);
+    Cell to = board.findCell('e', 6);
+
+    assertThat(pawn.canPerformEnPassant(from, to)).isTrue();
+    Cell f6 = board.findCell('f', 6);
+    f6.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, f6)).isFalse();
+
+    Cell f4 = board.findCell('f', 4);
+    f4.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, f4)).isFalse();
+
+    Cell g6 = board.findCell('g', 6);
+    g6.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, g6)).isFalse();
+    assertThat(from.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
+    assertThat(opponent.isOccupiedBy(FigureColor.BLACK, FigureType.PAWN)).isTrue();
+    assertThat(to.isFree()).isTrue();
+
+    board.moveFigure(from, to);
+
+    assertThat(from.isFree()).isTrue();
+    assertThat(opponent.isFree()).isTrue();
+    assertThat(to.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
+  }
+
+  @Test
+  void canPerformEnPassant_isNotAllowed() {
+    Board board = new Board(false);
+    FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - - 0 1");
+    Cell from = board.findCell('f', 5);
+    Pawn pawn = (Pawn) from.figure();
+    Cell opponent = board.findCell('e', 5);
+    Cell to = board.findCell('e', 6);
+
+    assertThat(pawn.canPerformEnPassant(from, to)).isFalse();
+    Cell f6 = board.findCell('f', 6);
+    f6.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, f6)).isFalse();
+
+    Cell f4 = board.findCell('f', 4);
+    f4.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, f4)).isFalse();
+
+    Cell g6 = board.findCell('g', 6);
+    g6.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, g6)).isFalse();
+    assertThat(from.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
+    assertThat(opponent.isOccupiedBy(FigureColor.BLACK, FigureType.PAWN)).isTrue();
+    assertThat(to.isFree()).isTrue();
+
+    assertThatThrownBy(() -> board.moveFigure(from, to))
+        .isInstanceOf(InvalidUserInputException.class)
+        .hasMessageContaining("The figure can't move to that cell");
   }
 }

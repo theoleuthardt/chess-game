@@ -1,4 +1,5 @@
 # ♟️ CHESS GAME by Group 3!
+
 Members: Hyejin, Aylin, Vasja, Jonas and Theo
 
 This repository contains a student project created for an ongoing lecture on object-oriented programming
@@ -78,42 +79,49 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 
 ### Library
 
-| Number | Feature         | Tests              |
-|--------|-----------------|--------------------|
-| 1      | Board           | :heavy_check_mark: |
-| 2      | Figure          | :heavy_check_mark: |
-| 3      | FigureType      | :heavy_check_mark: |
-| 4      | FigureColor     | :heavy_check_mark: |
-| 5      | Bishop          | :heavy_check_mark: |
-| 6      | King            | :heavy_check_mark: |
-| 7      | Knight          | :heavy_check_mark: |
-| 8      | Pawn            | :heavy_check_mark: |
-| 9      | Queen           | :heavy_check_mark: |
-| 10     | Rook            | :heavy_check_mark: |
-| 11     | Figure Movement | :heavy_check_mark: |
-| 12     | Cell            | :heavy_check_mark: |
-| 13     | CellDirection   | :heavy_check_mark: |
-| 14     | ChessGame       | :x:                |
+| Number | Feature         | Implemented        | Tests              |
+|--------|-----------------|--------------------|--------------------|
+| 1      | Board           | :heavy_check_mark: | :heavy_check_mark: |
+| 2      | Figure          | :heavy_check_mark: | :heavy_check_mark: |
+| 3      | FigureType      | :heavy_check_mark: | :heavy_check_mark: |
+| 4      | FigureColor     | :heavy_check_mark: | :heavy_check_mark: |
+| 5      | Bishop          | :heavy_check_mark: | :heavy_check_mark: |
+| 6      | King            | :heavy_check_mark: | :heavy_check_mark: |
+| 7      | Knight          | :heavy_check_mark: | :heavy_check_mark: |
+| 8      | Pawn            | :heavy_check_mark: | :heavy_check_mark: |
+| 9      | Queen           | :heavy_check_mark: | :heavy_check_mark: |
+| 10     | Rook            | :heavy_check_mark: | :heavy_check_mark: |
+| 11     | Figure Movement | :heavy_check_mark: | :heavy_check_mark: |
+| 12     | Cell            | :heavy_check_mark: | :heavy_check_mark: |
+| 13     | CellDirection   | :heavy_check_mark: | :heavy_check_mark: |
+| 14     | ChessGame       | :heavy_check_mark: | :x:                |
+| 15     | Tournament      | :x:                | :x:                |
 
 ### CLI
 
-| Number | Feature             | Tests              |
-|--------|---------------------|--------------------|
-| 1      | Create Game         | :x:                |
-| 2      | Show Help           | :heavy_check_mark: |
-| 3      | Show Board          | :heavy_check_mark: |
-| 4      | Move Figure         | :x:                |
-| 5      | Promotion           | :x:                |
-| 6      | Show Possible Moves | :x:                |
+| Number | Feature             | Implemented        | Tests              |
+|--------|---------------------|--------------------|--------------------|
+| 1      | Create Game         | :heavy_check_mark: | :heavy_check_mark: |
+| 2      | Show Help           | :heavy_check_mark: | :heavy_check_mark: |
+| 3      | Show Board          | :heavy_check_mark: | :heavy_check_mark: |
+| 4      | Move Figure         | :heavy_check_mark: | :heavy_check_mark: |
+| 5      | Promotion           | :heavy_check_mark: | :heavy_check_mark: |
+| 6      | Show Possible Moves | :heavy_check_mark: | :x:                |
+| 7      | Surrender           | :x:                | :x:                |
+| 8      | Offer Remi          | :x:                | :x:                |
+| 9      | Accept Remi         | :x:                | :x:                |
+| 10     | Create Tournament   | :x:                | :x:                |
 
 ### Persistence
 
-| Number | Feature      | Tests              |
-|--------|--------------|--------------------|
-| 1      | Player       | :heavy_check_mark: |
-| 2      | FEN Notation | :heavy_check_mark: |
-| 3      | Save Game    | :x:                |
-| 4      | Load Game    | :x:                |
+| Number | Feature         | Implemented        | Tests              |
+|--------|-----------------|--------------------|--------------------|
+| 1      | Player          | :heavy_check_mark: | :heavy_check_mark: |
+| 2      | FEN Notation    | :heavy_check_mark: | :heavy_check_mark: |
+| 3      | Save Game       | :heavy_check_mark: | :x:                |
+| 4      | Load Game       | :heavy_check_mark: | :x:                |
+| 5      | Save Tournament | :x:                | :x:                |
+| 6      | Load Tournament | :x:                | :x:                |
 
 ## Additional Dependencies
 

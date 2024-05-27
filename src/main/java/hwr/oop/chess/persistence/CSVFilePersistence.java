@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class CSVFilePersistence implements Persistence {
   private final Map<String, String> gameData = new HashMap<>();
+  private int gameId;
 
   public void storeState(String key, String value) {
     gameData.put(key, value);
@@ -24,7 +25,18 @@ public class CSVFilePersistence implements Persistence {
     return "game_" + gameId + ".csv";
   }
 
-  public void loadGame(int gameId) {
+  public void setGameId(int gameId) {
+    if (gameId <= 0) {
+      throw new InvalidUserInputException("The game ID must be a positive integer (1 or larger).");
+    }
+    this.gameId = gameId;
+  }
+
+  public int gameId() {
+    return gameId;
+  }
+
+  public void loadGame() {
     try (BufferedReader reader = new BufferedReader(new FileReader(fileName(gameId)))) {
       gameData.clear();
       String line;
@@ -44,7 +56,7 @@ public class CSVFilePersistence implements Persistence {
     }
   }
 
-  public void saveGame(int gameId) {
+  public void saveGame() {
     try (FileWriter writer = new FileWriter(fileName(gameId))) {
       for (Map.Entry<String, String> entry : gameData.entrySet()) {
         writer.write(entry.getKey() + "," + entry.getValue() + "\n");

@@ -1,20 +1,49 @@
 package hwr.oop.chess.persistence;
 
+import java.util.Arrays;
+
 public class NoPersistence implements Persistence {
+  public enum GameIdType {
+    NO_GAME,
+    PAWN_PROMOTION,
+    DEFAULT_POSITIONS,
+    WHITE_CHECK_POSSIBLE,
+    BLACK_CHECK_POSSIBLE,
+  }
+
+  private int gameId;
+
+  public void setGameId(int gameId) {
+    this.gameId = gameId;
+  }
+
+  public int gameId() {
+    return gameId;
+  }
 
   public void storeState(String key, String value) {
     // Some tests need a NoPersistence adapter which does nothing
   }
 
   public String loadState(String key) {
+    GameIdType type = Arrays.stream(GameIdType.values()).filter(x -> x.ordinal() == gameId).findFirst().orElse(null);
+    if(key.equals("fen")) {
+      return switch (type) {
+        case GameIdType.PAWN_PROMOTION -> "2PP4/8/8/8/7k/8/PP6/7K w - - 0 1";
+        case GameIdType.DEFAULT_POSITIONS -> "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        case GameIdType.WHITE_CHECK_POSSIBLE -> "8/8/k7/8/8/8/PP3q2/1K6 b - - 0 1";
+        case GameIdType.BLACK_CHECK_POSSIBLE -> "8/8/K7/8/8/8/pp3Q2/1k6 w - - 0 1";
+        case null, default -> null;
+      };
+    }
     return null;
   }
 
-  public void loadGame(int gameId) {
+  public void loadGame() {
     // Some tests need a NoPersistence adapter which does nothing
   }
 
-  public void saveGame(int gameId) {
+  public void saveGame() {
     // Some tests need a NoPersistence adapter which does nothing
   }
 }

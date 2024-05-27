@@ -1,31 +1,16 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.*;
-import hwr.oop.chess.cli.CLIAdapter;
 import hwr.oop.chess.cli.InvalidUserInputException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static hwr.oop.chess.persistence.FenNotation.charToFigureType;
-
 public class Board {
-  private CLIAdapter cli;
   private Cell firstCell;
-  private boolean castlingWhiteKing;
-  private boolean castlingWhiteQueen;
-  private boolean castlingBlackKing;
-  private boolean castlingBlackQueen;
-  private String enPassant;
-  private int halfmoveClockWhite;
-  private int halfmoveClockBlack;
-  private int fullmoveNumber;
-  private FigureColor turn;
-
-  public Board(CLIAdapter cli) {
-    this.cli = cli;
-    initializeBoard();
-  }
+  private int halfMove = 0;
+  private int fullMove = 0;
+  private FigureColor turn = FigureColor.WHITE;
 
   public Board(boolean setFigures) {
     initializeBoard();
@@ -67,6 +52,12 @@ public class Board {
     }
   }
 
+  public void initializeWith(FigureColor turn, int halfMove, int fullMove) {
+    this.turn = turn;
+    this.halfMove = halfMove;
+    this.fullMove = fullMove;
+  }
+
   // Method to connect each cell
   public void connectCells(Cell currentCell, Cell anotherCell) {
     if (anotherCell != null && currentCell != null) {
@@ -81,15 +72,12 @@ public class Board {
 
   public List<Cell> allCells() {
     ArrayList<Cell> cells = new ArrayList<>();
-    Cell cell = firstCell;
-    while (cell.topCell() != null) {
-      cell = cell.topCell();
-    }
+    Cell cell = firstCell.allCellsInDirection(CellDirection.TOP).getLast();
     Cell rowStart = cell;
 
     while (cell != null) {
       cells.add(cell);
-      if (cell.rightCell() != null) {
+      if (cell.hasRightCell()) {
         cell = cell.rightCell();
       } else {
         cell = rowStart = rowStart.bottomCell();
@@ -111,8 +99,7 @@ public class Board {
   }
 
   public Cell findCell(int x, int y) {
-    List<Cell> cells = allCells();
-    for (Cell cell : cells) {
+    for (Cell cell : allCells()) {
       if (cell.x() == x && cell.y() == y) {
         return cell;
       }
@@ -120,40 +107,17 @@ public class Board {
     return null;
   }
 
-  public void printBoard() {
-    printBoard(null);
-  }
-
-  public void printBoard(List<Cell> highlightCell) {
-    List<Cell> cells = allCells();
-    cli.println();
-    for (Cell cell : cells) {
-      if (cell.leftCell() == null) {
-        cli.printGray(cell.y() + " | ");
-      }
-
-      Figure figure = cell.figure();
-      String cellText = String.valueOf(figure == null ? '-' : figure.symbol());
-
-      // Print figure if it exists, otherwise print empty position
-      if (highlightCell != null && highlightCell.contains(cell)) {
-        cli.printBlue(cellText);
-      } else {
-        cli.print(cellText);
-      }
-
-      cli.print(" ");
-      if (cell.rightCell() == null) {
-        cli.println("");
+  public Cell findKing(FigureColor playerColor) {
+    for (Cell cell : allCells()) {
+      if (cell.isOccupiedBy(playerColor, FigureType.KING)) {
+        return cell;
       }
     }
-    cli.printlnGray("  \\________________");
-    cli.printlnGray("    A B C D E F G H");
+    throw new InvalidUserInputException("Impossible state! There is no king on the field.");
   }
 
-  private void addFiguresToBoard() {
-    List<Cell> cells = allCells();
-    for (Cell cell : cells) {
+  public void addFiguresToBoard() {
+    for (Cell cell : allCells()) {
       FigureColor figureColor = cell.y() <= 2 ? FigureColor.WHITE : FigureColor.BLACK;
 
       if (cell.y() == 1 || cell.y() == 8) {
@@ -163,7 +127,6 @@ public class Board {
           case 3, 6 -> cell.setFigure(new Bishop(figureColor));
           case 4 -> cell.setFigure(new Queen(figureColor));
           case 5 -> cell.setFigure(new King(figureColor));
-          default -> throw new IllegalStateException("Unexpected value: " + cell.x());
         }
       }
 
@@ -171,43 +134,6 @@ public class Board {
         cell.setFigure(new Pawn(figureColor));
       }
     }
-  }
-
-  public void addFiguresToBoard(String figurePositions) {
-    if (figurePositions == null) {
-      addFiguresToBoard();
-      return;
-    }
-    if (figurePositions.length() != 64) {
-      throw new IllegalArgumentException(
-          "The figurePositions should be a 64 character long string, but it is "
-              + figurePositions.length()
-              + " characters long.");
-    }
-    int figureIndex = 0;
-    for (Cell cell : allCells()) {
-      char figureType = figurePositions.charAt(figureIndex);
-      if (figureType == ' ') {
-        cell.setFigure(null);
-      } else {
-        Figure figure = charToFigureType(figureType);
-        cell.setFigure(figure);
-      }
-      figureIndex++;
-    }
-  }
-
-  public String figuresOnBoard() {
-    StringBuilder figurePositions = new StringBuilder();
-    List<Cell> cells = allCells();
-    for (Cell cell : cells) {
-      if (cell.figure() == null) {
-        figurePositions.append(' ');
-      } else {
-        figurePositions.append(cell.figure().symbol());
-      }
-    }
-    return figurePositions.toString();
   }
 
   // Method to move a piece on the board
@@ -234,59 +160,55 @@ public class Board {
     Cell startCell = findCell(startX, startY);
     Cell endCell = findCell(endX, endY);
 
-    Figure figure = startCell.figure();
-    if (figure == null) {
+    if (startCell.isFree()) {
       throw new InvalidUserInputException("On the starting cell is no figure");
     }
 
-    if (isCheckmate(figure.color())) {
-      throw new InvalidUserInputException("The game is over as you are in Checkmate!");
+    Figure figure = startCell.figure();
+    if (figure.color() != turn) {
+      throw new InvalidUserInputException(
+          "It is not your turn! Try to move a figure of color " + turn.name() + ".");
     }
-
-    // After this move the king is not allowed to be in check anymore
-    boolean wasInCheck = isCheck(figure.color());
 
     if (!figure.canMoveTo(startCell, endCell)) {
       throw new InvalidUserInputException("The figure can't move to that cell");
     }
 
+    if (wouldBeCheckAfterMove(startCell, endCell)) {
+      throw new InvalidUserInputException(
+          "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
+    }
+
+    MoveType moveType = moveType(startCell, endCell);
+    switch (moveType) {
+      case EN_PASSANT -> handleEnPassant(startCell, endCell);
+      case KING_CASTLING, QUEEN_CASTLING -> handleCastling(startCell, endCell, moveType);
+      default -> handleNormalMove(startCell, endCell);
+   }
+
+    changeTurnAndCountMoves();
+  }
+
+  public List<Cell> availableCellsWithoutCheckMoves(Cell startCell) {
+    Figure figure = startCell.figure();
+    List<Cell> availableCells = figure.availableCells(startCell);
+    availableCells.removeIf(cell -> wouldBeCheckAfterMove(startCell, cell));
+    return availableCells;
+  }
+
+  public boolean wouldBeCheckAfterMove(Cell startCell, Cell endCell) {
+    Figure figure = startCell.figure();
     Figure figureOnEndCell = endCell.figure();
     startCell.setFigure(null);
     endCell.setFigure(figure);
-
-    if (wasInCheck && isCheck(figure.color())) {
-      // After this move the king is not allowed to be in check anymore.
-      // As the king is still in check, we undo this action
-      startCell.setFigure(figure);
-      endCell.setFigure(figureOnEndCell);
-      throw new InvalidUserInputException(
-          "This move is not allowed as your king is in check! Move a figure so that your king is not in check anymore.");
-    }
-
-    if (isCheck(FigureColor.WHITE)) {
-      this.cli.printlnError("The white king is in check!");
-    }
-    if (isCheck(FigureColor.BLACK)) {
-      this.cli.printlnError("The black king is in check!");
-    }
-
-    this.changeTurn();
-  }
-
-  public Cell cellWithKingOfColor(FigureColor playerColor) {
-    List<Cell> cells = allCells();
-    for (Cell cell : cells) {
-      if (cell.figure() != null
-          && cell.figure().type() == FigureType.KING
-          && cell.figure().color() == playerColor) {
-        return cell;
-      }
-    }
-    throw new InvalidUserInputException("Impossible state! There is no king on the field.");
+    boolean isCheck = isCheck(figure.color());
+    startCell.setFigure(figure);
+    endCell.setFigure(figureOnEndCell);
+    return isCheck;
   }
 
   public boolean isCheck(FigureColor playerColor) {
-    Cell kingCell = cellWithKingOfColor(playerColor);
+    Cell kingCell = findKing(playerColor);
     List<Cell> opponentCells =
         cellsWithColor(playerColor == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE);
     for (Cell cell : opponentCells) {
@@ -301,60 +223,130 @@ public class Board {
     if (!isCheck(playerColor)) {
       return false;
     }
-    Cell kingCell = cellWithKingOfColor(playerColor);
-    List<Cell> kingCanMoveTo = kingCell.figure().getAvailableCells(kingCell);
-    List<Cell> opponentCells =
-        cellsWithColor(playerColor == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE);
 
-    for (Cell escapeCell : kingCanMoveTo) {
-      boolean opponentCanMoveHere = false;
-      for (Cell opponentCell : opponentCells) {
-        if (opponentCell.figure().canMoveTo(opponentCell, escapeCell)) {
-          opponentCanMoveHere = true;
-          break;
-        }
-      }
-      if (!opponentCanMoveHere) {
+    for (Cell startCell : cellsWithColor(playerColor)) {
+      List<Cell> availableCells = availableCellsWithoutCheckMoves(startCell);
+      if (!availableCells.isEmpty()) {
         return false;
       }
     }
-
     return true;
   }
 
   public List<Cell> cellsWithColor(FigureColor myColor) {
     List<Cell> cells = allCells();
-    cells.removeIf(cell -> cell.figure() == null);
-    cells.removeIf(cell -> cell.figure().color() != myColor);
+    cells.removeIf(cell -> !cell.isOccupiedBy(myColor));
     return cells;
   }
 
-  private void changeTurn() {
-    this.turn = this.turn == FigureColor.BLACK ? FigureColor.WHITE : FigureColor.BLACK;
+  private void changeTurnAndCountMoves() {
+    if (turn == FigureColor.BLACK) {
+      this.fullMove++;
+    }
+    this.halfMove++;
+    this.turn = turn.opposite();
   }
 
-  public FigureColor turn(){
+  private MoveType moveType(Cell startCell, Cell endCell) {
+    Figure figure = startCell.figure();
+    if (figure.type() == FigureType.KING) {
+      King king = (King) figure;
+      if (king.canPerformKingSideCastling(startCell)
+          && king.kingSideCastlingCell(startCell).isEqualTo(endCell)) {
+        return MoveType.KING_CASTLING;
+      }
+      if (king.canPerformQueenSideCastling(startCell)
+          && king.queenSideCastlingCell(startCell).isEqualTo(endCell)) {
+        return MoveType.QUEEN_CASTLING;
+      }
+    }
+
+    if (figure.type() == FigureType.PAWN
+        && ((Pawn) figure).canPerformEnPassant(startCell, endCell)) {
+      return MoveType.EN_PASSANT;
+    } else {
+      // reset EN_PASSANT because the next move is not an en passant move
+      allCells().forEach(cell -> cell.setIsEnPassant(false));
+    }
+
+    return MoveType.NORMAL;
+  }
+
+  private void handleNormalMove(Cell startCell, Cell endCell) {
+    Figure figure = startCell.figure();
+    if (endCell.isOccupied() || figure.type() == FigureType.PAWN) {
+      this.halfMove = -1;
+    }
+    startCell.setFigure(null);
+    endCell.setFigure(figure);
+
+    if (figure.type() == FigureType.PAWN && Math.abs(startCell.y() - endCell.y()) == 2) {
+      startCell.cellInDirection(((Pawn) figure).forwards()).setIsEnPassant(true);
+    }
+  }
+
+  private void handleEnPassant(Cell startCell, Cell endCell) {
+    Figure figure = startCell.figure();
+    this.halfMove = -1;
+    startCell.setFigure(null);
+    endCell.setFigure(figure);
+    endCell.setIsEnPassant(false);
+
+    CellDirection backwards =
+        ((Pawn) figure).forwards() == CellDirection.TOP ? CellDirection.BOTTOM : CellDirection.TOP;
+    Cell cellWithOpponentPawn = endCell.cellInDirection(backwards);
+    cellWithOpponentPawn.setFigure(null);
+  }
+
+  public void handleCastling(Cell startKingCell, Cell endKingCell, MoveType type) {
+    if (!startKingCell.isOccupiedBy(FigureType.KING)) {
+      throw new UnsupportedOperationException("A castling move can only be done by a king.");
+    }
+
+    Cell startRookCell;
+    Cell endRookCell;
+    switch (type) {
+      case KING_CASTLING -> {
+        startRookCell = findCell(8, startKingCell.y());
+        endRookCell = endKingCell.leftCell();
+      }
+      case QUEEN_CASTLING -> {
+        startRookCell = findCell(1, startKingCell.y());
+        endRookCell = endKingCell.rightCell();
+      }
+      default -> throw new UnsupportedOperationException("This is not a valid castling move.");
+    }
+
+    King king = (King) startKingCell.figure();
+    king.figureMoved();
+    startKingCell.setFigure(null);
+    endKingCell.setFigure(king);
+
+    Rook rook = (Rook) startRookCell.figure();
+    rook.figureMoved();
+    startRookCell.setFigure(null);
+    endRookCell.setFigure(rook);
+  }
+
+  public FigureColor turn() {
     return this.turn;
   }
-  public boolean castlingWhiteKing(){
-    return this.castlingWhiteKing;
+
+  public boolean canPerformQueenSideCastling(FigureColor color) {
+    Cell kingCell = findKing(color);
+    return ((King) kingCell.figure()).canPerformQueenSideCastling(kingCell);
   }
-  public boolean castlingWhiteQueen(){
-    return this.castlingWhiteQueen;
+
+  public boolean canPerformKingSideCastling(FigureColor color) {
+    Cell kingCell = findKing(color);
+    return ((King) kingCell.figure()).canPerformKingSideCastling(kingCell);
   }
-  public boolean castlingBlackKing(){
-    return this.castlingBlackKing;
+
+  public int fullMove() {
+    return this.fullMove;
   }
-  public boolean castlingBlackQueen(){
-    return this.castlingBlackQueen;
-  }
-  public String enPassant(){
-    return this.enPassant;
-  }
-  public int fullmoveNumber(){
-    return this.fullmoveNumber;
-  }
-  public int halfmoveClockBlack(){
-    return this.halfmoveClockBlack;
+
+  public int halfMove() {
+    return this.halfMove;
   }
 }

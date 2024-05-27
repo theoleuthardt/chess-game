@@ -14,22 +14,22 @@ public class Knight implements Figure {
     this.color = color;
   }
 
-  public List<Cell> getAvailableCells(Cell currentCell) {
+  public List<Cell> availableCells(Cell currentCell) {
     List<Cell> cells = new ArrayList<>();
 
-    if (currentCell.topCell() != null) {
+    if (currentCell.hasTopCell()) {
       cells.add(currentCell.topCell().topLeftCell());
       cells.add(currentCell.topCell().topRightCell());
     }
-    if (currentCell.bottomCell() != null) {
+    if (currentCell.hasBottomCell()) {
       cells.add(currentCell.bottomCell().bottomLeftCell());
       cells.add(currentCell.bottomCell().bottomRightCell());
     }
-    if (currentCell.leftCell() != null) {
+    if (currentCell.hasLeftCell()) {
       cells.add(currentCell.leftCell().topLeftCell());
       cells.add(currentCell.leftCell().bottomLeftCell());
     }
-    if (currentCell.rightCell() != null) {
+    if (currentCell.hasRightCell()) {
       cells.add(currentCell.rightCell().topRightCell());
       cells.add(currentCell.rightCell().bottomRightCell());
     }
@@ -38,13 +38,13 @@ public class Knight implements Figure {
     cells.removeIf(Objects::isNull);
 
     // Remove cell if figure is mine
-    cells.removeIf(cell -> cell.figure() != null && cell.figure().color() == color());
+    cells.removeIf(cell -> cell.isOccupiedBy(color()));
 
     return cells;
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    List<Cell> availableCell = getAvailableCells(prevCell);
+    List<Cell> availableCell = availableCells(prevCell);
     return availableCell.contains(nextCell);
   }
 

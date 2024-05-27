@@ -9,12 +9,14 @@ import java.util.List;
 public class Rook implements Figure {
   private static final FigureType type = FigureType.ROOK;
   private final FigureColor color;
+  private boolean hasMoved;
 
   public Rook(FigureColor color) {
     this.color = color;
+    this.hasMoved = false;
   }
 
-  public List<Cell> getAvailableCells(Cell currentCell) {
+  public List<Cell> availableCells(Cell currentCell) {
     List<Cell> cells = new ArrayList<>();
 
     // Check above
@@ -27,7 +29,7 @@ public class Rook implements Figure {
   }
 
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    List<Cell> availableCell = getAvailableCells(prevCell);
+    List<Cell> availableCell = availableCells(prevCell);
     return availableCell.contains(nextCell);
   }
 
@@ -41,5 +43,15 @@ public class Rook implements Figure {
 
   public FigureType type() {
     return type;
+  }
+
+  public boolean hasMoved() {
+    return this.hasMoved;
+  }
+
+  public void figureMoved() {
+    if (!this.hasMoved) {
+      this.hasMoved = true;
+    }
   }
 }
