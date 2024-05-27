@@ -100,7 +100,7 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 
 | Number | Feature             | Tests              |
 |--------|---------------------|--------------------|
-| 1      | Create Game         | :x:                |
+| 1      | Create Game         | :heavy_check_mark: |
 | 2      | Show Help           | :heavy_check_mark: |
 | 3      | Show Board          | :heavy_check_mark: |
 | 4      | Move Figure         | :heavy_check_mark: |
