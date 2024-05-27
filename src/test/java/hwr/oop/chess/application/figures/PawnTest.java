@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -228,5 +229,39 @@ class PawnTest {
 
     String changedStatus = FenNotation.generateFen(board);
     assertThat(changedStatus).isEqualTo(afterPawnMove);
+  }
+
+  @Test
+  void canPerformEnPassant_isAllowed() {
+    Board board = new Board(false);
+    FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - e6 0 1");
+    Cell from = board.findCell('f', 5);
+    Cell opponent = board.findCell('e', 5);
+    Cell to = board.findCell('e', 6);
+
+    assertThat(from.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
+    assertThat(opponent.isOccupiedBy(FigureColor.BLACK, FigureType.PAWN)).isTrue();
+    assertThat(to.isFree()).isTrue();
+    board.moveFigure(from, to);
+    assertThat(from.isFree()).isTrue();
+    assertThat(opponent.isFree()).isTrue();
+    assertThat(to.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
+  }
+
+  @Test
+  void canPerformEnPassant_isNotAllowed() {
+    Board board = new Board(false);
+    FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - - 0 1");
+    Cell from = board.findCell('f', 5);
+    Cell opponent = board.findCell('e', 5);
+    Cell to = board.findCell('e', 6);
+
+    assertThat(from.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
+    assertThat(opponent.isOccupiedBy(FigureColor.BLACK, FigureType.PAWN)).isTrue();
+    assertThat(to.isFree()).isTrue();
+
+    assertThatThrownBy(() -> board.moveFigure(from, to))
+        .isInstanceOf(InvalidUserInputException.class)
+        .hasMessageContaining("The figure can't move to that cell");
   }
 }
