@@ -4,6 +4,7 @@ import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 import hwr.oop.chess.cli.InvalidUserInputException;
+import hwr.oop.chess.persistence.FenNotation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +21,12 @@ class PawnTest {
   public void setUp() {
     // Initialize the board
     board = new Board(true);
+  }
+
+  @Test
+  void pawn_hasTypePawn() {
+    Pawn pawn = new Pawn(FigureColor.WHITE);
+    assertThat(pawn.type()).isEqualTo(FigureType.PAWN);
   }
 
   @Test
@@ -206,5 +213,18 @@ class PawnTest {
 
     assertThrows(
         InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.QUEEN));
+  }
+
+  @Test
+  void pawn_testHalfMove() {
+    board = new Board(false);
+    String initialStatus = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 3 1";
+    FenNotation.parseFEN(board, initialStatus);
+
+    board.moveFigure("b2", "b3");
+    String afterPawnMove = "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1";
+
+    String changedStatus = FenNotation.generateFen(board);
+    assertThat(changedStatus).isEqualTo(afterPawnMove);
   }
 }
