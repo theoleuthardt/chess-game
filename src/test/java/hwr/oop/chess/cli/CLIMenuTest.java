@@ -215,12 +215,150 @@ class CLIMenuTest {
 
   @Test
   void startNewGame() {
-    realCLIFromArguments("create 123");
+    realCLIFromArguments("create 1");
     assertThat(outputStream.toString())
-        .contains("Here is your new game")
-        .contains("Good luck and have fun.")
-        .contains("A B C D E F G H");
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;104m ACTION \033[0m Here is your new game '1'. Good luck and have fun.
+                    \033[37m8 | \033[0mr n b q k b n r
+                    \033[37m7 | \033[0mp p p p p p p p
+                    \033[37m6 | \033[0m- - - - - - - -
+                    \033[37m5 | \033[0m- - - - - - - -
+                    \033[37m4 | \033[0m- - - - - - - -
+                    \033[37m3 | \033[0m- - - - - - - -
+                    \033[37m2 | \033[0mP P P P P P P P
+                    \033[37m1 | \033[0mR N B Q K B N R
+                    \033[37m  \\________________\033[0m
+                    \033[37m    A B C D E F G H\033[0m
+                    """);
     assertThat(cli.game()).isNotNull();
     assertThat(cli.game().board().findCell("a1").figure().type()).isEqualTo(FigureType.ROOK);
+  }
+
+  @Test
+  void moveWithEnoughCoordinates() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " move a2 a4");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;104m ACTION \033[0m Move WHITE PAWN from A2 to A4.
+                    \033[37m8 | \033[0mr n b q k b n r
+                    \033[37m7 | \033[0mp p p p p p p p
+                    \033[37m6 | \033[0m- - - - - - - -
+                    \033[37m5 | \033[0m- - - - - - - -
+                    \033[37m4 | \033[0m\033[30;1;104mP\033[0m - - - - - - -
+                    \033[37m3 | \033[0m- - - - - - - -
+                    \033[37m2 | \033[0m\033[30;1;104m-\033[0m P P P P P P P
+                    \033[37m1 | \033[0mR N B Q K B N R
+                    \033[37m  \\________________\033[0m
+                    \033[37m    A B C D E F G H\033[0m
+                    """);
+  }
+
+  @Test
+  void moveWithoutEnoughCoordinates() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " move a1");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;103m ERROR \033[0m You must provide a coordinate for this command.
+                    \033[37m8 | \033[0mr n b q k b n r
+                    \033[37m7 | \033[0mp p p p p p p p
+                    \033[37m6 | \033[0m- - - - - - - -
+                    \033[37m5 | \033[0m- - - - - - - -
+                    \033[37m4 | \033[0m- - - - - - - -
+                    \033[37m3 | \033[0m- - - - - - - -
+                    \033[37m2 | \033[0mP P P P P P P P
+                    \033[37m1 | \033[0m\033[30;1;104mR\033[0m N B Q K B N R
+                    \033[37m  \\________________\033[0m
+                    \033[37m    A B C D E F G H\033[0m
+                    """);
+  }
+
+  @Test
+  void showMovesOfPawn() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " show-moves b2");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;104m ACTION \033[0m Showing the cells where the PAWN on B2 can move to.
+                    \033[37m8 | \033[0mr n b q k b n r
+                    \033[37m7 | \033[0mp p p p p p p p
+                    \033[37m6 | \033[0m- - - - - - - -
+                    \033[37m5 | \033[0m- - - - - - - -
+                    \033[37m4 | \033[0m- \033[30;1;104m-\033[0m - - - - - -
+                    \033[37m3 | \033[0m- \033[30;1;104m-\033[0m - - - - - -
+                    \033[37m2 | \033[0mP P P P P P P P
+                    \033[37m1 | \033[0mR N B Q K B N R
+                    \033[37m  \\________________\033[0m
+                    \033[37m    A B C D E F G H\033[0m
+                    """);
+  }
+
+  @Test
+  void moveToTheStartField() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " move a2 a2");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                            [30;1;104m ACTION [0m Move WHITE PAWN from A2 to A2.
+                            [30;1;103m ERROR [0m The figure can't move to that cell
+                            [37m8 | [0mr n b q k b n r
+                            [37m7 | [0mp p p p p p p p
+                            [37m6 | [0m- - - - - - - -
+                            [37m5 | [0m- - - - - - - -
+                            [37m4 | [0m- - - - - - - -
+                            [37m3 | [0m- - - - - - - -
+                            [37m2 | [0m[30;1;104mP[0m P P P P P P P
+                            [37m1 | [0mR N B Q K B N R
+                            [37m  \\________________[0m
+                            [37m    A B C D E F G H[0m
+                            """);
+  }
+
+  @Test
+  void moveEmptyField() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " move a3 a4");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                            [30;1;103m ERROR [0m On the cell A3 there is no figure!
+                            [37m8 | [0mr n b q k b n r
+                            [37m7 | [0mp p p p p p p p
+                            [37m6 | [0m- - - - - - - -
+                            [37m5 | [0m- - - - - - - -
+                            [37m4 | [0m- - - - - - - -
+                            [37m3 | [0m[30;1;104m-[0m - - - - - - -
+                            [37m2 | [0mP P P P P P P P
+                            [37m1 | [0mR N B Q K B N R
+                            [37m  \\________________[0m
+                            [37m    A B C D E F G H[0m
+                            """);
+  }
+
+  @Test
+  void moveWrongColor() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " move c7 c6");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    [30;1;104m ACTION [0m Move BLACK PAWN from C7 to C6.
+                    [30;1;103m ERROR [0m It is not your turn! Try to move a figure of color WHITE.
+                    [37m8 | [0mr n b q k b n r
+                    [37m7 | [0mp p [30;1;104mp[0m p p p p p
+                    [37m6 | [0m- - [30;1;104m-[0m - - - - -
+                    [37m5 | [0m- - - - - - - -
+                    [37m4 | [0m- - - - - - - -
+                    [37m3 | [0m- - - - - - - -
+                    [37m2 | [0mP P P P P P P P
+                    [37m1 | [0mR N B Q K B N R
+                    [37m  \\________________[0m
+                    [37m    A B C D E F G H[0m
+                    """);
   }
 }
