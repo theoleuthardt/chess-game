@@ -171,7 +171,7 @@ public class FenNotation {
         castling.append(c);
       }
     }
-    return castling.toString().isEmpty() ? "-" : castling.toString();
+    return castling.isEmpty() ? "-" : castling.toString();
   }
 
   private void setCastlingImpossibleIfKingIsNotOnStartField() {
