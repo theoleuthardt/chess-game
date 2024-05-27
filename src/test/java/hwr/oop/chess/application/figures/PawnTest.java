@@ -241,9 +241,17 @@ class PawnTest {
     Cell to = board.findCell('e', 6);
 
     assertThat(pawn.canPerformEnPassant(from, to)).isTrue();
-    assertThat(pawn.canPerformEnPassant(from, board.findCell('f', 6))).isFalse();
-    assertThat(pawn.canPerformEnPassant(from, board.findCell('f', 4))).isFalse();
-    assertThat(pawn.canPerformEnPassant(from, board.findCell('g', 6))).isFalse();
+    Cell f6 = board.findCell('f', 6);
+    f6.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, f6)).isFalse();
+
+    Cell f4 = board.findCell('f', 4);
+    f4.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, f4)).isFalse();
+
+    Cell g6 = board.findCell('g', 6);
+    g6.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, g6)).isFalse();
     assertThat(from.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
     assertThat(opponent.isOccupiedBy(FigureColor.BLACK, FigureType.PAWN)).isTrue();
     assertThat(to.isFree()).isTrue();
@@ -265,9 +273,17 @@ class PawnTest {
     Cell to = board.findCell('e', 6);
 
     assertThat(pawn.canPerformEnPassant(from, to)).isFalse();
-    assertThat(pawn.canPerformEnPassant(from, board.findCell('f', 6))).isFalse();
-    assertThat(pawn.canPerformEnPassant(from, board.findCell('f', 4))).isFalse();
-    assertThat(pawn.canPerformEnPassant(from, board.findCell('g', 6))).isFalse();
+    Cell f6 = board.findCell('f', 6);
+    f6.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, f6)).isFalse();
+
+    Cell f4 = board.findCell('f', 4);
+    f4.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, f4)).isFalse();
+
+    Cell g6 = board.findCell('g', 6);
+    g6.setIsEnPassant(true);
+    assertThat(pawn.canPerformEnPassant(from, g6)).isFalse();
     assertThat(from.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
     assertThat(opponent.isOccupiedBy(FigureColor.BLACK, FigureType.PAWN)).isTrue();
     assertThat(to.isFree()).isTrue();

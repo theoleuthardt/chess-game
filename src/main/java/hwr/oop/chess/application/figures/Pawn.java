@@ -106,9 +106,9 @@ public class Pawn implements Figure {
 
     Cell forwardsCell = startCell.cellInDirection(forwards());
     CellDirection direction;
-    if (endCell == forwardsCell.leftCell()) {
+    if (endCell.isEqualTo(forwardsCell.leftCell())) {
       direction = CellDirection.LEFT;
-    } else if (endCell == forwardsCell.rightCell()) {
+    } else if (endCell.isEqualTo(forwardsCell.rightCell())) {
       direction = CellDirection.RIGHT;
     } else {
       return false;
