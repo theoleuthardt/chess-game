@@ -112,6 +112,10 @@ class BoardTest {
       assertThat(cell.bottomLeftCell()).isNull();
       assertThat(cell.bottomRightCell()).isNull();
       assertThat(cell.topCell()).isNotNull();
+      assertThat(cell.hasTopLeftCell()).isEqualTo(cell.x() != 1 && cell.y() != 8);
+      assertThat(cell.hasTopRightCell()).isEqualTo(cell.x() != 8 && cell.y() != 8);
+      assertThat(cell.hasBottomLeftCell()).isEqualTo(cell.x() != 1 && cell.y() != 1);
+      assertThat(cell.hasBottomRightCell()).isEqualTo(cell.x() != 8 && cell.y() != 1);
     }
   }
 
@@ -151,7 +155,6 @@ class BoardTest {
       case BOTTOM_RIGHT -> CellDirection.TOP_LEFT;
       case LEFT -> CellDirection.RIGHT;
       case RIGHT -> CellDirection.LEFT;
-      default -> throw new IllegalArgumentException("You must pass a valid direction");
     };
   }
 
@@ -378,13 +381,14 @@ class BoardTest {
     Cell cellRookBlack = board.findCell("a8");
     assertThat(board.availableCellsWithoutCheckMoves(cellRookBlack)).isEmpty();
 
-    assertThat(assertThrows(InvalidUserInputException.class, () -> {
-      board.moveFigure("d8", "c8");
-    }).getMessage()).isEqualTo("This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
+    assertThatThrownBy(() -> board.moveFigure("d8", "c8"))
+        .isInstanceOf(InvalidUserInputException.class)
+        .hasMessageContaining(
+            "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
   }
 
   @Test
-  void testNotCheckMateState(){
+  void testNotCheckMateState() {
     Board board = new Board(false);
     String initialStatus = "rnb1kb1r/ppp1pppp/3q1np1/3p4/2P5/2N2N1B/PP1PPP1P/R1BQK2R b KQkq - 3 5";
     FenNotation.parseFEN(board, initialStatus);
@@ -395,58 +399,58 @@ class BoardTest {
   }
 
   @Test
-  void testNotExistKing(){
+  void testNotExistKing() {
     Board board = new Board(false);
     String initialStatus = "rn1q1bnr/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/RNBQ2NR b - - 2 10";
 
-    Exception exceptionBlackKing = assertThrows(InvalidUserInputException.class, () -> {
-      FenNotation.parseFEN(board, initialStatus);
-    });
-
-    String expectedMessage = "Impossible state! There is no king on the field.";
-    String actualMessage = exceptionBlackKing.getMessage();
-    assertThat(actualMessage.contains(expectedMessage)).isTrue();
+    assertThatThrownBy(() -> FenNotation.parseFEN(board, initialStatus))
+        .isInstanceOf(InvalidUserInputException.class)
+        .hasMessageContaining("Impossible state! There is no king on the field.");
   }
 
   @Test
-  void testInvalidMoveFigure(){
+  void testInvalidMoveFigure() {
     Board board = new Board(false);
     String initialStatus = "rnbqkbnr/ppp1pppp/8/3p4/2P5/8/PP1PPPPP/RNBQKBNR w KQkq d6 0 3";
     FenNotation.parseFEN(board, initialStatus);
 
     assertThat(board.isCheck(FigureColor.WHITE)).isFalse();
 
-    assertThat(assertThrows(InvalidUserInputException.class, () -> {
-      board.moveFigure(0,1,1,1);
-    }).getMessage().contains("Invalid coordinates. Coordinates must be between 1 and 8.")).isTrue();
+    assertThatThrownBy(() -> board.moveFigure(0, 1, 1, 1))
+        .isInstanceOf(InvalidUserInputException.class)
+        .hasMessageContaining("Invalid coordinates. Coordinates must be between 1 and 8.");
 
-    assertThat(assertThrows(InvalidUserInputException.class, () -> {
-      board.moveFigure("e4", "d5");
-    }).getMessage().contains("On the starting cell is no figure")).isTrue();
+    assertThatThrownBy(() -> board.moveFigure("e4", "d5"))
+        .isInstanceOf(InvalidUserInputException.class)
+        .hasMessageContaining("On the starting cell is no figure");
 
-    assertThat(assertThrows(InvalidUserInputException.class, () -> {
-      board.moveFigure("d5", "c4");
-    }).getMessage().contains("It is not your turn! Try to move a figure of color")).isTrue();
+    assertThatThrownBy(() -> board.moveFigure("d5", "c4"))
+        .isInstanceOf(InvalidUserInputException.class)
+        .hasMessageContaining("It is not your turn! Try to move a figure of color");
 
-    assertThat(assertThrows(InvalidUserInputException.class, () -> {
-      board.moveFigure("c4", "c6");
-    }).getMessage().contains("The figure can't move to that cell")).isTrue();
+    assertThatThrownBy(() -> board.moveFigure("c4", "c6"))
+        .isInstanceOf(InvalidUserInputException.class)
+        .hasMessageContaining("The figure can't move to that cell");
   }
 
   @Test
-  void testInValidCastling(){
+  void testInValidCastling() {
     Board board = new Board(false);
-    String initialState= "rnb1kb1r/ppp1pppp/3q1np1/3p4/2P5/2N2N1B/PP1PPP1P/R1BQK2R b KQkq - 3 5";
+    String initialState = "rnb1kb1r/ppp1pppp/3q1np1/3p4/2P5/2N2N1B/PP1PPP1P/R1BQK2R b KQkq - 3 5";
     FenNotation.parseFEN(board, initialState);
 
-    assertThat(assertThrows(UnsupportedOperationException.class, () -> {
-      board.handleCastling(board.findCell("f1"), board.findCell("g1"), MoveType.KING_CASTLING);
-    }).getMessage()).isEqualTo("A castling move can only be done by a king.");
+    Cell f1 = board.findCell("f1");
+    Cell g1 = board.findCell("g1");
+    Cell e1 = board.findCell("e1");
 
-    assertThat(assertThrows(UnsupportedOperationException.class, () -> {
-      board.handleCastling(board.findCell("e1"), board.findCell("g1"), MoveType.EN_PASSANT);
-    }).getMessage()).isEqualTo("This is not a valid castling move.");
+    assertThatThrownBy(() -> board.handleCastling(f1, g1, MoveType.KING_CASTLING))
+        .isInstanceOf(UnsupportedOperationException.class)
+        .hasMessageContaining("A castling move can only be done by a king.");
+    assertThatThrownBy(() -> board.handleCastling(e1, g1, MoveType.EN_PASSANT))
+        .isInstanceOf(UnsupportedOperationException.class)
+        .hasMessageContaining("This is not a valid castling move.");
   }
+
   /*
   Chess Match: Spasski–Fischer 0:1 Reykjavík, 20. Juli 1972
   */

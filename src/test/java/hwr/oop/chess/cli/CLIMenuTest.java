@@ -304,18 +304,18 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                            [30;1;104m ACTION [0m Move WHITE PAWN from A2 to A2.
-                            [30;1;103m ERROR [0m The figure can't move to that cell
-                            [37m8 | [0mr n b q k b n r
-                            [37m7 | [0mp p p p p p p p
-                            [37m6 | [0m- - - - - - - -
-                            [37m5 | [0m- - - - - - - -
-                            [37m4 | [0m- - - - - - - -
-                            [37m3 | [0m- - - - - - - -
-                            [37m2 | [0m[30;1;104mP[0m P P P P P P P
-                            [37m1 | [0mR N B Q K B N R
-                            [37m  \\________________[0m
-                            [37m    A B C D E F G H[0m
+                            \033[30;1;104m ACTION \033[0m Move WHITE PAWN from A2 to A2.
+                            \033[30;1;103m ERROR \033[0m The figure can't move to that cell
+                            \033[37m8 | \033[0mr n b q k b n r
+                            \033[37m7 | \033[0mp p p p p p p p
+                            \033[37m6 | \033[0m- - - - - - - -
+                            \033[37m5 | \033[0m- - - - - - - -
+                            \033[37m4 | \033[0m- - - - - - - -
+                            \033[37m3 | \033[0m- - - - - - - -
+                            \033[37m2 | \033[0m\033[30;1;104mP\033[0m P P P P P P P
+                            \033[37m1 | \033[0mR N B Q K B N R
+                            \033[37m  \\________________\033[0m
+                            \033[37m    A B C D E F G H\033[0m
                             """);
   }
 
@@ -326,17 +326,17 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                            [30;1;103m ERROR [0m On the cell A3 there is no figure!
-                            [37m8 | [0mr n b q k b n r
-                            [37m7 | [0mp p p p p p p p
-                            [37m6 | [0m- - - - - - - -
-                            [37m5 | [0m- - - - - - - -
-                            [37m4 | [0m- - - - - - - -
-                            [37m3 | [0m[30;1;104m-[0m - - - - - - -
-                            [37m2 | [0mP P P P P P P P
-                            [37m1 | [0mR N B Q K B N R
-                            [37m  \\________________[0m
-                            [37m    A B C D E F G H[0m
+                            \033[30;1;103m ERROR \033[0m On the cell A3 there is no figure!
+                            \033[37m8 | \033[0mr n b q k b n r
+                            \033[37m7 | \033[0mp p p p p p p p
+                            \033[37m6 | \033[0m- - - - - - - -
+                            \033[37m5 | \033[0m- - - - - - - -
+                            \033[37m4 | \033[0m- - - - - - - -
+                            \033[37m3 | \033[0m\033[30;1;104m-\033[0m - - - - - - -
+                            \033[37m2 | \033[0mP P P P P P P P
+                            \033[37m1 | \033[0mR N B Q K B N R
+                            \033[37m  \\________________\033[0m
+                            \033[37m    A B C D E F G H\033[0m
                             """);
   }
 
@@ -347,18 +347,201 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    [30;1;104m ACTION [0m Move BLACK PAWN from C7 to C6.
-                    [30;1;103m ERROR [0m It is not your turn! Try to move a figure of color WHITE.
-                    [37m8 | [0mr n b q k b n r
-                    [37m7 | [0mp p [30;1;104mp[0m p p p p p
-                    [37m6 | [0m- - [30;1;104m-[0m - - - - -
-                    [37m5 | [0m- - - - - - - -
-                    [37m4 | [0m- - - - - - - -
-                    [37m3 | [0m- - - - - - - -
-                    [37m2 | [0mP P P P P P P P
-                    [37m1 | [0mR N B Q K B N R
-                    [37m  \\________________[0m
-                    [37m    A B C D E F G H[0m
+                            \033[30;1;104m ACTION \033[0m Move BLACK PAWN from C7 to C6.
+                            \033[30;1;103m ERROR \033[0m It is not your turn! Try to move a figure of color WHITE.
+                            \033[37m8 | \033[0mr n b q k b n r
+                            \033[37m7 | \033[0mp p \033[30;1;104mp\033[0m p p p p p
+                            \033[37m6 | \033[0m- - \033[30;1;104m-\033[0m - - - - -
+                            \033[37m5 | \033[0m- - - - - - - -
+                            \033[37m4 | \033[0m- - - - - - - -
+                            \033[37m3 | \033[0m- - - - - - - -
+                            \033[37m2 | \033[0mP P P P P P P P
+                            \033[37m1 | \033[0mR N B Q K B N R
+                            \033[37m  \\________________\033[0m
+                            \033[37m    A B C D E F G H\033[0m
+                            """);
+  }
+
+  @Test
+  void promotionWithoutPawn() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.PAWN_PROMOTION.ordinal() + " promote c3");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;103m ERROR \033[0m On the cell C3 there is no pawn!
+                    \033[37m8 | \033[0m- - P P - - - -
+                    \033[37m7 | \033[0m- - - - - - - -
+                    \033[37m6 | \033[0m- - - - - - - -
+                    \033[37m5 | \033[0m- - - - - - - -
+                    \033[37m4 | \033[0m- - - - - - - k
+                    \033[37m3 | \033[0m- - \033[30;1;104m-\033[0m - - - - -
+                    \033[37m2 | \033[0mP P - - - - - -
+                    \033[37m1 | \033[0m- - - - - - - K
+                    \033[37m  \\________________\033[0m
+                    \033[37m    A B C D E F G H\033[0m
+                    """);
+  }
+
+  @Test
+  void promotionPawnIsNotOnEnd() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.PAWN_PROMOTION.ordinal() + " promote b2 rook");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;104m ACTION \033[0m Promote WHITE PAWN on B2 to become a ROOK.
+                    \033[30;1;103m ERROR \033[0m The pawn is not allowed to be promoted as it has not reached the end.
+                    \033[37m8 | \033[0m- - P P - - - -
+                    \033[37m7 | \033[0m- - - - - - - -
+                    \033[37m6 | \033[0m- - - - - - - -
+                    \033[37m5 | \033[0m- - - - - - - -
+                    \033[37m4 | \033[0m- - - - - - - k
+                    \033[37m3 | \033[0m- - - - - - - -
+                    \033[37m2 | \033[0mP \033[30;1;104mP\033[0m - - - - - -
+                    \033[37m1 | \033[0m- - - - - - - K
+                    \033[37m  \\________________\033[0m
+                    \033[37m    A B C D E F G H\033[0m
+                    """);
+  }
+
+  @Test
+  void promotionPawnIsOnEnd() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.PAWN_PROMOTION.ordinal() + " promote c8 rook");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;104m ACTION \033[0m Promote WHITE PAWN on C8 to become a ROOK.
+                    \033[37m8 | \033[0m- - \033[30;1;104mR\033[0m P - - - -
+                    \033[37m7 | \033[0m- - - - - - - -
+                    \033[37m6 | \033[0m- - - - - - - -
+                    \033[37m5 | \033[0m- - - - - - - -
+                    \033[37m4 | \033[0m- - - - - - - k
+                    \033[37m3 | \033[0m- - - - - - - -
+                    \033[37m2 | \033[0mP P - - - - - -
+                    \033[37m1 | \033[0m- - - - - - - K
+                    \033[37m  \\________________\033[0m
+                    \033[37m    A B C D E F G H\033[0m
+                    """);
+  }
+
+  @Test
+  void promotionPawnIsOnEndButInvalidType() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.PAWN_PROMOTION.ordinal() + " promote c8 king");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;104m ACTION \033[0m Promote WHITE PAWN on C8 to become a KING.
+                    \033[30;1;103m ERROR \033[0m The pawn cannot become a KING.
+                    \033[37m8 | \033[0m- - \033[30;1;104mP\033[0m P - - - -
+                    \033[37m7 | \033[0m- - - - - - - -
+                    \033[37m6 | \033[0m- - - - - - - -
+                    \033[37m5 | \033[0m- - - - - - - -
+                    \033[37m4 | \033[0m- - - - - - - k
+                    \033[37m3 | \033[0m- - - - - - - -
+                    \033[37m2 | \033[0mP P - - - - - -
+                    \033[37m1 | \033[0m- - - - - - - K
+                    \033[37m  \\________________\033[0m
+                    \033[37m    A B C D E F G H\033[0m
+                    """);
+  }
+
+  @Test
+  void whiteKingIsInCheck() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.WHITE_CHECK_POSSIBLE.ordinal() + " move f2 f1");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                            \033[30;1;104m ACTION \033[0m Move BLACK QUEEN from F2 to F1.
+                            \033[30;1;103m ERROR \033[0m The white king is in check!
+                            \033[37m8 | \033[0m- - - - - - - -
+                            \033[37m7 | \033[0m- - - - - - - -
+                            \033[37m6 | \033[0mk - - - - - - -
+                            \033[37m5 | \033[0m- - - - - - - -
+                            \033[37m4 | \033[0m- - - - - - - -
+                            \033[37m3 | \033[0m- - - - - - - -
+                            \033[37m2 | \033[0mP P - - - \033[30;1;104m-\033[0m - -
+                            \033[37m1 | \033[0m- K - - - \033[30;1;104mq\033[0m - -
+                            \033[37m  \\________________\033[0m
+                            \033[37m    A B C D E F G H\033[0m
+                            """);
+  }
+
+  @Test
+  void blackKingIsInCheck() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.BLACK_CHECK_POSSIBLE.ordinal() + " move f2 f1");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;104m ACTION \033[0m Move WHITE QUEEN from F2 to F1.
+                    \033[30;1;103m ERROR \033[0m The black king is in check!
+                    \033[37m8 | \033[0m- - - - - - - -
+                    \033[37m7 | \033[0m- - - - - - - -
+                    \033[37m6 | \033[0mK - - - - - - -
+                    \033[37m5 | \033[0m- - - - - - - -
+                    \033[37m4 | \033[0m- - - - - - - -
+                    \033[37m3 | \033[0m- - - - - - - -
+                    \033[37m2 | \033[0mp p - - - \033[30;1;104m-\033[0m - -
+                    \033[37m1 | \033[0m- k - - - \033[30;1;104mQ\033[0m - -
+                    \033[37m  \\________________\033[0m
+                    \033[37m    A B C D E F G H\033[0m
+                    """);
+  }
+
+  @Test
+  void invalidArgument() {
+    realCLIFromArguments("invalid");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;103m ERROR \033[0m The command 'invalid' is not supported. Try 'help' to see available commands.
+                    """);
+  }
+
+  @Test
+  void onGameWithoutAction() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal());
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m You must specify the action you would like to perform on the board
+            """)
+        .containsIgnoringWhitespaces(
+            """
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p p p p p p p
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0mP P P P P P P P
+            \033[37m1 | \033[0mR N B Q K B N R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
+  }
+
+  @Test
+  void onGameWithInvalidAction() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " invalid");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            "\033[30;1;103m ERROR \033[0m The command 'chess on <ID> invalid' is not supported. Try 'help' to see available commands.")
+        .containsIgnoringWhitespaces(
+            """
+                    \033[37m8 | \033[0mr n b q k b n r
+                    \033[37m7 | \033[0mp p p p p p p p
+                    \033[37m6 | \033[0m- - - - - - - -
+                    \033[37m5 | \033[0m- - - - - - - -
+                    \033[37m4 | \033[0m- - - - - - - -
+                    \033[37m3 | \033[0m- - - - - - - -
+                    \033[37m2 | \033[0mP P P P P P P P
+                    \033[37m1 | \033[0mR N B Q K B N R
+                    \033[37m  \\________________\033[0m
+                    \033[37m    A B C D E F G H\033[0m
                     """);
   }
 }
