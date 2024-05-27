@@ -43,7 +43,6 @@ public class FenNotation {
     fen.parseEnPassant(parts.get(3));
     fen.parseHalfMove(parts.get(4));
     fen.parseFullMove(parts.getLast());
-    fen.setCastlingImpossibleIfKingIsNotOnStartField();
 
     board.initializeWith(fen.turn, fen.halfMove, fen.fullMove);
   }
@@ -88,12 +87,13 @@ public class FenNotation {
     int emptyCount = 0;
 
     List<Cell> allCells = board.allCells();
+    // Sort only Y position
     allCells.sort(
         (c1, c2) -> {
-          if (c1.y() == c2.y()) {
-            return Integer.compare(c1.x(), c2.x());
+          if (c1.y() != c2.y()) {
+            return Integer.compare(c1.y(), c2.y());
           }
-          return Integer.compare(c1.y(), c2.y());
+         return 0;
         });
 
     for (Cell cell : allCells) {

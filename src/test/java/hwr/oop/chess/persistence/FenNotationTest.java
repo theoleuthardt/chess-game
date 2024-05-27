@@ -2,8 +2,12 @@ package hwr.oop.chess.persistence;
 
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.figures.Figure;
+import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
 
+import hwr.oop.chess.application.figures.King;
+import hwr.oop.chess.application.figures.Rook;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static hwr.oop.chess.persistence.FenNotation.*;
@@ -79,5 +83,108 @@ class FenNotationTest {
     String initialStatus = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
     FenNotation.parseFEN(board, initialStatus);
     assertThat(FenNotation.generateFen(board)).isEqualTo(initialStatus);
+  }
+
+  @Test
+  void testParseFEN() {
+    Board board = new Board(false);
+    String fenString = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
+    assertThatThrownBy(() -> parseFENOnlyPiecePlacement(board, fenString)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("This is an invalid FEN string, as it should have 1 part!");
+
+    List<String> parts = List.of(fenString.split(" "));
+    assertThatThrownBy(() -> parseFEN(board, parts.get(1))).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("This is an invalid FEN string, as it should have 6 parts!");
+
+    parseFEN(board, fenString);
+    assertThat(generateFen(board)).isEqualTo(fenString);
+    }
+
+  @Test
+  void testParseCastling() {
+    Board board = new Board(false);
+
+    String disableCastling = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
+    parseFEN(board, disableCastling);
+    for (String position: List.of( "a1", "a8", "h1", "h8")){
+      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isTrue();
+    }
+    for (String position: List.of( "e1", "e8")){
+      assertThat(((King)board.findCell(position).figure()).hasMoved()).isTrue();
+    }
+    assertThat(generateFen(board)).isEqualTo(disableCastling);
+  }
+
+  @Test
+  void testAvailableCastling(){
+    Board board = new Board(false);
+
+    String availableCastling = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b KQkq - 2 5";
+    parseFEN(board, availableCastling);
+    for (String position: List.of( "a1", "a8", "h1", "h8")){
+      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isFalse();
+    }
+    for (String position: List.of( "e1", "e8")){
+      assertThat(((King)board.findCell(position).figure()).hasMoved()).isFalse();
+    }
+    assertThat(generateFen(board)).isEqualTo(availableCastling);
+  }
+
+  @Test
+  void testAvailableQueenCastling(){
+    Board board = new Board(false);
+    String availableQueenCastling = "r3k2r/1pp1pppp/8/p1B2b2/5P2/4p3/PPP3PP/R3K2R b Qq - 2 5";
+    parseFEN(board, availableQueenCastling);
+    for (String position: List.of("e1", "e8")){
+      assertThat(((King)board.findCell(position).figure()).hasMoved()).isFalse();
+    }
+    for (String position: List.of("a1",  "a8")){
+      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isFalse();
+    }
+    for (String position: List.of("h1", "h8")){
+      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isTrue();
+    }
+    assertThat(generateFen(board)).isEqualTo(availableQueenCastling);
+  }
+
+  @Test
+  void testAvailableKingCastling(){
+    Board board = new Board(false);
+    String availableQueenCastling = "r3k2r/1pp1pppp/8/p1B2b2/5P2/4p3/PPP3PP/R3K2R b Kk - 2 5";
+    parseFEN(board, availableQueenCastling);
+    for (String position: List.of("e1", "e8")){
+      assertThat(((King)board.findCell(position).figure()).hasMoved()).isFalse();
+    }
+    for (String position: List.of("a1",  "a8")){
+      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isTrue();
+    }
+    for (String position: List.of("h1", "h8")){
+      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isFalse();
+    }
+    assertThat(generateFen(board)).isEqualTo(availableQueenCastling);
+  }
+
+  @Test
+  void testCastlingNoKingSideRook(){
+    Board board = new Board(false);
+
+    String noKingSideRook = "r3k3/1p2pppr/2p5/pB3b1p/5P2/4p2P/PPP3PR/R3K3 w Qq - 2 8";
+    parseFEN(board, noKingSideRook);
+    for (String position: List.of("e1", "e8")){
+      assertThat(((King)board.findCell(position).figure()).hasMoved()).isFalse();
+    }
+    for (String position: List.of("a1",  "a8")){
+      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isFalse();
+    }
+    assertThat(generateFen(board)).isEqualTo(noKingSideRook);
+  }
+
+  @Test
+  void testCastlingKingIsNotStartPosition(){
+    Board board = new Board(false);
+    String kingIsNotStartPosition = "r2k3r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R2K3R w - - 2 10";
+    parseFEN(board, kingIsNotStartPosition);
+    for (FigureColor color: List.of( FigureColor.WHITE, FigureColor.BLACK)){
+      assertThat(((King)board.findKing(color).figure()).hasMoved()).isTrue();
+    }
+    assertThat(generateFen(board)).isEqualTo(kingIsNotStartPosition);
   }
 }
