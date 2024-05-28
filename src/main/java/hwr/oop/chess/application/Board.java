@@ -127,7 +127,6 @@ public class Board {
           case 3, 6 -> cell.setFigure(new Bishop(figureColor));
           case 4 -> cell.setFigure(new Queen(figureColor));
           case 5 -> cell.setFigure(new King(figureColor));
-          default -> cell.setFigure(null);
         }
       }
 
@@ -185,7 +184,7 @@ public class Board {
       case EN_PASSANT -> handleEnPassant(startCell, endCell);
       case KING_CASTLING, QUEEN_CASTLING -> handleCastling(startCell, endCell, moveType);
       default -> handleNormalMove(startCell, endCell);
-    }
+   }
 
     changeTurnAndCountMoves();
   }
