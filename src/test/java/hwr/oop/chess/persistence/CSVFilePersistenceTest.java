@@ -1,6 +1,5 @@
 package hwr.oop.chess.persistence;
 
-import hwr.oop.chess.persistence.CSVFilePersistence;
 import hwr.oop.chess.cli.InvalidUserInputException;
 
 import java.io.File;
@@ -85,7 +84,7 @@ class CSVFilePersistenceTest {
   }
 
   @Test
-  void testSaveGameIOException() throws NoSuchFieldException, IllegalAccessException {
+  void testSaveGameIOException() throws NoSuchFieldException {
     // to make the temporary directory read-only to simulate an IOException
     tempDir.setWritable(false);
 
@@ -119,7 +118,7 @@ class CSVFilePersistenceTest {
 
     assertTrue(exception.getMessage().contains("could not be saved"));
 
-    // to Cleanup
+    // to clean up
     tempDir.setWritable(true);
   }
 }
