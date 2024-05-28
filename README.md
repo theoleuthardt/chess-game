@@ -94,7 +94,7 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 | 11     | Figure Movement | :heavy_check_mark: | :heavy_check_mark: |
 | 12     | Cell            | :heavy_check_mark: | :heavy_check_mark: |
 | 13     | CellDirection   | :heavy_check_mark: | :heavy_check_mark: |
-| 14     | ChessGame       | :x:                | :x:                |
+| 14     | ChessGame       | :heavy_check_mark: | :heavy_check_mark: |
 | 15     | Tournament      | :x:                | :x:                |
 
 ### CLI
