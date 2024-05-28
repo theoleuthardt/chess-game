@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CSVFilePersistence implements Persistence {
-  private final Map<String, String> gameData = new HashMap<>();
-  private int gameId;
+  final Map<String, String> gameData = new HashMap<>();
+  int gameId;
 
   public void storeState(String key, String value) {
     gameData.put(key, value);
