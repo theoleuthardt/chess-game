@@ -16,18 +16,6 @@ public class FenNotation {
     this.board = board;
   }
 
-  public static void parseFENOnlyPiecePlacement(Board board, String fenString) {
-    List<String> parts = List.of(fenString.split(" "));
-    if (parts.size() != 1) {
-      throw new IllegalArgumentException(
-          "This is an invalid FEN string, as it should have 1 part!");
-    }
-
-    FenNotation fen = new FenNotation(board);
-    fen.parsePiecePlacement(parts.getFirst());
-    fen.setCastlingImpossibleIfKingIsNotOnStartField();
-  }
-
   public static void parseFEN(Board board, String fenString) {
     List<String> parts = List.of(fenString.split(" "));
     if (parts.size() != 6) {
@@ -43,7 +31,6 @@ public class FenNotation {
     fen.parseEnPassant(parts.get(3));
     fen.parseHalfMove(parts.get(4));
     fen.parseFullMove(parts.getLast());
-    fen.setCastlingImpossibleIfKingIsNotOnStartField();
 
     board.initializeWith(fen.turn, fen.halfMove, fen.fullMove);
   }
@@ -88,12 +75,13 @@ public class FenNotation {
     int emptyCount = 0;
 
     List<Cell> allCells = board.allCells();
+    // Sort only Y position
     allCells.sort(
         (c1, c2) -> {
-          if (c1.y() == c2.y()) {
-            return Integer.compare(c1.x(), c2.x());
+          if (c1.y() != c2.y()) {
+            return Integer.compare(c1.y(), c2.y());
           }
-          return Integer.compare(c1.y(), c2.y());
+         return 0;
         });
 
     for (Cell cell : allCells) {
@@ -152,6 +140,16 @@ public class FenNotation {
       Cell kingCell = board.findKing(FigureColor.BLACK);
       ((King) kingCell.figure()).figureMoved();
     }
+
+    if (this.isKingNotOnStartField(FigureColor.WHITE) && (castling.contains("K") || castling.contains("Q"))){
+      throw new IllegalArgumentException(
+          "Cannot load position because it is invalid.");
+    }
+
+    if (this.isKingNotOnStartField(FigureColor.BLACK) && (castling.contains("k") || castling.contains("q"))){
+      throw new IllegalArgumentException(
+          "Cannot load position because it is invalid.");
+    }
   }
 
   private String generateCastling() {
@@ -174,14 +172,13 @@ public class FenNotation {
     return castling.isEmpty() ? "-" : castling.toString();
   }
 
-  private void setCastlingImpossibleIfKingIsNotOnStartField() {
-    Cell whiteKingCell = board.findKing(FigureColor.WHITE);
-    if (whiteKingCell.x() != 5 || whiteKingCell.y() != 1) {
-      ((King) whiteKingCell.figure()).figureMoved();
-    }
-    Cell blackKingCell = board.findKing(FigureColor.BLACK);
-    if (blackKingCell.x() != 5 || blackKingCell.y() != 8) {
-      ((King) blackKingCell.figure()).figureMoved();
+  private boolean isKingNotOnStartField(FigureColor color) {
+    Cell kingCell = board.findKing(color);
+
+    if (color == FigureColor.WHITE) {
+      return kingCell.x() != 5 || kingCell.y() != 1;
+    } else {
+      return kingCell.x() != 5 || kingCell.y() != 8;
     }
   }
 

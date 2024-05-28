@@ -37,8 +37,8 @@ public class CSVFilePersistence implements Persistence {
   }
 
   public void loadGame() {
+    gameData.clear();
     try (BufferedReader reader = new BufferedReader(new FileReader(fileName(gameId)))) {
-      gameData.clear();
       String line;
       while ((line = reader.readLine()) != null) {
         int comma = line.indexOf(',');

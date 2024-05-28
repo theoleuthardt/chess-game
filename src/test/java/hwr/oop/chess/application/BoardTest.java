@@ -203,13 +203,13 @@ class BoardTest {
     // King can only move to "d8"
     Cell kingCell = board.findKing(FigureColor.BLACK);
     List<Cell> availableCells = board.availableCellsWithoutCheckMoves(kingCell);
-    assertThat(availableCells).hasSize(1); // TODO Fix: King's getAvailableCells
+    assertThat(availableCells).hasSize(1);
   }
 
   @Test
   void testCheckMateBlackKing_e4() {
-    String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8";
-    FenNotation.parseFENOnlyPiecePlacement(board, fenString);
+    String fenString = "8/4Q1R1/R7/5k2/3pP3/5K2/8/8 b - - 0 4";
+    FenNotation.parseFEN(board, fenString);
     assertThat(board.isCheckmate(FigureColor.BLACK)).isTrue();
   }
 
