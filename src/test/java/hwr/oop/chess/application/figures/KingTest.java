@@ -122,4 +122,26 @@ class KingTest {
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
     assertThat(((Rook) board.findCell(4, 1).figure()).hasMoved()).isTrue();
   }
+
+  @Test
+  void testCanPerformWhiteKingSideCastling() {
+    board = new Board(false);
+    String fenString = "r3k3/8/8/8/8/8/8/4K2R w Kq - 1 1";
+    FenNotation.parseFEN(board, fenString);
+    Cell whiteKingCell = board.findCell('e', 1);
+    King whiteKing = (King) whiteKingCell.figure();
+    assertThat(whiteKing.canPerformKingSideCastling(whiteKingCell)).isTrue();
+    assertThat(whiteKing.canPerformQueenSideCastling(whiteKingCell)).isFalse();
+  }
+
+  @Test
+  void testCanPerformBlackQueenSideCastling() {
+    board = new Board(false);
+    String fenString = "r3k3/8/8/8/8/8/8/4K2R w Kq - 1 1";
+    FenNotation.parseFEN(board, fenString);
+    Cell blackKingCell = board.findCell('e', 8);
+    King blackKing = (King) blackKingCell.figure();
+    assertThat(blackKing.canPerformKingSideCastling(blackKingCell)).isFalse();
+    assertThat(blackKing.canPerformQueenSideCastling(blackKingCell)).isTrue();
+  }
 }
