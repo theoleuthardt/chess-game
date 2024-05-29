@@ -544,4 +544,11 @@ class CLIMenuTest {
                     \033[37m    A B C D E F G H\033[0m
                     """);
   }
+
+  @Test
+  void noGameDoesNotHaveFenSaved() {
+    Persistence persistence = new NoPersistence();
+    persistence.setGameId(NoPersistence.GameIdType.NO_GAME.ordinal());
+    assertThat(persistence.loadState("fen")).isNull();
+  }
 }

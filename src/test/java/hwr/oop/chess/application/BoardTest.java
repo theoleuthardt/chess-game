@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -512,5 +513,22 @@ class BoardTest {
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
     assertThat(((Rook) board.findCell(6, 8).figure()).hasMoved()).isTrue();
     assertThat(((King) board.findCell(7, 8).figure()).hasMoved()).isTrue();
+  }
+
+  @Test
+  void whenXCoordinateIs9ThereShouldBeNoFigure()
+      throws NoSuchFieldException, IllegalAccessException {
+
+    Cell h1 = board.findCell('h', 1);
+    Cell i1 = new Cell('h', 1);
+    Field field = i1.getClass().getDeclaredField("x");
+    field.setAccessible(true);
+    field.set(i1, 9);
+
+    i1.setFigure(new Pawn(FigureColor.WHITE));
+    board.connectCells(h1, i1);
+    board.addFiguresToBoard();
+
+    assertThat(i1.isFree()).isTrue();
   }
 }
