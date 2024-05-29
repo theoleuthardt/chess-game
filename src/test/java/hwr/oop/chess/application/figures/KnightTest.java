@@ -35,19 +35,8 @@ class KnightTest {
   }
 
   @ParameterizedTest
-  @ValueSource(ints = {2, 3})
-  void moveWhiteKnight_cannotMoveForward(int args) {
-    Cell from = board.findCell('b', 1);
-    Cell to = board.findCell('b', args);
-
-    Figure knight = from.figure();
-    assertThat(knight.type()).isEqualTo(FigureType.KNIGHT);
-    assertThat(knight.canMoveTo(from, to)).isFalse();
-  }
-
-  @ParameterizedTest
-  @ValueSource(ints = {0, -1})
-  void moveWhiteKnight_cannotMoveIntoVoid(int args) {
+  @ValueSource(ints = {-1, 0, 2, 3})
+  void moveWhiteKnight_cannotMoveForwardOrIntoVoid(int args) {
     Cell from = board.findCell('b', 1);
     Cell to = board.findCell('b', args);
 
@@ -68,18 +57,7 @@ class KnightTest {
   }
 
   @ParameterizedTest
-  @ValueSource(ints = {6, 7})
-  void moveBlackKnight_isNotAllowed(int args) {
-    Cell from = board.findCell('b', 8);
-    Cell to = board.findCell('b', args);
-
-    Figure knight = from.figure();
-    assertThat(knight.type()).isEqualTo(FigureType.KNIGHT);
-    assertThat(knight.canMoveTo(from, to)).isFalse();
-  }
-
-  @ParameterizedTest
-  @ValueSource(ints = {9, 10})
+  @ValueSource(ints = {6, 7, 9, 10})
   void moveBlackKnight_cannotMoveIntoVoid(int args) {
     Cell from = board.findCell('b', 8);
     Cell to = board.findCell('b', args);
@@ -104,7 +82,7 @@ class KnightTest {
   @Test
   void moveWhiteKnight_ifOccupied() {
     Cell from = board.findCell('b', 1);
-    Cell to = board.findCell('d',2);
+    Cell to = board.findCell('d', 2);
 
     Figure knight = from.figure();
     assertThat(knight.type()).isEqualTo(FigureType.KNIGHT);

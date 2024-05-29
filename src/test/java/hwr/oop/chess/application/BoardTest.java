@@ -175,7 +175,7 @@ class BoardTest {
 
   @Test
   void testMoveFigureInvalidCoordinates() {
-    Board board = new Board(false);
+    board = new Board(false);
     assertThatThrownBy(() -> board.moveFigure(0, 1, 8, 8))
         .isInstanceOf(InvalidUserInputException.class);
     assertThatThrownBy(() -> board.moveFigure(4, 1, 9, 9))
@@ -389,7 +389,7 @@ class BoardTest {
 
   @Test
   void testNotCheckMateState() {
-    Board board = new Board(false);
+    board = new Board(false);
     String initialStatus = "rnb1kb1r/ppp1pppp/3q1np1/3p4/2P5/2N2N1B/PP1PPP1P/R1BQK2R b KQkq - 3 5";
     FenNotation.parseFEN(board, initialStatus);
 
@@ -400,7 +400,7 @@ class BoardTest {
 
   @Test
   void testNotExistKing() {
-    Board board = new Board(false);
+    board = new Board(false);
     String initialStatus = "rn1q1bnr/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/RNBQ2NR b - - 2 10";
 
     assertThatThrownBy(() -> FenNotation.parseFEN(board, initialStatus))
@@ -410,7 +410,7 @@ class BoardTest {
 
   @Test
   void testInvalidMoveFigure() {
-    Board board = new Board(false);
+    board = new Board(false);
     String initialStatus = "rnbqkbnr/ppp1pppp/8/3p4/2P5/8/PP1PPPPP/RNBQKBNR w KQkq d6 0 3";
     FenNotation.parseFEN(board, initialStatus);
 
@@ -435,7 +435,7 @@ class BoardTest {
 
   @Test
   void testInValidCastling() {
-    Board board = new Board(false);
+    board = new Board(false);
     String initialState = "rnb1kb1r/ppp1pppp/3q1np1/3p4/2P5/2N2N1B/PP1PPP1P/R1BQK2R b KQkq - 3 5";
     FenNotation.parseFEN(board, initialState);
 
