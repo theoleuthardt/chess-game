@@ -71,7 +71,7 @@ public class Board {
   }
 
   public List<Cell> allCells() {
-    ArrayList<Cell> cells = new ArrayList<>();
+    List<Cell> cells = new ArrayList<>();
     Cell cell = firstCell.allCellsInDirection(CellDirection.TOP).getLast();
     Cell rowStart = cell;
 
