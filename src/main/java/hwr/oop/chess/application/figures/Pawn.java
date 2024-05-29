@@ -17,7 +17,7 @@ public class Pawn implements Figure {
   }
 
   private boolean isInStartPosition(Cell cell) {
-    return cell.y() == (color == FigureColor.WHITE ? 2 : 7);
+    return cell.y().toInt() == (color == FigureColor.WHITE ? 2 : 7);
   }
 
   public CellDirection forwards() {

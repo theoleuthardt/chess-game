@@ -20,14 +20,14 @@ class FenNotationTest {
     Board board = new Board(false);
     String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
     FenNotation.parseFEN(board, fenString);
-    assertThat(board.findCell(1, 1).figure().type()).isEqualTo(FigureType.ROOK);
-    assertThat(board.findCell(2, 1).figure().type()).isEqualTo(FigureType.KNIGHT);
-    assertThat(board.findCell(3, 1).figure().type()).isEqualTo(FigureType.BISHOP);
-    assertThat(board.findCell(4, 1).figure().type()).isEqualTo(FigureType.QUEEN);
-    assertThat(board.findCell(5, 1).figure().type()).isEqualTo(FigureType.KING);
-    assertThat(board.findCell(6, 1).figure().type()).isEqualTo(FigureType.BISHOP);
-    assertThat(board.findCell(7, 1).figure().type()).isEqualTo(FigureType.KNIGHT);
-    assertThat(board.findCell(8, 1).figure().type()).isEqualTo(FigureType.ROOK);
+    assertThat(board.findCell("a1").figure().type()).isEqualTo(FigureType.ROOK);
+    assertThat(board.findCell("b1").figure().type()).isEqualTo(FigureType.KNIGHT);
+    assertThat(board.findCell("c1").figure().type()).isEqualTo(FigureType.BISHOP);
+    assertThat(board.findCell("d1").figure().type()).isEqualTo(FigureType.QUEEN);
+    assertThat(board.findCell("e1").figure().type()).isEqualTo(FigureType.KING);
+    assertThat(board.findCell("f1").figure().type()).isEqualTo(FigureType.BISHOP);
+    assertThat(board.findCell("g1").figure().type()).isEqualTo(FigureType.KNIGHT);
+    assertThat(board.findCell("h1").figure().type()).isEqualTo(FigureType.ROOK);
   }
 
   @Test

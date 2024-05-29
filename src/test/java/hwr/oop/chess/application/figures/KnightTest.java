@@ -35,8 +35,8 @@ class KnightTest {
   }
 
   @ParameterizedTest
-  @ValueSource(ints = {-1, 0, 2, 3})
-  void moveWhiteKnight_cannotMoveForwardOrIntoVoid(int args) {
+  @ValueSource(ints = {2, 3})
+  void moveWhiteKnight_cannotMoveForward(int args) {
     Cell from = board.findCell('b', 1);
     Cell to = board.findCell('b', args);
 
@@ -57,8 +57,8 @@ class KnightTest {
   }
 
   @ParameterizedTest
-  @ValueSource(ints = {6, 7, 9, 10})
-  void moveBlackKnight_cannotMoveIntoVoid(int args) {
+  @ValueSource(ints = {6, 7})
+  void moveBlackKnight_cannotMoveForward(int args) {
     Cell from = board.findCell('b', 8);
     Cell to = board.findCell('b', args);
 

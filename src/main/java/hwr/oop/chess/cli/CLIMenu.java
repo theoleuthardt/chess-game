@@ -195,8 +195,10 @@ public class CLIMenu {
       throw new InvalidUserInputException("You must provide a coordinate for this command.");
     }
     String coordinate = remainingArguments.removeFirst();
-    Cell cell = board.findCell(coordinate);
-    if (cell == null) {
+    Cell cell;
+    try {
+      cell = board.findCell(coordinate);
+    } catch (IllegalArgumentException e) {
       throw new InvalidUserInputException(
           "The XY-Coordinates must be between A-H and 1-8 (eg. c3, a7). Please correct '"
               + coordinate

@@ -62,10 +62,11 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 | `<FROM>` `<TO>` | Cell coordinates | a4, c7        |
 | `<TYPE>`        | Type of figure   | queen, knight |
 
-| Command              | Description                                         |
-|----------------------|-----------------------------------------------------|
-| `chess` `chess help` | Show the list of supported commands                 |
-| `chess create <ID>`  | Create a new, fresh game (stored in game_\<ID>.csv) |
+| Command                        | Description                                              |
+|--------------------------------|----------------------------------------------------------|
+| `chess` `chess help`           | Show the list of supported commands                      |
+| `chess create <ID>`            | Create a new, fresh game (stored in game_\<ID>.csv)      |
+| `chess create tournament <ID>` | Create a new tournament (stored in tournament_\<ID>.csv) |
 
 ### In-Game Commands `chess on <ID> [...]`
 
@@ -74,6 +75,9 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 | `chess on <ID> move <FROM> <TO>`      | Move the figure on FROM to the cell TO         |
 | `chess on <ID> promote <FROM> <TYPE>` | Promote the pawn on cell FROM                  |
 | `chess on <ID> show-moves <FROM>`     | Show where the figure on cell FROM can move to |
+| `chess on <ID> remis offer`           | Offer remis to the other player                |
+| `chess on <ID> remis accept`          | Accept the remis offer                         |
+| `chess on <ID> surrender`             | Surrender the game                             |
 
 ## Feature List
 

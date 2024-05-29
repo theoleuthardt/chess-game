@@ -109,12 +109,12 @@ class PawnTest {
   void movePawn_noCellAvailableOnLastRow() {
     board = new Board(false);
     Figure blackPawn = new Pawn(FigureColor.BLACK);
-    Cell blackPawnCell = board.findCell(3, 1);
+    Cell blackPawnCell = board.findCell("c1");
     blackPawnCell.setFigure(blackPawn);
     assertThat(board.availableCellsWithoutCheckMoves(blackPawnCell)).isEmpty();
 
     Figure whitePawn = new Pawn(FigureColor.WHITE);
-    Cell whitePawnCell = board.findCell(3, 8);
+    Cell whitePawnCell = board.findCell("c8");
     whitePawnCell.setFigure(whitePawn);
     assertThat(board.availableCellsWithoutCheckMoves(whitePawnCell)).isEmpty();
   }
@@ -124,7 +124,7 @@ class PawnTest {
 
     CellDirection forwards =
         pawnColor == FigureColor.WHITE ? CellDirection.TOP : CellDirection.BOTTOM;
-    Cell from = board.findCell(4, 4);
+    Cell from = board.findCell("d4");
     Cell forwardsLeft = from.cellInDirection(forwards).leftCell();
     Cell forwardsRight = from.cellInDirection(forwards).rightCell();
 
