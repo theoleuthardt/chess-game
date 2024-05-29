@@ -69,7 +69,7 @@ public class CLIMenu {
       }
     } catch (InvalidUserInputException e) {
       printer.printlnError(e);
-      if (cli.game() != null && cli.persistence().gameId() > 0) {
+      if (cli.game() != null) {
         cli.printBoard();
       }
     }
