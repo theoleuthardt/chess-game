@@ -9,6 +9,8 @@ public class NoPersistence implements Persistence {
     DEFAULT_POSITIONS,
     WHITE_CHECK_POSSIBLE,
     BLACK_CHECK_POSSIBLE,
+    WHITE_CHECKMATE_POSSIBLE,
+    BLACK_CHECKMATE_POSSIBLE,
   }
 
   private int gameId;
@@ -33,6 +35,8 @@ public class NoPersistence implements Persistence {
         case GameIdType.DEFAULT_POSITIONS -> "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         case GameIdType.WHITE_CHECK_POSSIBLE -> "8/8/k7/8/8/8/PP3q2/1K6 b - - 0 1";
         case GameIdType.BLACK_CHECK_POSSIBLE -> "8/8/K7/8/8/8/pp3Q2/1k6 w - - 0 1";
+        case GameIdType.WHITE_CHECKMATE_POSSIBLE -> "K7/8/8/1r6/1r6/8/8/7k b - - 0 1";
+        case GameIdType.BLACK_CHECKMATE_POSSIBLE -> "k7/8/8/1R6/1R6/8/8/7K w - - 0 1";
         case null, default -> null;
       };
     }

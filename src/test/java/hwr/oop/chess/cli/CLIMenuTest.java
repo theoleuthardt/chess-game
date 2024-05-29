@@ -470,6 +470,28 @@ class CLIMenuTest {
   }
 
   @Test
+  void whiteKingIsInCheckMate() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.WHITE_CHECKMATE_POSSIBLE.ordinal() + " move b4 a4");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;104m ACTION \033[0m Move BLACK ROOK from B4 to A4.
+            \033[30;1;103m ERROR \033[0m The white king is in checkmate!
+            \033[37m8 | \033[0mK - - - - - - -
+            \033[37m7 | \033[0m- - - - - - - -
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- r - - - - - -
+            \033[37m4 | \033[0m\033[30;1;104mr\033[0m \033[30;1;104m-\033[0m - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0m- - - - - - - -
+            \033[37m1 | \033[0m- - - - - - - k
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
+  }
+
+  @Test
   void blackKingIsInCheck() {
     realCLIFromArguments(
         "on " + NoPersistence.GameIdType.BLACK_CHECK_POSSIBLE.ordinal() + " move f2 f1");
@@ -488,6 +510,18 @@ class CLIMenuTest {
                     \033[37m1 | \033[0m- k - - - \033[30;1;104mQ\033[0m - -
                     \033[37m  \\________________\033[0m
                     \033[37m    A B C D E F G H\033[0m
+                    """);
+  }
+
+  @Test
+  void blackKingIsInCheckMate() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.BLACK_CHECKMATE_POSSIBLE.ordinal() + " move b4 a4");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;104m ACTION \033[0m Move WHITE ROOK from B4 to A4.
+                    \033[30;1;103m ERROR \033[0m The black king is in checkmate!
                     """);
   }
 
@@ -543,5 +577,12 @@ class CLIMenuTest {
                     \033[37m  \\________________\033[0m
                     \033[37m    A B C D E F G H\033[0m
                     """);
+  }
+
+  @Test
+  void noGameDoesNotHaveFenSaved() {
+    Persistence persistence = new NoPersistence();
+    persistence.setGameId(NoPersistence.GameIdType.NO_GAME.ordinal());
+    assertThat(persistence.loadState("fen")).isNull();
   }
 }

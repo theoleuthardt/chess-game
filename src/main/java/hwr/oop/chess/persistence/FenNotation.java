@@ -2,6 +2,7 @@ package hwr.oop.chess.persistence;
 
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
+import hwr.oop.chess.application.Coordinate;
 import hwr.oop.chess.application.figures.*;
 
 import java.util.*;
@@ -79,9 +80,9 @@ public class FenNotation {
     allCells.sort(
         (c1, c2) -> {
           if (c1.y() != c2.y()) {
-            return Integer.compare(c1.y(), c2.y());
+            return Integer.compare(c1.y().toInt(), c2.y().toInt());
           }
-         return 0;
+          return 0;
         });
 
     for (Cell cell : allCells) {
@@ -120,8 +121,8 @@ public class FenNotation {
         continue;
       }
       FigureColor color = Character.isUpperCase(c) ? FigureColor.WHITE : FigureColor.BLACK;
-      int x = Character.toLowerCase(c) == 'q' ? 1 : 8;
-      int y = Character.isLowerCase(c) ? 8 : 1;
+      Coordinate x = Character.toLowerCase(c) == 'q' ? Coordinate.ONE : Coordinate.EIGHT;
+      Coordinate y = Character.isLowerCase(c) ? Coordinate.EIGHT : Coordinate.ONE;
 
       Cell rookCell = board.findCell(x, y);
       if (rookCell.isOccupiedBy(color, FigureType.ROOK)) {
@@ -141,14 +142,14 @@ public class FenNotation {
       ((King) kingCell.figure()).figureMoved();
     }
 
-    if (this.isKingNotOnStartField(FigureColor.WHITE) && (castling.contains("K") || castling.contains("Q"))){
-      throw new IllegalArgumentException(
-          "Cannot load position because it is invalid.");
+    if (this.isKingNotOnStartField(FigureColor.WHITE)
+        && (castling.contains("K") || castling.contains("Q"))) {
+      throw new IllegalArgumentException("Cannot load position because it is invalid.");
     }
 
-    if (this.isKingNotOnStartField(FigureColor.BLACK) && (castling.contains("k") || castling.contains("q"))){
-      throw new IllegalArgumentException(
-          "Cannot load position because it is invalid.");
+    if (this.isKingNotOnStartField(FigureColor.BLACK)
+        && (castling.contains("k") || castling.contains("q"))) {
+      throw new IllegalArgumentException("Cannot load position because it is invalid.");
     }
   }
 
@@ -162,8 +163,8 @@ public class FenNotation {
         continue;
       }
 
-      int x = Character.toLowerCase(c) == 'q' ? 1 : 8;
-      int y = Character.isLowerCase(c) ? 8 : 1;
+      Coordinate x = Character.toLowerCase(c) == 'q' ? Coordinate.ONE : Coordinate.EIGHT;
+      Coordinate y = Character.isLowerCase(c) ? Coordinate.EIGHT : Coordinate.ONE;
       Cell rookCell = board.findCell(x, y);
       if (rookCell.isOccupiedBy(color, FigureType.ROOK) && !((Rook) rookCell.figure()).hasMoved()) {
         castling.append(c);
@@ -176,9 +177,9 @@ public class FenNotation {
     Cell kingCell = board.findKing(color);
 
     if (color == FigureColor.WHITE) {
-      return kingCell.x() != 5 || kingCell.y() != 1;
+      return kingCell.x() != Coordinate.FIVE || kingCell.y() != Coordinate.ONE;
     } else {
-      return kingCell.x() != 5 || kingCell.y() != 8;
+      return kingCell.x() != Coordinate.FIVE || kingCell.y() != Coordinate.EIGHT;
     }
   }
 

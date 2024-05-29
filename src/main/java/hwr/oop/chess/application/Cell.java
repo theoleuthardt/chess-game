@@ -3,14 +3,13 @@ package hwr.oop.chess.application;
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
-import hwr.oop.chess.cli.InvalidUserInputException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Cell {
-  private final int y;
-  private final int x;
+  private final Coordinate y;
+  private final Coordinate x;
   private Figure figure;
   private Cell topCell;
   private Cell bottomCell;
@@ -22,32 +21,9 @@ public class Cell {
   private Cell bottomRightCell;
   private boolean isEnPassant = false;
 
-  public Cell(int x, int y) {
-    if (isInvalidCoordinate(x, y)) {
-      throw new InvalidUserInputException("Invalid Position");
-    }
+  public Cell(Coordinate x, Coordinate y) {
     this.x = x;
     this.y = y;
-  }
-
-  public Cell(char x, int y) {
-    this(x - 96, y);
-  }
-
-  public boolean isValidCoordinate(int c) {
-    return c >= 1 && c <= 8;
-  }
-
-  public boolean isInvalidCoordinate(int c) {
-    return !isValidCoordinate(c);
-  }
-
-  public boolean isValidCoordinate(int x, int y) {
-    return isValidCoordinate(x) && isValidCoordinate(y);
-  }
-
-  public boolean isInvalidCoordinate(int x, int y) {
-    return !isValidCoordinate(x, y);
   }
 
   // Method to set the figure
@@ -154,12 +130,12 @@ public class Cell {
   }
 
   // Method to return the index of the column to which the position belongs
-  public int x() {
+  public Coordinate x() {
     return x;
   }
 
   // Method to return the index of the row to which the position belongs
-  public int y() {
+  public Coordinate y() {
     return y;
   }
 
@@ -202,11 +178,11 @@ public class Cell {
     }
     // -1 if anotherCell is to the left
     // 1 if anotherCell is to the right
-    int diffX = anotherCell.x() - x;
+    int diffX = anotherCell.x().toInt() - x.toInt();
 
     // -1 if anotherCell is below
     // 1 if anotherCell is above
-    int diffY = anotherCell.y() - y;
+    int diffY = anotherCell.y().toInt() - y.toInt();
 
     final String notNeighboursError =
         "The cells " + this + " and " + anotherCell + " are not neighbours to each other";
@@ -248,7 +224,7 @@ public class Cell {
   }
 
   public String toCoordinates() {
-    return (char) (x + 64) + String.valueOf(y);
+    return (char) (x.toInt() + 64) + String.valueOf(y.toInt());
   }
 
   public List<Cell> allCellsInDirection(CellDirection direction) {

@@ -10,94 +10,69 @@ import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 class CellTest {
-  @Test
-  void positionIsInvalid_XZeroIsTooSmall() {
-    assertThatThrownBy(() -> new Cell(0, 3))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("Invalid Position");
-  }
-
-  @Test
-  void positionIsInvalid_YZeroIsTooSmall() {
-    assertThatThrownBy(() -> new Cell(3, 0))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("Invalid Position");
-  }
-
-  @Test
-  void positionIsInvalid_XNineIsTooBig() {
-    assertThatThrownBy(() -> new Cell(9, 3))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("Invalid Position");
-  }
-
-  @Test
-  void positionIsInvalid_YNineIsTooBig() {
-    assertThatThrownBy(() -> new Cell(3, 9))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("Invalid Position");
-  }
 
   @Test
   void positionIsValid() {
-    Cell position = new Cell(6, 5);
+    Cell position = new Cell(Coordinate.SIX, Coordinate.FIVE);
     assertSoftly(
         softly -> {
-          softly.assertThat(position.x()).isEqualTo(6);
-          softly.assertThat(position.y()).isEqualTo(5);
+          softly.assertThat(position.x()).isEqualTo(Coordinate.SIX);
+          softly.assertThat(position.y()).isEqualTo(Coordinate.FIVE);
         });
   }
 
   @Test
   void positionConversion_AIsEqualToOne() {
-    Cell position = new Cell('a', 5);
-    assertThat(position.x()).isEqualTo(1);
-    assertThat(position.y()).isEqualTo(5);
+    Cell position = new Cell(Coordinate.ONE, Coordinate.FIVE);
+    assertThat(position.x()).isEqualTo(Coordinate.ONE);
+    assertThat(position.y()).isEqualTo(Coordinate.FIVE);
   }
 
   @Test
   void positionConversion_EIsEqualToFive() {
-    Cell position = new Cell('e', 2);
-    assertThat(position.x()).isEqualTo(5);
-    assertThat(position.y()).isEqualTo(2);
-  }
-
-  @Test
-  void isInvalidCoordinate() {
-    Cell cell = new Cell('a', 1);
-    assertThat(cell.isInvalidCoordinate(19)).isTrue();
-    assertThat(cell.isInvalidCoordinate(1)).isFalse();
+    Cell position = new Cell(Coordinate.FIVE, Coordinate.TWO);
+    assertThat(position.x()).isEqualTo(Coordinate.FIVE);
+    assertThat(position.y()).isEqualTo(Coordinate.TWO);
   }
 
   @Test
   void cellsAreEqual() {
-    Cell one = new Cell('e', 2);
-    Cell two = new Cell('e', 2);
+    Cell one = new Cell(Coordinate.FIVE, Coordinate.TWO);
+    Cell two = new Cell(Coordinate.FIVE, Coordinate.TWO);
     assertThat(one.isEqualTo(two)).isTrue();
   }
 
   @Test
   void cellsAreNotEqual() {
-    assertThat(new Cell('e', 2).isEqualTo(new Cell('e', 3))).isFalse();
-    assertThat(new Cell('f', 2).isEqualTo(new Cell('e', 3))).isFalse();
-    assertThat(new Cell('e', 2).isEqualTo(new Cell('a', 1))).isFalse();
+    assertThat(
+            new Cell(Coordinate.FIVE, Coordinate.TWO)
+                .isEqualTo(new Cell(Coordinate.FIVE, Coordinate.THREE)))
+        .isFalse();
+    assertThat(
+            new Cell(Coordinate.SIX, Coordinate.TWO)
+                .isEqualTo(new Cell(Coordinate.FIVE, Coordinate.THREE)))
+        .isFalse();
+    assertThat(
+            new Cell(Coordinate.ONE, Coordinate.THREE)
+                .isEqualTo(new Cell(Coordinate.ONE, Coordinate.ONE)))
+        .isFalse();
   }
 
   @Test
   void cellConnectImpossible() {
-    Cell cell = new Cell('c', 3);
+    Cell cell = new Cell(Coordinate.THREE, Coordinate.THREE);
     List<Cell> list =
         List.of(
             cell,
-            new Cell('c', 1),
-            new Cell('c', 3),
-            new Cell('c', 5),
-            new Cell('a', 3),
-            new Cell('e', 3),
-            new Cell('a', 1),
-            new Cell('h', 8),
-            new Cell('d', 1),
-            new Cell('b', 1));
+            new Cell(Coordinate.THREE, Coordinate.ONE),
+            new Cell(Coordinate.THREE, Coordinate.THREE),
+            new Cell(Coordinate.THREE, Coordinate.FIVE),
+            new Cell(Coordinate.ONE, Coordinate.THREE),
+            new Cell(Coordinate.FIVE, Coordinate.THREE),
+            new Cell(Coordinate.ONE, Coordinate.ONE),
+            new Cell(Coordinate.EIGHT, Coordinate.EIGHT),
+            new Cell(Coordinate.FOUR, Coordinate.ONE),
+            new Cell(Coordinate.TWO, Coordinate.ONE));
 
     for (Cell c : list) {
       assertThatThrownBy(() -> cell.connectTo(c)).isInstanceOf(IllegalArgumentException.class);
@@ -107,7 +82,7 @@ class CellTest {
 
   @Test
   void cellToString() {
-    Cell cell = new Cell('c', 3);
+    Cell cell = new Cell(Coordinate.THREE, Coordinate.THREE);
     assertThat(cell).hasToString("Cell_C3(-)");
     cell.setFigure(new Pawn(FigureColor.WHITE));
     assertThat(cell).hasToString("Cell_C3(P)");
@@ -115,14 +90,14 @@ class CellTest {
 
   @Test
   void findCellInDirection() {
-    Cell cell = new Cell('c', 3);
+    Cell cell = new Cell(Coordinate.THREE, Coordinate.THREE);
     assertThatThrownBy(() -> cell.findCellInDirection(10, CellDirection.RIGHT))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void isFreeInDirection() {
-    Cell cell = new Cell('c', 3);
+    Cell cell = new Cell(Coordinate.THREE, Coordinate.THREE);
     assertThat(cell.isFreeInDirection(10, CellDirection.RIGHT)).isFalse();
   }
 }

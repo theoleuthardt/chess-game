@@ -182,10 +182,14 @@ public class CLIMenu {
   }
 
   private void checkForCheck() {
-    if (cli.game().board().isCheck(FigureColor.WHITE)) {
+    if (cli.game().board().isCheckmate(FigureColor.WHITE)) {
+      this.cli.printer().printlnError("The white king is in checkmate!");
+    } else if (cli.game().board().isCheck(FigureColor.WHITE)) {
       this.cli.printer().printlnError("The white king is in check!");
     }
-    if (cli.game().board().isCheck(FigureColor.BLACK)) {
+    if (cli.game().board().isCheckmate(FigureColor.BLACK)) {
+      this.cli.printer().printlnError("The black king is in checkmate!");
+    } else if (cli.game().board().isCheck(FigureColor.BLACK)) {
       this.cli.printer().printlnError("The black king is in check!");
     }
   }
@@ -195,8 +199,10 @@ public class CLIMenu {
       throw new InvalidUserInputException("You must provide a coordinate for this command.");
     }
     String coordinate = remainingArguments.removeFirst();
-    Cell cell = board.findCell(coordinate);
-    if (cell == null) {
+    Cell cell;
+    try {
+      cell = board.findCell(coordinate);
+    } catch (IllegalArgumentException e) {
       throw new InvalidUserInputException(
           "The XY-Coordinates must be between A-H and 1-8 (eg. c3, a7). Please correct '"
               + coordinate

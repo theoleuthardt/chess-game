@@ -62,10 +62,11 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 | `<FROM>` `<TO>` | Cell coordinates | a4, c7        |
 | `<TYPE>`        | Type of figure   | queen, knight |
 
-| Command              | Description                                         |
-|----------------------|-----------------------------------------------------|
-| `chess` `chess help` | Show the list of supported commands                 |
-| `chess create <ID>`  | Create a new, fresh game (stored in game_\<ID>.csv) |
+| Command                        | Description                                              |
+|--------------------------------|----------------------------------------------------------|
+| `chess` `chess help`           | Show the list of supported commands                      |
+| `chess create <ID>`            | Create a new, fresh game (stored in game_\<ID>.csv)      |
+| `chess create tournament <ID>` | Create a new tournament (stored in tournament_\<ID>.csv) |
 
 ### In-Game Commands `chess on <ID> [...]`
 
@@ -74,6 +75,9 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 | `chess on <ID> move <FROM> <TO>`      | Move the figure on FROM to the cell TO         |
 | `chess on <ID> promote <FROM> <TYPE>` | Promote the pawn on cell FROM                  |
 | `chess on <ID> show-moves <FROM>`     | Show where the figure on cell FROM can move to |
+| `chess on <ID> remis offer`           | Offer remis to the other player                |
+| `chess on <ID> remis accept`          | Accept the remis offer                         |
+| `chess on <ID> surrender`             | Surrender the game                             |
 
 ## Feature List
 
@@ -106,7 +110,7 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 | 3      | Show Board          | :heavy_check_mark: | :heavy_check_mark: |
 | 4      | Move Figure         | :heavy_check_mark: | :heavy_check_mark: |
 | 5      | Promotion           | :heavy_check_mark: | :heavy_check_mark: |
-| 6      | Show Possible Moves | :heavy_check_mark: | :x:                |
+| 6      | Show Possible Moves | :heavy_check_mark: | :heavy_check_mark: |
 | 7      | Surrender           | :x:                | :x:                |
 | 8      | Offer Remi          | :x:                | :x:                |
 | 9      | Accept Remi         | :x:                | :x:                |
@@ -118,8 +122,8 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 |--------|-----------------|--------------------|--------------------|
 | 1      | Player          | :heavy_check_mark: | :heavy_check_mark: |
 | 2      | FEN Notation    | :heavy_check_mark: | :heavy_check_mark: |
-| 3      | Save Game       | :heavy_check_mark: | :x:                |
-| 4      | Load Game       | :heavy_check_mark: | :x:                |
+| 3      | Save Game       | :heavy_check_mark: | :heavy_check_mark: |
+| 4      | Load Game       | :heavy_check_mark: | :heavy_check_mark: |
 | 5      | Save Tournament | :x:                | :x:                |
 | 6      | Load Tournament | :x:                | :x:                |
 
