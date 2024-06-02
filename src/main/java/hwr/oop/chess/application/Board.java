@@ -127,6 +127,9 @@ public class Board {
           case THREE, SIX -> cell.setFigure(new Bishop(figureColor));
           case FOUR -> cell.setFigure(new Queen(figureColor));
           case FIVE -> cell.setFigure(new King(figureColor));
+          default -> {
+            // This column does not exist
+          }
         }
       }
 
