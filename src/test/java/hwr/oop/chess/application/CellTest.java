@@ -81,9 +81,14 @@ class CellTest {
   }
 
   @Test
-  void cellToString() {
+  void cellToStringIsEmpty() {
     Cell cell = new Cell(Coordinate.THREE, Coordinate.THREE);
     assertThat(cell).hasToString("Cell_C3(-)");
+  }
+
+  @Test
+  void cellToStringWithFigure() {
+    Cell cell = new Cell(Coordinate.THREE, Coordinate.THREE);
     cell.setFigure(new Pawn(FigureColor.WHITE));
     assertThat(cell).hasToString("Cell_C3(P)");
   }

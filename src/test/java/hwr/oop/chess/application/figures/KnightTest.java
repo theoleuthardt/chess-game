@@ -67,6 +67,9 @@ class KnightTest {
     assertThat(knight.canMoveTo(from, to)).isFalse();
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void moveWhiteKnight_cannotMoveIntoVoid1() {
     Cell from = board.findCell('b', 1);

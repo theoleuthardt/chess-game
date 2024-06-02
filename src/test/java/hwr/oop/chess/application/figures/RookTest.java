@@ -4,7 +4,6 @@ import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
 import hwr.oop.chess.application.Coordinate;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,9 +38,9 @@ class RookTest {
   @Test
   void rook_hasCorrectSymbol() {
     Rook whiteRook = new Rook(FigureColor.WHITE);
-    assertThat(whiteRook.symbol()).isEqualTo('R');
-
     Rook blackRook = new Rook(FigureColor.BLACK);
+
+    assertThat(whiteRook.symbol()).isEqualTo('R');
     assertThat(blackRook.symbol()).isEqualTo('r');
   }
 
@@ -58,7 +57,7 @@ class RookTest {
     Cell cellA1 = board.findCell('a', 1);
     Cell cellA6 = board.findCell('a', 6);
     Figure rook = cellA1.figure();
-    Assertions.assertThat(rook.canMoveTo(cellA1, cellA6)).isTrue();
+    assertThat(rook.canMoveTo(cellA1, cellA6)).isTrue();
   }
 
   @Test

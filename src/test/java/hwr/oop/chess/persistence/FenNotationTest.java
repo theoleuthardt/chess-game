@@ -9,6 +9,8 @@ import hwr.oop.chess.application.figures.King;
 import hwr.oop.chess.application.figures.Rook;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static hwr.oop.chess.persistence.FenNotation.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,7 +21,8 @@ class FenNotationTest {
   void testInitialFigureFromFEN() {
     Board board = new Board(false);
     String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
-    FenNotation.parseFEN(board, fenString);
+    parseFEN(board, fenString);
+
     assertThat(board.findCell("a1").figure().type()).isEqualTo(FigureType.ROOK);
     assertThat(board.findCell("b1").figure().type()).isEqualTo(FigureType.KNIGHT);
     assertThat(board.findCell("c1").figure().type()).isEqualTo(FigureType.BISHOP);
@@ -49,24 +52,16 @@ class FenNotationTest {
         .hasMessageContaining("Invalid char for figure type!");
   }
 
-  @Test
-  void testGenerateFENFromBoard() {
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 0 5",
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0"
+      })
+  void parsingFenAndGeneratingItFromBoard_shouldNotChangeFenString(String initialFen) {
     Board board = new Board(false);
-    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 0 5";
-
-    FenNotation.parseFEN(board, fen);
-    String generatedFEN = FenNotation.generateFen(board);
-    assertThat(generatedFEN).startsWith(fen);
-  }
-
-  @Test
-  void testGenerateFENInitialState() {
-    Board board = new Board(false);
-    String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
-
-    FenNotation.parseFEN(board, fen);
-    String generatedFEN = FenNotation.generateFen(board);
-    assertThat(generatedFEN).isEqualTo(fen);
+    parseFEN(board, initialFen);
+    assertThat(generateFen(board)).isEqualTo(initialFen);
   }
 
   @Test
@@ -81,23 +76,17 @@ class FenNotationTest {
   void testGenerateFenByCastling() {
     Board board = new Board(false);
     String initialStatus = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
-    FenNotation.parseFEN(board, initialStatus);
-    assertThat(FenNotation.generateFen(board)).isEqualTo(initialStatus);
+    parseFEN(board, initialStatus);
+    assertThat(generateFen(board)).isEqualTo(initialStatus);
   }
 
   @Test
-  void testParseFEN() {
+  void generateFenFailsWithoutEnoughParts() {
     Board board = new Board(false);
-    String fenString = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
-
-    List<String> parts = List.of(fenString.split(" "));
-    String firstPart = parts.getFirst();
-    assertThatThrownBy(() -> parseFEN(board, firstPart))
+    String invalidFenString = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R";
+    assertThatThrownBy(() -> parseFEN(board, invalidFenString))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("This is an invalid FEN string, as it should have 6 parts!");
-
-    parseFEN(board, fenString);
-    assertThat(generateFen(board)).isEqualTo(fenString);
   }
 
   @Test

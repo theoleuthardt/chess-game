@@ -12,7 +12,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
   private Board board;
@@ -195,14 +194,14 @@ class BoardTest {
     String fenString = "rnb1kb1r/pppp1Qpp/5n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4";
     FenNotation.parseFEN(board, fenString);
 
-    // Status: Black is checked, but no checkmated
-    assertThat(board.isCheck(FigureColor.BLACK)).isTrue();
-    assertThat(board.isCheckmate(FigureColor.BLACK)).isFalse();
-
     // King can only move to "d8"
     Cell kingCell = board.findKing(FigureColor.BLACK);
     List<Cell> availableCells = board.availableCellsWithoutCheckMoves(kingCell);
     assertThat(availableCells).hasSize(1);
+
+    // Status: Black is checked, but no checkmated
+    assertThat(board.isCheck(FigureColor.BLACK)).isTrue();
+    assertThat(board.isCheckmate(FigureColor.BLACK)).isFalse();
   }
 
   @Test
@@ -217,8 +216,8 @@ class BoardTest {
     // invalid Value
     assertThatThrownBy(() -> board.findCell("c3d")).isInstanceOf(InvalidUserInputException.class);
     assertThatThrownBy(() -> board.findCell("a")).isInstanceOf(InvalidUserInputException.class);
-    assertNotNull(board.findCell("a1"));
-    assertNotNull(board.findCell("e5"));
+    assertThat(board.findCell("a1")).isNotNull();
+    assertThat(board.findCell("e5")).isNotNull();
   }
 
   @Test
@@ -307,6 +306,9 @@ class BoardTest {
     }
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void testEnPassant() {
     // given
@@ -329,6 +331,9 @@ class BoardTest {
     assertThat(FenNotation.generateFen(board)).isEqualTo(afterEnPassant);
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void testHalfMove() {
     // Given
@@ -386,6 +391,9 @@ class BoardTest {
             "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void testNotCheckMateState() {
     board = new Board(false);
@@ -449,6 +457,9 @@ class BoardTest {
   /*
   Chess Match: Spasski–Fischer 0:1 Reykjavík, 20. Juli 1972
   */
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void testChessGameSpasskiFischer() {
     board = new Board(true);

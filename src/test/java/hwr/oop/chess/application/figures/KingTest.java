@@ -36,9 +36,9 @@ class KingTest {
   @Test
   void king_hasCorrectSymbol() {
     King whiteKing = new King(FigureColor.WHITE);
-    assertThat(whiteKing.symbol()).isEqualTo('K');
-
     King blackKing = new King(FigureColor.BLACK);
+
+    assertThat(whiteKing.symbol()).isEqualTo('K');
     assertThat(blackKing.symbol()).isEqualTo('k');
   }
 
@@ -69,6 +69,9 @@ class KingTest {
     assertThat(king.canMoveTo(from, to)).isFalse();
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion, try to change the order
+  // or split it into two seperate test.
   @Test
   void testCastlingKingWhite() {
     board = new Board(false);
@@ -96,6 +99,9 @@ class KingTest {
     assertThat(((Rook) board.findCell("f1").figure()).hasMoved()).isTrue();
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void testCastlingQueenWhite() {
     board = new Board(false);
