@@ -2,10 +2,10 @@ package hwr.oop.chess.cli;
 
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
+import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.persistence.FenNotation;
 import hwr.oop.chess.persistence.NoPersistence;
-import hwr.oop.chess.persistence.Persistence;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -19,8 +19,11 @@ import static org.assertj.core.api.Assertions.*;
 
 class CLIMenuTest {
   private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-  private final CLIAdapter cli = new CLIAdapter(new PrintStream(outputStream), new NoPersistence());
+  private final NoPersistence persistence = new NoPersistence();
+  private final CLIAdapter cli = new CLIAdapter(new PrintStream(outputStream), persistence);
   private CLIMenu menu;
+
+  private final int gameWithDefaultFigures = NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal();
 
   void menuFromArguments(List<String> args) {
     cli.forGameId("123");
@@ -50,22 +53,21 @@ class CLIMenuTest {
   }
 
   @Test
-  void canPrintHelpMenu() {
+  void showErrorOnUnsupportedCommand() {
     cli.handle(new LinkedList<>(List.of("abc")));
     assertThat(outputStream.toString().replaceAll("\\r", ""))
         .isEqualTo(
             """
 
-                      \033[30;1;103m ERROR \033[0m The command 'abc' is not supported. Try 'help' to see available commands.
+            \033[30;1;103m ERROR \033[0m The command 'abc' is not supported. Try 'help' to see available commands.
 
-                      """);
+            """);
   }
 
   @Test
   void usesGameIdOnCreation() {
     menuFromArguments(List.of("create", "123"));
     assertThat(cli.game()).isNotNull();
-    Persistence persistence = cli.persistence();
     assertThat(persistence.loadState("figures")).isNull();
     assertThatNoException().isThrownBy(persistence::loadGame);
     assertThatNoException().isThrownBy(persistence::saveGame);
@@ -158,7 +160,16 @@ class CLIMenuTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"create 7 xyz", "show 7 xyz"})
+  @ValueSource(
+      strings = {
+        "create 1 xyz",
+        "on 1 show-board xyz",
+        "on 1 show-stats xyz",
+        "on 1 show-moveable xyz",
+        "on 1 draw offer xyz",
+        "on 1 resign xyz",
+        "on 1 rematch xyz",
+      })
   void runCommandsWithTooManyArguments(String arguments) {
     Main.mainWithCli(arguments.split(" "), cli);
     assertThat(outputStream.toString())
@@ -195,7 +206,7 @@ class CLIMenuTest {
   void argumentToGameIdSetsGameId() {
     menuFromArguments(List.of("123"));
     menu.argumentToGameId();
-    assertThat(cli.persistence().gameId()).isEqualTo(123);
+    assertThat(persistence.gameId()).isEqualTo(123);
   }
 
   @Test
@@ -208,8 +219,29 @@ class CLIMenuTest {
 
   @Test
   void showBoardStatus() {
-    realCLIFromArguments("show " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal());
+    realCLIFromArguments("on " + gameWithDefaultFigures + " show-board");
     assertThat(outputStream.toString()).contains("Here is game ").contains("A B C D E F G H");
+    assertThat(cli.game()).isNotNull();
+  }
+
+  @Test
+  void showBoardMoveable() {
+    realCLIFromArguments("on " + gameWithDefaultFigures + " show-moveable");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;104m ACTION \033[0m Showing the figures which can be moved by the WHITE player.
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p p p p p p p
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0m\033[30;1;104mP\033[0m \033[30;1;104mP\033[0m \033[30;1;104mP\033[0m \033[30;1;104mP\033[0m \033[30;1;104mP\033[0m \033[30;1;104mP\033[0m \033[30;1;104mP\033[0m \033[30;1;104mP\033[0m
+            \033[37m1 | \033[0mR \033[30;1;104mN\033[0m B Q K B \033[30;1;104mN\033[0m R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
     assertThat(cli.game()).isNotNull();
   }
 
@@ -219,147 +251,142 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;104m ACTION \033[0m Here is your new game '1'. Good luck and have fun.
-                    \033[37m8 | \033[0mr n b q k b n r
-                    \033[37m7 | \033[0mp p p p p p p p
-                    \033[37m6 | \033[0m- - - - - - - -
-                    \033[37m5 | \033[0m- - - - - - - -
-                    \033[37m4 | \033[0m- - - - - - - -
-                    \033[37m3 | \033[0m- - - - - - - -
-                    \033[37m2 | \033[0mP P P P P P P P
-                    \033[37m1 | \033[0mR N B Q K B N R
-                    \033[37m  \\________________\033[0m
-                    \033[37m    A B C D E F G H\033[0m
-                    """);
+            \033[30;1;104m ACTION \033[0m Here is your new game '1'. Good luck and have fun.
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p p p p p p p
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0mP P P P P P P P
+            \033[37m1 | \033[0mR N B Q K B N R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
     assertThat(cli.game()).isNotNull();
     assertThat(cli.game().board().findCell("a1").figure().type()).isEqualTo(FigureType.ROOK);
   }
 
   @Test
   void moveWithEnoughCoordinates() {
-    realCLIFromArguments(
-        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " move a2 a4");
+    realCLIFromArguments("on " + gameWithDefaultFigures + " move a2 a4");
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;104m ACTION \033[0m Move WHITE PAWN from A2 to A4.
-                    \033[37m8 | \033[0mr n b q k b n r
-                    \033[37m7 | \033[0mp p p p p p p p
-                    \033[37m6 | \033[0m- - - - - - - -
-                    \033[37m5 | \033[0m- - - - - - - -
-                    \033[37m4 | \033[0m\033[30;1;104mP\033[0m - - - - - - -
-                    \033[37m3 | \033[0m- - - - - - - -
-                    \033[37m2 | \033[0m\033[30;1;104m-\033[0m P P P P P P P
-                    \033[37m1 | \033[0mR N B Q K B N R
-                    \033[37m  \\________________\033[0m
-                    \033[37m    A B C D E F G H\033[0m
-                    """);
+            \033[30;1;104m ACTION \033[0m Move WHITE PAWN from A2 to A4.
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p p p p p p p
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m\033[30;1;104mP\033[0m - - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0m\033[30;1;104m-\033[0m P P P P P P P
+            \033[37m1 | \033[0mR N B Q K B N R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
   }
 
   @Test
   void moveWithoutEnoughCoordinates() {
-    realCLIFromArguments("on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " move a1");
+    realCLIFromArguments("on " + gameWithDefaultFigures + " move a1");
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;103m ERROR \033[0m You must provide a coordinate for this command.
-                    \033[37m8 | \033[0mr n b q k b n r
-                    \033[37m7 | \033[0mp p p p p p p p
-                    \033[37m6 | \033[0m- - - - - - - -
-                    \033[37m5 | \033[0m- - - - - - - -
-                    \033[37m4 | \033[0m- - - - - - - -
-                    \033[37m3 | \033[0m- - - - - - - -
-                    \033[37m2 | \033[0mP P P P P P P P
-                    \033[37m1 | \033[0m\033[30;1;104mR\033[0m N B Q K B N R
-                    \033[37m  \\________________\033[0m
-                    \033[37m    A B C D E F G H\033[0m
-                    """);
+            \033[30;1;103m ERROR \033[0m You must provide a coordinate for this command.
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p p p p p p p
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0mP P P P P P P P
+            \033[37m1 | \033[0m\033[30;1;104mR\033[0m N B Q K B N R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
   }
 
   @Test
   void showMovesOfPawn() {
-    realCLIFromArguments(
-        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " show-moves b2");
+    realCLIFromArguments("on " + gameWithDefaultFigures + " show-moves b2");
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;104m ACTION \033[0m Showing the cells where the PAWN on B2 can move to.
-                    \033[37m8 | \033[0mr n b q k b n r
-                    \033[37m7 | \033[0mp p p p p p p p
-                    \033[37m6 | \033[0m- - - - - - - -
-                    \033[37m5 | \033[0m- - - - - - - -
-                    \033[37m4 | \033[0m- \033[30;1;104m-\033[0m - - - - - -
-                    \033[37m3 | \033[0m- \033[30;1;104m-\033[0m - - - - - -
-                    \033[37m2 | \033[0mP P P P P P P P
-                    \033[37m1 | \033[0mR N B Q K B N R
-                    \033[37m  \\________________\033[0m
-                    \033[37m    A B C D E F G H\033[0m
-                    """);
+            \033[30;1;104m ACTION \033[0m Showing the cells where the PAWN on B2 can move to.
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p p p p p p p
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- \033[30;1;104m-\033[0m - - - - - -
+            \033[37m3 | \033[0m- \033[30;1;104m-\033[0m - - - - - -
+            \033[37m2 | \033[0mP P P P P P P P
+            \033[37m1 | \033[0mR N B Q K B N R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
   }
 
   @Test
   void moveToTheStartField() {
-    realCLIFromArguments(
-        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " move a2 a2");
+    realCLIFromArguments("on " + gameWithDefaultFigures + " move a2 a2");
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                            \033[30;1;104m ACTION \033[0m Move WHITE PAWN from A2 to A2.
-                            \033[30;1;103m ERROR \033[0m The figure can't move to that cell
-                            \033[37m8 | \033[0mr n b q k b n r
-                            \033[37m7 | \033[0mp p p p p p p p
-                            \033[37m6 | \033[0m- - - - - - - -
-                            \033[37m5 | \033[0m- - - - - - - -
-                            \033[37m4 | \033[0m- - - - - - - -
-                            \033[37m3 | \033[0m- - - - - - - -
-                            \033[37m2 | \033[0m\033[30;1;104mP\033[0m P P P P P P P
-                            \033[37m1 | \033[0mR N B Q K B N R
-                            \033[37m  \\________________\033[0m
-                            \033[37m    A B C D E F G H\033[0m
-                            """);
+            \033[30;1;104m ACTION \033[0m Move WHITE PAWN from A2 to A2.
+            \033[30;1;103m ERROR \033[0m The figure can't move to that cell
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p p p p p p p
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0m\033[30;1;104mP\033[0m P P P P P P P
+            \033[37m1 | \033[0mR N B Q K B N R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
   }
 
   @Test
   void moveEmptyField() {
-    realCLIFromArguments(
-        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " move a3 a4");
+    realCLIFromArguments("on " + gameWithDefaultFigures + " move a3 a4");
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                            \033[30;1;103m ERROR \033[0m On the cell A3 there is no figure!
-                            \033[37m8 | \033[0mr n b q k b n r
-                            \033[37m7 | \033[0mp p p p p p p p
-                            \033[37m6 | \033[0m- - - - - - - -
-                            \033[37m5 | \033[0m- - - - - - - -
-                            \033[37m4 | \033[0m- - - - - - - -
-                            \033[37m3 | \033[0m\033[30;1;104m-\033[0m - - - - - - -
-                            \033[37m2 | \033[0mP P P P P P P P
-                            \033[37m1 | \033[0mR N B Q K B N R
-                            \033[37m  \\________________\033[0m
-                            \033[37m    A B C D E F G H\033[0m
-                            """);
+            \033[30;1;103m ERROR \033[0m On the cell A3 there is no figure!
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p p p p p p p
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - -
+            \033[37m3 | \033[0m\033[30;1;104m-\033[0m - - - - - - -
+            \033[37m2 | \033[0mP P P P P P P P
+            \033[37m1 | \033[0mR N B Q K B N R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
   }
 
   @Test
   void moveWrongColor() {
-    realCLIFromArguments(
-        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " move c7 c6");
+    realCLIFromArguments("on " + gameWithDefaultFigures + " move c7 c6");
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                            \033[30;1;104m ACTION \033[0m Move BLACK PAWN from C7 to C6.
-                            \033[30;1;103m ERROR \033[0m It is not your turn! Try to move a figure of color WHITE.
-                            \033[37m8 | \033[0mr n b q k b n r
-                            \033[37m7 | \033[0mp p \033[30;1;104mp\033[0m p p p p p
-                            \033[37m6 | \033[0m- - \033[30;1;104m-\033[0m - - - - -
-                            \033[37m5 | \033[0m- - - - - - - -
-                            \033[37m4 | \033[0m- - - - - - - -
-                            \033[37m3 | \033[0m- - - - - - - -
-                            \033[37m2 | \033[0mP P P P P P P P
-                            \033[37m1 | \033[0mR N B Q K B N R
-                            \033[37m  \\________________\033[0m
-                            \033[37m    A B C D E F G H\033[0m
-                            """);
+            \033[30;1;104m ACTION \033[0m Move BLACK PAWN from C7 to C6.
+            \033[30;1;103m ERROR \033[0m It is not your turn! Try to move a figure of color WHITE.
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p \033[30;1;104mp\033[0m p p p p p
+            \033[37m6 | \033[0m- - \033[30;1;104m-\033[0m - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0mP P P P P P P P
+            \033[37m1 | \033[0mR N B Q K B N R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
   }
 
   @Test
@@ -368,18 +395,18 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;103m ERROR \033[0m On the cell C3 there is no pawn!
-                    \033[37m8 | \033[0m- - P P - - - -
-                    \033[37m7 | \033[0m- - - - - - - -
-                    \033[37m6 | \033[0m- - - - - - - -
-                    \033[37m5 | \033[0m- - - - - - - -
-                    \033[37m4 | \033[0m- - - - - - - k
-                    \033[37m3 | \033[0m- - \033[30;1;104m-\033[0m - - - - -
-                    \033[37m2 | \033[0mP P - - - - - -
-                    \033[37m1 | \033[0m- - - - - - - K
-                    \033[37m  \\________________\033[0m
-                    \033[37m    A B C D E F G H\033[0m
-                    """);
+            \033[30;1;103m ERROR \033[0m On the cell C3 there is no pawn!
+            \033[37m8 | \033[0m- - P P - - - -
+            \033[37m7 | \033[0m- - - - - - - -
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - k
+            \033[37m3 | \033[0m- - \033[30;1;104m-\033[0m - - - - -
+            \033[37m2 | \033[0mP P - - - - - -
+            \033[37m1 | \033[0m- - - - - - - K
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
   }
 
   @Test
@@ -389,19 +416,19 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;104m ACTION \033[0m Promote WHITE PAWN on B2 to become a ROOK.
-                    \033[30;1;103m ERROR \033[0m The pawn is not allowed to be promoted as it has not reached the end.
-                    \033[37m8 | \033[0m- - P P - - - -
-                    \033[37m7 | \033[0m- - - - - - - -
-                    \033[37m6 | \033[0m- - - - - - - -
-                    \033[37m5 | \033[0m- - - - - - - -
-                    \033[37m4 | \033[0m- - - - - - - k
-                    \033[37m3 | \033[0m- - - - - - - -
-                    \033[37m2 | \033[0mP \033[30;1;104mP\033[0m - - - - - -
-                    \033[37m1 | \033[0m- - - - - - - K
-                    \033[37m  \\________________\033[0m
-                    \033[37m    A B C D E F G H\033[0m
-                    """);
+            \033[30;1;104m ACTION \033[0m Promote WHITE PAWN on B2 to become a ROOK.
+            \033[30;1;103m ERROR \033[0m The pawn is not allowed to be promoted as it has not reached the end.
+            \033[37m8 | \033[0m- - P P - - - -
+            \033[37m7 | \033[0m- - - - - - - -
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - k
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0mP \033[30;1;104mP\033[0m - - - - - -
+            \033[37m1 | \033[0m- - - - - - - K
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
   }
 
   @Test
@@ -411,18 +438,18 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;104m ACTION \033[0m Promote WHITE PAWN on C8 to become a ROOK.
-                    \033[37m8 | \033[0m- - \033[30;1;104mR\033[0m P - - - -
-                    \033[37m7 | \033[0m- - - - - - - -
-                    \033[37m6 | \033[0m- - - - - - - -
-                    \033[37m5 | \033[0m- - - - - - - -
-                    \033[37m4 | \033[0m- - - - - - - k
-                    \033[37m3 | \033[0m- - - - - - - -
-                    \033[37m2 | \033[0mP P - - - - - -
-                    \033[37m1 | \033[0m- - - - - - - K
-                    \033[37m  \\________________\033[0m
-                    \033[37m    A B C D E F G H\033[0m
-                    """);
+            \033[30;1;104m ACTION \033[0m Promote WHITE PAWN on C8 to become a ROOK.
+            \033[37m8 | \033[0m- - \033[30;1;104mR\033[0m P - - - -
+            \033[37m7 | \033[0m- - - - - - - -
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - k
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0mP P - - - - - -
+            \033[37m1 | \033[0m- - - - - - - K
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
   }
 
   @Test
@@ -432,19 +459,9 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;104m ACTION \033[0m Promote WHITE PAWN on C8 to become a KING.
-                    \033[30;1;103m ERROR \033[0m The pawn cannot become a KING.
-                    \033[37m8 | \033[0m- - \033[30;1;104mP\033[0m P - - - -
-                    \033[37m7 | \033[0m- - - - - - - -
-                    \033[37m6 | \033[0m- - - - - - - -
-                    \033[37m5 | \033[0m- - - - - - - -
-                    \033[37m4 | \033[0m- - - - - - - k
-                    \033[37m3 | \033[0m- - - - - - - -
-                    \033[37m2 | \033[0mP P - - - - - -
-                    \033[37m1 | \033[0m- - - - - - - K
-                    \033[37m  \\________________\033[0m
-                    \033[37m    A B C D E F G H\033[0m
-                    """);
+            \033[30;1;104m ACTION \033[0m Promote WHITE PAWN on C8 to become a KING.
+            \033[30;1;103m ERROR \033[0m The pawn cannot become a KING.
+            """);
   }
 
   @Test
@@ -454,30 +471,34 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                            \033[30;1;104m ACTION \033[0m Move BLACK QUEEN from F2 to F1.
-                            \033[30;1;103m ERROR \033[0m The white king is in check!
-                            \033[37m8 | \033[0m- - - - - - - -
-                            \033[37m7 | \033[0m- - - - - - - -
-                            \033[37m6 | \033[0mk - - - - - - -
-                            \033[37m5 | \033[0m- - - - - - - -
-                            \033[37m4 | \033[0m- - - - - - - -
-                            \033[37m3 | \033[0m- - - - - - - -
-                            \033[37m2 | \033[0mP P - - - \033[30;1;104m-\033[0m - -
-                            \033[37m1 | \033[0m- K - - - \033[30;1;104mq\033[0m - -
-                            \033[37m  \\________________\033[0m
-                            \033[37m    A B C D E F G H\033[0m
-                            """);
+            \033[30;1;104m ACTION \033[0m Move BLACK QUEEN from F2 to F1.
+            \033[30;1;103m ERROR \033[0m The WHITE king is in check.
+            \033[37m8 | \033[0m- - - - - - - -
+            \033[37m7 | \033[0m- - - - - - - -
+            \033[37m6 | \033[0mk - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0mP P - - - \033[30;1;104m-\033[0m - -
+            \033[37m1 | \033[0m- K - - - \033[30;1;104mq\033[0m - -
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
   }
 
   @Test
   void whiteKingIsInCheckMate() {
     realCLIFromArguments(
         "on " + NoPersistence.GameIdType.WHITE_CHECKMATE_POSSIBLE.ordinal() + " move b4 a4");
+    assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.0);
+    assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(1.0);
+    assertThat(persistence.loadState("winner")).isEqualTo(FigureColor.BLACK.name());
+    assertThat(persistence.wasSaved()).isTrue();
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
             \033[30;1;104m ACTION \033[0m Move BLACK ROOK from B4 to A4.
-            \033[30;1;103m ERROR \033[0m The white king is in checkmate!
+            \033[30;1;103m ERROR \033[0m The WHITE king is in checkmate. The game is over.
             \033[37m8 | \033[0mK - - - - - - -
             \033[37m7 | \033[0m- - - - - - - -
             \033[37m6 | \033[0m- - - - - - - -
@@ -492,37 +513,41 @@ class CLIMenuTest {
   }
 
   @Test
-  void blackKingIsInCheck() {
+  void whiteKingIsInStalemate() {
     realCLIFromArguments(
-        "on " + NoPersistence.GameIdType.BLACK_CHECK_POSSIBLE.ordinal() + " move f2 f1");
+        "on " + NoPersistence.GameIdType.WHITE_STALEMATE_POSSIBLE.ordinal() + " move h7 c7");
+    assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.5);
+    assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(0.5);
+    assertThat(persistence.loadState("winner")).isEqualTo("draw");
+    assertThat(persistence.wasSaved()).isTrue();
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;104m ACTION \033[0m Move WHITE QUEEN from F2 to F1.
-                    \033[30;1;103m ERROR \033[0m The black king is in check!
-                    \033[37m8 | \033[0m- - - - - - - -
-                    \033[37m7 | \033[0m- - - - - - - -
-                    \033[37m6 | \033[0mK - - - - - - -
-                    \033[37m5 | \033[0m- - - - - - - -
-                    \033[37m4 | \033[0m- - - - - - - -
-                    \033[37m3 | \033[0m- - - - - - - -
-                    \033[37m2 | \033[0mp p - - - \033[30;1;104m-\033[0m - -
-                    \033[37m1 | \033[0m- k - - - \033[30;1;104mQ\033[0m - -
-                    \033[37m  \\________________\033[0m
-                    \033[37m    A B C D E F G H\033[0m
-                    """);
+            \033[30;1;104m ACTION \033[0m Move BLACK QUEEN from H7 to C7.
+            \033[30;1;103m ERROR \033[0m The WHITE king is in stalemate. The game is over.
+            """);
   }
 
   @Test
-  void blackKingIsInCheckMate() {
+  void gameIsOverWhiteWon() {
     realCLIFromArguments(
-        "on " + NoPersistence.GameIdType.BLACK_CHECKMATE_POSSIBLE.ordinal() + " move b4 a4");
+        "on " + NoPersistence.GameIdType.GAME_IS_OVER_WHITE_WINS.ordinal() + " move h7 c7");
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;104m ACTION \033[0m Move WHITE ROOK from B4 to A4.
-                    \033[30;1;103m ERROR \033[0m The black king is in checkmate!
-                    """);
+            \033[30;1;103m ERROR \033[0m The WHITE player has already won the game.
+            """);
+  }
+
+  @Test
+  void gameIsOverDraw() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.GAME_IS_OVER_DRAW.ordinal() + " move h7 c7");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m The game ended with a draw. Both players got half a point.
+            """);
   }
 
   @Test
@@ -531,13 +556,13 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    \033[30;1;103m ERROR \033[0m The command 'invalid' is not supported. Try 'help' to see available commands.
-                    """);
+            \033[30;1;103m ERROR \033[0m The command 'invalid' is not supported. Try 'help' to see available commands.
+            """);
   }
 
   @Test
   void onGameWithoutAction() {
-    realCLIFromArguments("on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal());
+    realCLIFromArguments("on " + gameWithDefaultFigures);
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
@@ -560,29 +585,215 @@ class CLIMenuTest {
 
   @Test
   void onGameWithInvalidAction() {
-    realCLIFromArguments("on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " invalid");
+    realCLIFromArguments("on " + gameWithDefaultFigures + " invalid");
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             "\033[30;1;103m ERROR \033[0m The command 'chess on <ID> invalid' is not supported. Try 'help' to see available commands.")
         .containsIgnoringWhitespaces(
             """
-                    \033[37m8 | \033[0mr n b q k b n r
-                    \033[37m7 | \033[0mp p p p p p p p
-                    \033[37m6 | \033[0m- - - - - - - -
-                    \033[37m5 | \033[0m- - - - - - - -
-                    \033[37m4 | \033[0m- - - - - - - -
-                    \033[37m3 | \033[0m- - - - - - - -
-                    \033[37m2 | \033[0mP P P P P P P P
-                    \033[37m1 | \033[0mR N B Q K B N R
-                    \033[37m  \\________________\033[0m
-                    \033[37m    A B C D E F G H\033[0m
-                    """);
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p p p p p p p
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0mP P P P P P P P
+            \033[37m1 | \033[0mR N B Q K B N R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
+  }
+
+  @Test
+  void resignGame() {
+    realCLIFromArguments("on " + gameWithDefaultFigures + " resign");
+    assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.0);
+    assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(1.0);
+    assertThat(persistence.loadState("winner")).isEqualTo(FigureColor.BLACK.name());
+    assertThat(persistence.wasSaved()).isTrue();
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;104m ACTION \033[0m You resigned the game. Your opponent has won.
+            """);
+  }
+
+  @Test
+  void performRematchOnlyIfGameEnded() {
+    realCLIFromArguments("on " + gameWithDefaultFigures + " rematch");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m You can only request a rematch after the game is over.
+            """);
+  }
+
+  @Test
+  void drawGameDeclineBeforeRequest() {
+    realCLIFromArguments("on " + gameWithDefaultFigures + " draw decline");
+    assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.0);
+    assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(0.0);
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m There is no draw offer to decline.
+            """);
+  }
+
+  @Test
+  void drawGameAcceptBeforeRequest() {
+    realCLIFromArguments("on " + gameWithDefaultFigures + " draw accept");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m There is no draw offer to accept.
+            """);
+  }
+
+  @Test
+  void drawGameRequest() {
+    realCLIFromArguments("on " + gameWithDefaultFigures + " draw offer");
+    System.out.println(persistence);
+    assertThat(persistence.loadState("isDrawOffered")).isEqualTo("1");
+    assertThat(persistence.wasSaved()).isTrue();
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;104m ACTION \033[0m You offered a draw. Your opponent can accept or decline this.
+            """);
+  }
+
+  @Test
+  void drawGameRequestMustBeAnswered() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.DRAW_OFFERED.ordinal() + " move a2 a4");
+    assertThat(persistence.wasSaved()).isFalse();
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m You must first accept or decline the draw offer.
+            """);
+  }
+
+  @Test
+  void drawGameRequestAccepted() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.DRAW_OFFERED.ordinal() + " draw accept");
+    assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.5);
+    assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(0.5);
+    assertThat(persistence.wasSaved()).isTrue();
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;104m ACTION \033[0m The draw offer has been accepted.
+            """);
+  }
+
+  @Test
+  void drawGameRequestDeclined() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.DRAW_OFFERED.ordinal() + " draw decline");
+    assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.0);
+    assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(0.0);
+    assertThat(persistence.loadState("isDrawOffered")).isEqualTo("0");
+    assertThat(persistence.wasSaved()).isTrue();
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;104m ACTION \033[0m The draw offer has been declined.
+            """);
+  }
+
+  @Test
+  void drawGameRequestWhileRequestAlreadyExists() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.DRAW_OFFERED.ordinal() + " draw offer");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m There is already a draw request.
+            """);
+  }
+
+  @Test
+  void rematchDoesNotForgetScore() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.GAME_IS_OVER_DRAW.ordinal() + " rematch");
+    assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.5);
+    assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(0.5);
+    assertThat(persistence.wasSaved()).isTrue();
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;104m ACTION \033[0m You have started a new game with the same players.
+            \033[37m8 | \033[0mr n b q k b n r
+            \033[37m7 | \033[0mp p p p p p p p
+            \033[37m6 | \033[0m- - - - - - - -
+            \033[37m5 | \033[0m- - - - - - - -
+            \033[37m4 | \033[0m- - - - - - - -
+            \033[37m3 | \033[0m- - - - - - - -
+            \033[37m2 | \033[0mP P P P P P P P
+            \033[37m1 | \033[0mR N B Q K B N R
+            \033[37m  \\________________\033[0m
+            \033[37m    A B C D E F G H\033[0m
+            """);
+  }
+
+  @Test
+  void statsOfRunningGame() {
+    realCLIFromArguments("on " + gameWithDefaultFigures + " show-stats");
+    assertThat(persistence.wasSaved()).isFalse();
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;104mGame Stats:\033[0m
+            - Game ID:          \033[37m
+            """,
+            """
+            - Score > Black:    \033[37m0.0 points\033[0m
+            - Score > White:    \033[37m0.0 points\033[0m
+            - Status:           \033[37mGame in Progress\033[0m
+            """);
+  }
+
+  @Test
+  void statsOfDrawGame() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.GAME_IS_OVER_DRAW.ordinal() + " show-stats");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            - Status:           \033[37mGame Over (draw)\033[0m
+            """);
+  }
+
+  @Test
+  void boardOfEndedGame() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.GAME_IS_OVER_DRAW.ordinal() + " show-board");
+    assertThat(outputStream.toString()).contains("Here is game ").contains("A B C D E F G H");
+  }
+
+  @Test
+  void statsOfWhiteHasWonGame() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.GAME_IS_OVER_WHITE_WINS.ordinal() + " show-stats");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            - Status:           \033[37mGame Over (WHITE won)\033[0m
+            """);
+  }
+
+  @Test
+  void invalidSubcommandForDraw() {
+    realCLIFromArguments("on " + gameWithDefaultFigures + " draw invalid");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            The command 'chess on <ID> draw invalid' is not supported.
+            """);
   }
 
   @Test
   void noGameDoesNotHaveFenSaved() {
-    Persistence persistence = new NoPersistence();
     persistence.setGameId(NoPersistence.GameIdType.NO_GAME.ordinal());
     assertThat(persistence.loadState("fen")).isNull();
+    assertThat(persistence.loadState("winner")).isNull();
   }
 }

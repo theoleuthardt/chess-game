@@ -205,10 +205,14 @@ public class Board {
   }
 
   public boolean isCheckmate(FigureColor playerColor) {
-    if (!isCheck(playerColor)) {
-      return false;
-    }
+    return isCheck(playerColor) && playerCannotMoveAnyFigure(playerColor);
+  }
 
+  public boolean isStalemate(FigureColor playerColor) {
+    return !isCheck(playerColor) && playerCannotMoveAnyFigure(playerColor);
+  }
+
+  public boolean playerCannotMoveAnyFigure(FigureColor playerColor) {
     for (Cell startCell : cellsWithColor(playerColor)) {
       List<Cell> availableCells = availableCellsWithoutCheckMoves(startCell);
       if (!availableCells.isEmpty()) {

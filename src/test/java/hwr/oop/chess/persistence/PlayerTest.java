@@ -1,28 +1,28 @@
 package hwr.oop.chess.persistence;
 
-import hwr.oop.chess.application.figures.FigureColor;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class PlayerTest {
   @Test
-  void createPlayer() {
-    Player player = new Player(FigureColor.WHITE, 0);
-    Assertions.assertThat(player.color()).isEqualTo(FigureColor.WHITE);
-    Assertions.assertThat(player.elo()).isZero();
+  void playerHasInitialScore() {
+    Player player = new Player("120");
+    assertThat(player.doubleOfScore()).isEqualTo(120);
+    assertThat(player.score()).isEqualTo(60.0);
   }
 
   @Test
-  void setColor() {
-    Player player = new Player(FigureColor.WHITE, 0);
-    player.setColor(FigureColor.BLACK);
-    Assertions.assertThat(player.color()).isEqualTo(FigureColor.BLACK);
+  void drawAddsHalfAPoint() {
+    Player player = new Player("0");
+    player.halfPointOnDraw();
+    assertThat(player.score()).isEqualTo(0.5);
   }
 
   @Test
-  void setElo() {
-    Player player = new Player(FigureColor.WHITE, 0);
-    player.setElo(10);
-    Assertions.assertThat(player.elo()).isEqualTo(10);
+  void winAddsAFullPoint() {
+    Player player = new Player("0");
+    player.fullPointOnWin();
+    assertThat(player.score()).isEqualTo(1.0);
   }
 }
