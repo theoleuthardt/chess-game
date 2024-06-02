@@ -16,6 +16,7 @@ public class Rook implements Figure {
     this.hasMoved = false;
   }
 
+  @Override
   public List<Cell> availableCells(Cell currentCell) {
     List<Cell> cells = new ArrayList<>();
 
@@ -28,19 +29,23 @@ public class Rook implements Figure {
     return cells;
   }
 
+  @Override
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
     List<Cell> availableCell = availableCells(prevCell);
     return availableCell.contains(nextCell);
   }
 
+  @Override
   public char symbol() {
     return color == FigureColor.WHITE ? 'R' : 'r';
   }
 
+  @Override
   public FigureColor color() {
     return color;
   }
 
+  @Override
   public FigureType type() {
     return type;
   }

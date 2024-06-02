@@ -15,18 +15,22 @@ public class NoPersistence implements Persistence {
 
   private int gameId;
 
+  @Override
   public void setGameId(int gameId) {
     this.gameId = gameId;
   }
 
+  @Override
   public int gameId() {
     return gameId;
   }
 
+  @Override
   public void storeState(String key, String value) {
     // Some tests need a NoPersistence adapter which does nothing
   }
 
+  @Override
   public String loadState(String key) {
     GameIdType type = Arrays.stream(GameIdType.values()).filter(x -> x.ordinal() == gameId).findFirst().orElse(null);
     if(key.equals("fen")) {
@@ -43,10 +47,12 @@ public class NoPersistence implements Persistence {
     return null;
   }
 
+  @Override
   public void loadGame() {
     // Some tests need a NoPersistence adapter which does nothing
   }
 
+  @Override
   public void saveGame() {
     // Some tests need a NoPersistence adapter which does nothing
   }
