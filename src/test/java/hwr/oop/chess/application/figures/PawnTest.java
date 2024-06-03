@@ -10,10 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.*;
 
 class PawnTest {
   private Board board;
@@ -194,7 +191,7 @@ class PawnTest {
     board = new Board(true);
     Cell currentCell = board.findCell('a', 7);
 
-    assertFalse(pawn.isAbleToPromote(currentCell));
+    assertThat(pawn.isAbleToPromote(currentCell)).isFalse();
   }
 
   @Test
@@ -202,10 +199,12 @@ class PawnTest {
     Pawn pawn = new Pawn(FigureColor.WHITE);
     board = new Board(true);
     Cell currentCell = board.findCell('a', 7);
-    assertThrows(
-        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.KING));
-    assertThrows(
-        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.PAWN));
+    assertThatException()
+        .isThrownBy(() -> pawn.promotePawn(currentCell, FigureType.KING))
+        .isInstanceOf(InvalidUserInputException.class);
+    assertThatException()
+        .isThrownBy(() -> pawn.promotePawn(currentCell, FigureType.PAWN))
+        .isInstanceOf(InvalidUserInputException.class);
   }
 
   @Test
@@ -214,8 +213,9 @@ class PawnTest {
     board = new Board(true);
     Cell currentCell = board.findCell('a', 1);
 
-    assertThrows(
-        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.QUEEN));
+    assertThatException()
+        .isThrownBy(() -> pawn.promotePawn(currentCell, FigureType.QUEEN))
+        .isInstanceOf(InvalidUserInputException.class);
   }
 
   @Test
@@ -231,6 +231,9 @@ class PawnTest {
     assertThat(changedStatus).isEqualTo(afterPawnMove);
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void canPerformEnPassant_isAllowed() {
     board = new Board(false);
@@ -263,6 +266,9 @@ class PawnTest {
     assertThat(to.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void canPerformEnPassant_isNotAllowed() {
     board = new Board(false);

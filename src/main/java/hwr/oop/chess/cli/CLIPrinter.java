@@ -95,12 +95,15 @@ public class CLIPrinter {
 
   public void printAsTable(String title, int firstColumWidth, Map<String, String> rows) {
     println(title, CLIColor.BLUE);
-    rows.forEach(
-        (firstCol, secondCol) -> {
-          firstCol = stringToWidth(firstColumWidth, "- " + firstCol + ":");
-          print(firstCol);
-          println(secondCol, CLIColor.GRAY);
-        });
+    rows.keySet().stream()
+        .sorted()
+        .forEach(
+            firstCol -> {
+              String secondCol = rows.get(firstCol);
+              firstCol = stringToWidth(firstColumWidth, "- " + firstCol + ":");
+              print(firstCol);
+              println(secondCol, CLIColor.GRAY);
+            });
   }
 
   public void printlnError(Exception e) {

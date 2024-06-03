@@ -127,6 +127,9 @@ public class Board {
           case THREE, SIX -> cell.setFigure(new Bishop(figureColor));
           case FOUR -> cell.setFigure(new Queen(figureColor));
           case FIVE -> cell.setFigure(new King(figureColor));
+          default -> {
+            // This column does not exist
+          }
         }
       }
 
@@ -202,10 +205,14 @@ public class Board {
   }
 
   public boolean isCheckmate(FigureColor playerColor) {
-    if (!isCheck(playerColor)) {
-      return false;
-    }
+    return isCheck(playerColor) && playerCannotMoveAnyFigure(playerColor);
+  }
 
+  public boolean isStalemate(FigureColor playerColor) {
+    return !isCheck(playerColor) && playerCannotMoveAnyFigure(playerColor);
+  }
+
+  public boolean playerCannotMoveAnyFigure(FigureColor playerColor) {
     for (Cell startCell : cellsWithColor(playerColor)) {
       List<Cell> availableCells = availableCellsWithoutCheckMoves(startCell);
       if (!availableCells.isEmpty()) {

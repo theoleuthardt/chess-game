@@ -2,12 +2,14 @@ package hwr.oop.chess.cli;
 
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
+import hwr.oop.chess.application.ChessGame;
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.application.figures.Pawn;
 
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,12 +21,32 @@ public class CLIMenu {
 
   private final Map<String, String> commandAndExplanation =
       Map.ofEntries(
-          new AbstractMap.SimpleEntry<>("chess create <ID>", "Create a new game of chess"),
-          new AbstractMap.SimpleEntry<>("chess show <ID>", "Show the board"),
-          new AbstractMap.SimpleEntry<>("chess on <ID> move <FROM> <TO>", "Move a figure"),
+          new AbstractMap.SimpleEntry<>("1  Basic Game commands", ""),
           new AbstractMap.SimpleEntry<>(
-              "chess on <ID> show-moves <FROM>", "Show where the figure can go"),
-          new AbstractMap.SimpleEntry<>("chess on <ID> promote <FROM> <TYPE>", "Promote a pawn"));
+              "1: chess create <ID>", "Create a new, fresh game (stored in game_<ID>.csv)"),
+          new AbstractMap.SimpleEntry<>(
+              "1: chess on <ID> move <FROM> <TO>", "Move the figure on FROM to the cell TO"),
+          new AbstractMap.SimpleEntry<>(
+              "1: on <ID> promote <FROM> <TYPE>", "Promote the pawn on cell FROM"),
+          new AbstractMap.SimpleEntry<>(
+              "2  Show Status", "--------------------------------------------------"),
+          new AbstractMap.SimpleEntry<>(
+              "2: chess on <ID> show-board", "Show the current state of the board"),
+          new AbstractMap.SimpleEntry<>(
+              "2: chess on <ID> show-moves <FROM>", "Show where the figure can move to"),
+          new AbstractMap.SimpleEntry<>(
+              "2: chess on <ID> show-moveable", "Show figures which can be moved"),
+          new AbstractMap.SimpleEntry<>("2: chess on <ID> show-stats", "Show score of the players"),
+          new AbstractMap.SimpleEntry<>(
+              "3  End of Game", "--------------------------------------------------"),
+          new AbstractMap.SimpleEntry<>(
+              "3: chess on <ID> draw offer", "Offer draw to the other player"),
+          new AbstractMap.SimpleEntry<>("3: chess on <ID> draw accept", "Accept the draw offer"),
+          new AbstractMap.SimpleEntry<>("3: chess on <ID> draw decline", "Decline the draw offer"),
+          new AbstractMap.SimpleEntry<>(
+              "3: chess on <ID> resign", "End the game by accepting a loss"),
+          new AbstractMap.SimpleEntry<>(
+              "3: chess on <ID> rematch", "Start a new game without resetting your score"));
 
   private final Map<String, String> parameterTypes =
       Map.ofEntries(
@@ -59,7 +81,6 @@ public class CLIMenu {
       switch (command) {
         case "help" -> printHelpMenu();
         case "create" -> startNewGame();
-        case "show" -> showBoardStatus();
         case "on" -> performActionOnBoard();
         default ->
             throw new InvalidUserInputException(
@@ -69,7 +90,7 @@ public class CLIMenu {
       }
     } catch (InvalidUserInputException e) {
       printer.printlnError(e);
-      if (cli.game() != null && cli.persistence().gameId() > 0) {
+      if (cli.game() != null) {
         cli.printBoard();
       }
     }
@@ -105,10 +126,30 @@ public class CLIMenu {
               + "'.");
     }
     String command = remainingArguments.removeFirst();
+
+    if (cli.game().isOver() && !command.equals("rematch")) {
+      printImportantGameStatus();
+      if (!command.equals("show-stats") && !command.equals("show-board")) {
+        return;
+      }
+    }
+
+    if (cli.game().isDrawOffered() && !command.equals("draw")) {
+      throw new InvalidUserInputException("You must first accept or decline the draw offer.");
+    }
+
     switch (command) {
       case "move" -> performMoveFigureOnBoard();
       case "promote" -> performPromotePawnOnBoard();
+
+      case "show-stats" -> printStats();
+      case "show-board" -> showBoardStatus();
       case "show-moves" -> showMovesOfFigure();
+      case "show-moveable" -> showMoveableFigures();
+
+      case "draw" -> performDraw();
+      case "resign" -> performResign();
+      case "rematch" -> performRematch();
       default ->
           throw new InvalidUserInputException(
               "The command 'chess on <ID> "
@@ -135,7 +176,8 @@ public class CLIMenu {
             + ".");
 
     board.moveFigure(from, to);
-    checkForCheck();
+    printImportantGameStatus();
+    handleAutomaticGameEnd();
     cli.game().saveGame();
     cli.printBoard();
   }
@@ -181,17 +223,125 @@ public class CLIMenu {
     cli.printBoard();
   }
 
-  private void checkForCheck() {
-    if (cli.game().board().isCheckmate(FigureColor.WHITE)) {
-      this.cli.printer().printlnError("The white king is in checkmate!");
-    } else if (cli.game().board().isCheck(FigureColor.WHITE)) {
-      this.cli.printer().printlnError("The white king is in check!");
+  private void showMoveableFigures() {
+    countOfRemainingArgumentsIs(0);
+    Board board = cli.game().board();
+    printer.printlnAction(
+        "Showing the figures which can be moved by the " + board.turn().name() + " player.");
+    for (Cell cell : board.cellsWithColor(board.turn())) {
+      if (!board.availableCellsWithoutCheckMoves(cell).isEmpty()) {
+        cli.printer().alsoHighlightOnBoard(cell);
+      }
     }
-    if (cli.game().board().isCheckmate(FigureColor.BLACK)) {
-      this.cli.printer().printlnError("The black king is in checkmate!");
-    } else if (cli.game().board().isCheck(FigureColor.BLACK)) {
-      this.cli.printer().printlnError("The black king is in check!");
+    cli.printBoard();
+  }
+
+  private void performDraw() {
+    countOfRemainingArgumentsIs(1);
+    String command = remainingArguments.removeFirst();
+    switch (command) {
+      case "offer" -> {
+        if (cli.game().isDrawOffered()) {
+          throw new InvalidUserInputException("There is already a draw request.");
+        }
+        cli.game().offerDraw();
+        cli.game().saveGame();
+        printer.printlnAction("You offered a draw. Your opponent can accept or decline this.");
+      }
+      case "accept" -> {
+        if (!cli.game().isDrawOffered()) {
+          throw new InvalidUserInputException("There is no draw offer to accept.");
+        }
+        printer.printlnAction("The draw offer has been accepted.");
+        cli.game().endsWithDraw();
+        cli.game().saveGame();
+      }
+
+      case "decline" -> {
+        if (!cli.game().isDrawOffered()) {
+          throw new InvalidUserInputException("There is no draw offer to decline.");
+        }
+        printer.printlnAction("The draw offer has been declined.");
+        cli.game().denyDrawOffer();
+        cli.game().saveGame();
+      }
+      default ->
+          throw new InvalidUserInputException(
+              "The command 'chess on <ID> draw " + command + "' is not supported.");
     }
+  }
+
+  private void performResign() {
+    countOfRemainingArgumentsIs(0);
+    printer.printlnAction("You resigned the game. Your opponent has won.");
+    cli.game().playerHasWon(cli.game().board().turn().opposite());
+    cli.game().saveGame();
+  }
+
+  private void handleAutomaticGameEnd() {
+    ChessGame game = cli.game();
+    Board board = game.board();
+
+    for (FigureColor color : FigureColor.values()) {
+      if (board.isStalemate(color)) {
+        game.endsWithDraw();
+      } else if (board.isCheckmate(color)) {
+        game.playerHasWon(color.opposite());
+      }
+    }
+  }
+
+  private void printImportantGameStatus() {
+    Board board = cli.game().board();
+    for (FigureColor color : FigureColor.values()) {
+      if (board.isStalemate(color)) {
+        printer.printlnError("The " + color.name() + " king is in stalemate. The game is over.");
+      } else if (board.isCheckmate(color)) {
+        printer.printlnError("The " + color.name() + " king is in checkmate. The game is over.");
+      } else if (board.isCheck(color)) {
+        printer.printlnError("The " + color.name() + " king is in check.");
+      }
+    }
+
+    if (cli.game().isOver()) {
+      String winner = cli.persistence().loadState("winner");
+      if (winner == null || winner.equals("draw")) {
+        printer.printlnError("The game ended with a draw. Both players got half a point.");
+      } else {
+        printer.printlnError("The " + winner + " player has already won the game.");
+      }
+    }
+  }
+
+  private void printStats() {
+    countOfRemainingArgumentsIs(0);
+    ChessGame game = cli.game();
+
+    Map<String, String> stats = new HashMap<>();
+
+    stats.put("Game ID", "" + cli.persistence().gameId());
+    String gameStatus = "Game in Progress";
+    if (game.isOver()) {
+      String winner = cli.persistence().loadState("winner");
+      gameStatus = "Game Over (" + (winner.equals("draw") ? "draw)" : winner + " won)");
+    }
+    stats.put("Status", gameStatus);
+
+    stats.put("Score > White", game.players().get(FigureColor.WHITE).score() + " points");
+    stats.put("Score > Black", game.players().get(FigureColor.BLACK).score() + " points");
+
+    printer.printAsTable("Game Stats:", 20, stats);
+  }
+
+  private void performRematch() {
+    countOfRemainingArgumentsIs(0);
+    if (!cli.game().isOver()) {
+      throw new InvalidUserInputException("You can only request a rematch after the game is over.");
+    }
+    printer.printlnAction("You have started a new game with the same players.");
+    ChessGame oldGame = cli.game();
+    cli.initializeGame(true).keepPlayersOf(oldGame).saveGame();
+    cli.printBoard();
   }
 
   public Cell argumentToCoordinate(Board board) {
