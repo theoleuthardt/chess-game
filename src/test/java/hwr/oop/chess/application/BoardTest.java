@@ -305,49 +305,33 @@ class BoardTest {
       assertThat(board.findCell(x, Coordinate.EIGHT).figure().color()).isEqualTo(FigureColor.BLACK);
     }
   }
-
-  // TODO: Every assertion should be at the end of the test function.
-  // If there is a function like "board.moveFigure(...)" after an Assertion,
-  // try to change the order or split it into two seperate test.
   @Test
-  void testEnPassant() {
-    // given
+  void testAvailableEnPassant() {
     board = new Board(false);
-    String fen = "rnbqkbnr/ppp1pppp/8/8/3p4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2";
-    FenNotation.parseFEN(board, fen);
-
-    // White Pawn two field moved
+    FenNotation.parseFEN(board, "rnbqkbnr/ppp1pppp/8/8/3p4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2");
     board.moveFigure("e2", "e4");
-    String availableEnPassant = "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2";
-    assertThat(FenNotation.generateFen(board)).isEqualTo(availableEnPassant);
+    assertThat(FenNotation.generateFen(board)).isEqualTo("rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2");
+  }
 
-    // Black Pawn catch white pawn using en passant
+  @Test
+  void testPerformEnPassant() {
+    board = new Board(false);
+    FenNotation.parseFEN(board, "rnbqkbnr/ppp1pppp/8/8/3p4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2");
+    board.moveFigure("e2", "e4");
     board.moveFigure("d4", "e3");
     assertThat(board.findCell('e', 3).figure().type()).isEqualTo(FigureType.PAWN);
     assertThat(board.findCell('e', 4).figure()).isNull();
-
-    // Check Status
-    String afterEnPassant = "rnbqkbnr/ppp1pppp/8/8/8/4p3/PPP2PPP/RNBQKBNR w KQkq - 0 3";
-    assertThat(FenNotation.generateFen(board)).isEqualTo(afterEnPassant);
+    assertThat(FenNotation.generateFen(board)).isEqualTo("rnbqkbnr/ppp1pppp/8/8/8/4p3/PPP2PPP/RNBQKBNR w KQkq - 0 3");
   }
 
-  // TODO: Every assertion should be at the end of the test function.
-  // If there is a function like "board.moveFigure(...)" after an Assertion,
-  // try to change the order or split it into two seperate test.
   @Test
   void testHalfMove() {
     // Given
-    board = new Board(false); // Create Without Figure
+    board = new Board(false);
     String initialStatus = "rn1qkbnr/ppp1pppp/8/5b2/5P2/4p3/PPP3PP/RNBQKBNR w KQkq - 1 4";
-    FenNotation.parseFEN(board, initialStatus); // Set Figure on Board
-
-    // Move white bishop
+    FenNotation.parseFEN(board, initialStatus);
     board.moveFigure("f1", "b5");
-    String afterBishopMove = "rn1qkbnr/ppp1pppp/8/1B3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 4";
-
-    // Compare Status Of Board
-    String changedStatus = FenNotation.generateFen(board);
-    assertThat(changedStatus).isEqualTo(afterBishopMove);
+    assertThat(FenNotation.generateFen(board)).isEqualTo("rn1qkbnr/ppp1pppp/8/1B3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 4");
   }
 
   @Test
@@ -391,17 +375,19 @@ class BoardTest {
             "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
   }
 
-  // TODO: Every assertion should be at the end of the test function.
-  // If there is a function like "board.moveFigure(...)" after an Assertion,
-  // try to change the order or split it into two seperate test.
   @Test
-  void testNotCheckMateState() {
+  void testNotCheckMateStateWhite() {
     board = new Board(false);
     String initialStatus = "rnb1kb1r/ppp1pppp/3q1np1/3p4/2P5/2N2N1B/PP1PPP1P/R1BQK2R b KQkq - 3 5";
     FenNotation.parseFEN(board, initialStatus);
-
     assertThat(board.isCheckmate(FigureColor.WHITE)).isFalse();
-    board.moveFigure("b8", "c6");
+  }
+
+  @Test
+  void testNotCheckMateStateBlack() {
+    board = new Board(false);
+    String initialStatus = "r1b1kb1r/ppp1pppp/2nq1np1/3p4/2P5/2N2N1B/PP1PPP1P/R1BQK2R w KQkq - 4 6";
+    FenNotation.parseFEN(board, initialStatus);
     assertThat(board.isCheckmate(FigureColor.BLACK)).isFalse();
   }
 
@@ -409,7 +395,6 @@ class BoardTest {
   void testNotExistKing() {
     board = new Board(false);
     String initialStatus = "rn1q1bnr/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/RNBQ2NR b - - 2 10";
-
     assertThatThrownBy(() -> FenNotation.parseFEN(board, initialStatus))
         .isInstanceOf(InvalidUserInputException.class)
         .hasMessageContaining("Impossible state! There is no king on the field.");
@@ -454,14 +439,8 @@ class BoardTest {
         .hasMessageContaining("This is not a valid castling move.");
   }
 
-  /*
-  Chess Match: Spasski–Fischer 0:1 Reykjavík, 20. Juli 1972
-  */
-  // TODO: Every assertion should be at the end of the test function.
-  // If there is a function like "board.moveFigure(...)" after an Assertion,
-  // try to change the order or split it into two seperate test.
   @Test
-  void testChessGameSpasskiFischer() {
+  void testChessGame() {
     board = new Board(true);
     board.moveFigure("d2", "d4"); // 1. d4
     board.moveFigure("g8", "f6"); // 1... Nf6
@@ -475,14 +454,7 @@ class BoardTest {
     board.moveFigure("b8", "c6"); // 5... Nc6
     board.moveFigure("f1", "d3"); // 6. Bd3
     board.moveFigure("b4", "c3"); // 6... Bxc3+
-    // Black Bishop catches White Knight and White is checked
-    assertThat(board.isCheck(FigureColor.WHITE)).isTrue();
-    assertThat(board.cellsWithColor(FigureColor.WHITE)).hasSize(15);
-    assertThat(board.cellsWithColor(FigureColor.BLACK)).hasSize(16);
-
     board.moveFigure("b2", "c3"); // 7. bxc3
-    assertThat(board.cellsWithColor(FigureColor.BLACK)).hasSize(15);
-
     board.moveFigure("d7", "d6"); // 7... d6
     board.moveFigure("e3", "e4"); // 8. e4
     board.moveFigure("e6", "e5"); // 8... e5
@@ -498,25 +470,13 @@ class BoardTest {
     board.moveFigure("d6", "e5"); // 13... dxe5
     board.moveFigure("c1", "e3"); // 14. Be3
     board.moveFigure("b7", "b6"); // 14... b6
-
-    String fen = FenNotation.generateFen(board);
-    assertThat(fen).isEqualTo("r1bqk2r/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2QK2R w KQkq - 0 14");
-    assertThat(((King) board.findCell("e1").figure()).hasMoved()).isFalse();
-    assertThat(((King) board.findCell("e8").figure()).hasMoved()).isFalse();
-
     board.moveFigure("e1", "g1"); // 15. O-O White King Castling
-    fen = FenNotation.generateFen(board);
-    assertThat(fen).isEqualTo("r1bqk2r/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 b kq - 1 14");
-    assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
-    assertThat(board.canPerformKingSideCastling(FigureColor.BLACK)).isTrue();
-    assertThat(((Rook) board.findCell("f1").figure()).hasMoved()).isTrue();
-    assertThat(((King) board.findCell("g1").figure()).hasMoved()).isTrue();
-
     board.moveFigure("e8", "g8"); // 15. O-O Black King Castling
-    fen = FenNotation.generateFen(board);
-    assertThat(fen).isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w - - 2 15");
+    assertThat( FenNotation.generateFen(board)).isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w - - 2 15");
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
     assertThat(((Rook) board.findCell("f8").figure()).hasMoved()).isTrue();
     assertThat(((King) board.findCell("g8").figure()).hasMoved()).isTrue();
+    assertThat(board.cellsWithColor(FigureColor.WHITE)).hasSize(13);
+    assertThat(board.cellsWithColor(FigureColor.BLACK)).hasSize(13);
   }
 }

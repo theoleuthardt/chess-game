@@ -7,7 +7,9 @@ import hwr.oop.chess.application.figures.FigureType;
 
 import hwr.oop.chess.application.figures.King;
 import hwr.oop.chess.application.figures.Rook;
+
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -54,22 +56,14 @@ class FenNotationTest {
 
   @ParameterizedTest
   @ValueSource(
-      strings = {
-        "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 0 5",
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0"
-      })
+    strings = {
+      "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 0 5",
+      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0"
+    })
   void parsingFenAndGeneratingItFromBoard_shouldNotChangeFenString(String initialFen) {
     Board board = new Board(false);
     parseFEN(board, initialFen);
     assertThat(generateFen(board)).isEqualTo(initialFen);
-  }
-
-  @Test
-  void testIsCharValid() {
-    assertThat(isCharValid('a')).isFalse();
-    assertThat(isCharValid('b')).isTrue(); // Bishop
-    assertThat(isCharValid('c')).isFalse();
-    assertThat(isCharValid('d')).isFalse();
   }
 
   @Test
@@ -86,13 +80,12 @@ class FenNotationTest {
     String invalidFenString = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R";
     assertThatThrownBy(() -> parseFEN(board, invalidFenString))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("This is an invalid FEN string, as it should have 6 parts!");
+        .hasMessageContaining("This is an invalid FEN string!");
   }
 
   @Test
   void testParseCastling() {
     Board board = new Board(false);
-
     String disableCastling = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
     parseFEN(board, disableCastling);
     for (String position : List.of("a1", "a8", "h1", "h8")) {
@@ -107,7 +100,6 @@ class FenNotationTest {
   @Test
   void testAvailableCastling() {
     Board board = new Board(false);
-
     String availableCastling = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b KQkq - 2 5";
     parseFEN(board, availableCastling);
     for (String position : List.of("a1", "a8", "h1", "h8")) {
@@ -193,5 +185,30 @@ class FenNotationTest {
     assertThatThrownBy(() -> parseFEN(board, blackKingIsNotStartPosition))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("Cannot load position because it is invalid.");
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "8/8/8/8/8/8/8/8 w - - 0 1"
+    })
+  void testValidFEN(String fen) {
+    assertThat(isValidFEN(fen)).isTrue();
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "rnbqkbnr/pppppppp/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0",
+      "8/8/8/8/8/8/8/8 w - - 0",
+      "rnbqkbnr/pppppppp/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - - 1",
+      "r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/R2Q1RK1 w - - 2 15",
+      "r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/3PBB3/P5PP/R2Q1RK1 w - - 2 15",
+      "rnbqkbn3/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "8/1r7/8/8/8/8/8/8 w - - 0 1",
+    })
+  void testInvalidFEN(String fen) {
+    assertThat(isValidFEN(fen)).isFalse();
   }
 }

@@ -6,6 +6,7 @@ import hwr.oop.chess.application.Coordinate;
 import hwr.oop.chess.application.figures.*;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class FenNotation {
   private final Board board;
@@ -18,12 +19,11 @@ public class FenNotation {
   }
 
   public static void parseFEN(Board board, String fenString) {
-    List<String> parts = List.of(fenString.split(" "));
-    if (parts.size() != 6) {
-      throw new IllegalArgumentException(
-          "This is an invalid FEN string, as it should have 6 parts!");
+    if(!isValidFEN(fenString)){
+      throw new IllegalArgumentException("This is an invalid FEN string!");
     }
 
+    List<String> parts = List.of(fenString.split(" "));
     FenNotation fen = new FenNotation(board);
     fen.parsePiecePlacement(parts.getFirst());
     fen.parseTurn(parts.get(1));
@@ -34,6 +34,38 @@ public class FenNotation {
     fen.parseFullMove(parts.getLast());
 
     board.initializeWith(fen.turn, fen.halfMove, fen.fullMove);
+  }
+  private static final String FEN_PATTERN = "^([rnbqkpRNBQKP1-8]{1,8}/){7}[rnbqkpRNBQKP1-8]{1,8} [wb] ([KQkq]{1,4}|-) ([a-h][36]|-) (\\d+) (\\d+)$";
+
+  public static boolean isValidFEN(String fen) {
+    // Check if the FEN matches the regular expression pattern
+    if (!Pattern.matches(FEN_PATTERN, fen)) {
+      return false;
+    }
+
+    // Validate the first part of the FEN (the board state)
+    List<String> parts = List.of(fen.split(" "));
+    List<String> rows =  List.of(parts.getFirst().split("/"));            ;
+
+    for (String row : rows) {
+      if (!isValidRow(row)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private static boolean isValidRow(String row) {
+    int count = 0;
+    for (char c : row.toCharArray()) {
+      if (Character.isDigit(c)) {
+        count += c - '0';  // If it's a digit, add that many empty squares
+      } else {
+        count++;
+      }
+    }
+    return count == 8;  // Each row must have exactly 8 squares
   }
 
   public static String generateFen(Board board) {
@@ -212,12 +244,5 @@ public class FenNotation {
 
   private String generateFullMove() {
     return String.valueOf(board.fullMove());
-  }
-
-  public static boolean isCharValid(char c) {
-    return switch (Character.toLowerCase(c)) {
-      case 'b', 'k', 'n', 'p', 'q', 'r' -> true;
-      default -> false;
-    };
   }
 }
