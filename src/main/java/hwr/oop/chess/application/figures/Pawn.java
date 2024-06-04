@@ -2,6 +2,7 @@ package hwr.oop.chess.application.figures;
 
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.CellDirection;
+import hwr.oop.chess.application.Coordinate;
 import hwr.oop.chess.cli.InvalidUserInputException;
 
 import java.util.ArrayList;
@@ -17,7 +18,12 @@ public class Pawn implements Figure {
   }
 
   private boolean isInStartPosition(Cell cell) {
-    return cell.y().toInt() == (color == FigureColor.WHITE ? 2 : 7);
+    return cell.y() == (color == FigureColor.WHITE ? Coordinate.TWO : Coordinate.SEVEN);
+  }
+
+  private boolean isAtLastRank(Cell cell) {
+    Coordinate lastRank = color == FigureColor.WHITE ? Coordinate.EIGHT : Coordinate.ONE;
+    return cell.y() == lastRank;
   }
 
   public CellDirection forwards() {
@@ -68,7 +74,7 @@ public class Pawn implements Figure {
   }
 
   public boolean isAbleToPromote(Cell currentCell) {
-    return currentCell.cellInDirection(forwards()) == null;
+    return isAtLastRank(currentCell);
   }
 
   // Pawn Promotion

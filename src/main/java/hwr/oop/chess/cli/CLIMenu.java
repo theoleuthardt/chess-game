@@ -138,6 +138,10 @@ public class CLIMenu {
       throw new InvalidUserInputException("You must first accept or decline the draw offer.");
     }
 
+    if (cli.game().board().isPawnPromotionPossible() && !command.equals("promote")) {
+      throw new InvalidUserInputException("You must first promote the pawn to a different figure");
+    }
+
     switch (command) {
       case "move" -> performMoveFigureOnBoard();
       case "promote" -> performPromotePawnOnBoard();
@@ -301,6 +305,11 @@ public class CLIMenu {
       } else if (board.isCheck(color)) {
         printer.printlnError("The " + color.name() + " king is in check.");
       }
+    }
+
+    if (cli.game().board().isPawnPromotionPossible()) {
+      printer.printlnError(
+          "Please promote your pawn to a different figure. You can choose QUEEN, ROOK, BISHOP or KNIGHT.");
     }
 
     if (cli.game().isOver()) {

@@ -162,18 +162,21 @@ class CLIMenuTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "create 1 xyz",
-        "on 1 show-board xyz",
-        "on 1 show-stats xyz",
-        "on 1 show-moveable xyz",
-        "on 1 draw offer xyz",
-        "on 1 resign xyz",
-        "on 1 rematch xyz",
+        "create <ID> xyz",
+        "on <ID> show-board xyz",
+        "on <ID> show-stats xyz",
+        "on <ID> show-moveable xyz",
+        "on <ID> draw offer xyz",
+        "on <ID> resign xyz",
+        "on <ID> rematch xyz",
       })
   void runCommandsWithTooManyArguments(String arguments) {
-    Main.mainWithCli(arguments.split(" "), cli);
+    String command =
+        arguments.replace("<ID>", "" + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal());
+    Main.mainWithCli(command.split(" "), cli);
+
     assertThat(outputStream.toString())
-        .contains("Your command '" + arguments + "' has 1 argument(s) more than needed.");
+        .contains("Your command '" + command + "' has 1 argument(s) more than needed.");
   }
 
   @Test
@@ -798,6 +801,23 @@ class CLIMenuTest {
   }
 
   @Test
+  void pawnPromotionMustBeDone() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.PAWN_PROMOTION.ordinal() + " move a1 a2");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+              \033[30;1;103m ERROR \033[0m You must first promote the pawn to a different figure
+              """);
+  }
+
+  @Test
+  void pawnPromotionHintIsShown() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.PAWN_PROMOTION_POSSIBLE.ordinal() + " move a7 a8");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m Please promote your pawn to a different figure. You can choose QUEEN, ROOK, BISHOP or KNIGHT.
   void showErrorOnInvalidSaveGameFile() {
     realCLIFromArguments("on " + NoPersistence.GameIdType.NO_GAME.ordinal() + " show-board");
     assertThat(outputStream.toString())
