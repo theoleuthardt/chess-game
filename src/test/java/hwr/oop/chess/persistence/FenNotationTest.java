@@ -171,27 +171,28 @@ class FenNotationTest {
     assertThat(generateFen(board)).isEqualTo(kingIsNotStartPosition);
   }
 
-  @Test
-  void testInValidFenString() {
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+            "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R2K3R w KkQq - 2 10", // !whiteKingAtInitial
+            "r2k3r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10", // !blackKingAtInitial
+            "r3k3/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10", // !blackRookAtInitialKingSide
+            "4k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10", // !blackRookAtInitialQueenSide
+            "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K3 w KkQq - 2 10", // !whiteRookAtInitialKingSide
+            "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/4K2R w KkQq - 2 10", // !whiteRookAtInitialQueenSide
+    })
+  void testInvalidCastlingFEN(String fen) {
     Board board = new Board(false);
-    String whiteKingIsNotStartPosition =
-        "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R2K3R w KkQq - 2 10";
-    assertThatThrownBy(() -> parseFEN(board, whiteKingIsNotStartPosition))
+    assertThatThrownBy(() -> parseFEN(board, fen))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Cannot load position because it is invalid.");
-
-    String blackKingIsNotStartPosition =
-        "r2k3r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10";
-    assertThatThrownBy(() -> parseFEN(board, blackKingIsNotStartPosition))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Cannot load position because it is invalid.");
+        .hasMessageContaining("This is an invalid FEN string!");
   }
 
   @ParameterizedTest
   @ValueSource(
     strings = {
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-      "8/8/8/8/8/8/8/8 w - - 0 1"
+      "8/8/8/8/8/8/8/8 w - - 0 1",
     })
   void testValidFEN(String fen) {
     assertThat(isValidFEN(fen)).isTrue();
@@ -208,7 +209,7 @@ class FenNotationTest {
       "rnbqkbn3/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
       "8/1r7/8/8/8/8/8/8 w - - 0 1",
     })
-  void testInvalidFEN(String fen) {
+  void testInvalidPartFEN(String fen) {
     assertThat(isValidFEN(fen)).isFalse();
   }
 }
