@@ -7,8 +7,12 @@ import hwr.oop.chess.application.figures.FigureType;
 
 import hwr.oop.chess.application.figures.King;
 import hwr.oop.chess.application.figures.Rook;
+
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static hwr.oop.chess.persistence.FenNotation.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,15 +23,16 @@ class FenNotationTest {
   void testInitialFigureFromFEN() {
     Board board = new Board(false);
     String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
-    FenNotation.parseFEN(board, fenString);
-    assertThat(board.findCell(1, 1).figure().type()).isEqualTo(FigureType.ROOK);
-    assertThat(board.findCell(2, 1).figure().type()).isEqualTo(FigureType.KNIGHT);
-    assertThat(board.findCell(3, 1).figure().type()).isEqualTo(FigureType.BISHOP);
-    assertThat(board.findCell(4, 1).figure().type()).isEqualTo(FigureType.QUEEN);
-    assertThat(board.findCell(5, 1).figure().type()).isEqualTo(FigureType.KING);
-    assertThat(board.findCell(6, 1).figure().type()).isEqualTo(FigureType.BISHOP);
-    assertThat(board.findCell(7, 1).figure().type()).isEqualTo(FigureType.KNIGHT);
-    assertThat(board.findCell(8, 1).figure().type()).isEqualTo(FigureType.ROOK);
+    parseFEN(board, fenString);
+
+    assertThat(board.findCell("a1").figure().type()).isEqualTo(FigureType.ROOK);
+    assertThat(board.findCell("b1").figure().type()).isEqualTo(FigureType.KNIGHT);
+    assertThat(board.findCell("c1").figure().type()).isEqualTo(FigureType.BISHOP);
+    assertThat(board.findCell("d1").figure().type()).isEqualTo(FigureType.QUEEN);
+    assertThat(board.findCell("e1").figure().type()).isEqualTo(FigureType.KING);
+    assertThat(board.findCell("f1").figure().type()).isEqualTo(FigureType.BISHOP);
+    assertThat(board.findCell("g1").figure().type()).isEqualTo(FigureType.KNIGHT);
+    assertThat(board.findCell("h1").figure().type()).isEqualTo(FigureType.ROOK);
   }
 
   @Test
@@ -49,151 +54,162 @@ class FenNotationTest {
         .hasMessageContaining("Invalid char for figure type!");
   }
 
-  @Test
-  void testGenerateFENFromBoard() {
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 0 5",
+      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0"
+    })
+  void parsingFenAndGeneratingItFromBoard_shouldNotChangeFenString(String initialFen) {
     Board board = new Board(false);
-    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 0 5";
-
-    FenNotation.parseFEN(board, fen);
-    String generatedFEN = FenNotation.generateFen(board);
-    assertThat(generatedFEN).startsWith(fen);
-  }
-
-  @Test
-  void testGenerateFENInitialState() {
-    Board board = new Board(false);
-    String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
-
-    FenNotation.parseFEN(board, fen);
-    String generatedFEN = FenNotation.generateFen(board);
-    assertThat(generatedFEN).isEqualTo(fen);
-  }
-
-  @Test
-  void testIsCharValid() {
-    assertThat(isCharValid('a')).isFalse();
-    assertThat(isCharValid('b')).isTrue(); // Bishop
-    assertThat(isCharValid('c')).isFalse();
-    assertThat(isCharValid('d')).isFalse();
+    parseFEN(board, initialFen);
+    assertThat(generateFen(board)).isEqualTo(initialFen);
   }
 
   @Test
   void testGenerateFenByCastling() {
     Board board = new Board(false);
     String initialStatus = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
-    FenNotation.parseFEN(board, initialStatus);
-    assertThat(FenNotation.generateFen(board)).isEqualTo(initialStatus);
+    parseFEN(board, initialStatus);
+    assertThat(generateFen(board)).isEqualTo(initialStatus);
   }
 
   @Test
-  void testParseFEN() {
+  void generateFenFailsWithoutEnoughParts() {
     Board board = new Board(false);
-    String fenString = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
-
-    List<String> parts = List.of(fenString.split(" "));
-    assertThatThrownBy(() -> parseFEN(board, parts.getFirst())).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("This is an invalid FEN string, as it should have 6 parts!");
-
-    parseFEN(board, fenString);
-    assertThat(generateFen(board)).isEqualTo(fenString);
-    }
+    String invalidFenString = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R";
+    assertThatThrownBy(() -> parseFEN(board, invalidFenString))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("This is an invalid FEN string!");
+  }
 
   @Test
   void testParseCastling() {
     Board board = new Board(false);
-
     String disableCastling = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
     parseFEN(board, disableCastling);
-    for (String position: List.of( "a1", "a8", "h1", "h8")){
-      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isTrue();
+    for (String position : List.of("a1", "a8", "h1", "h8")) {
+      assertThat(((Rook) board.findCell(position).figure()).hasMoved()).isTrue();
     }
-    for (String position: List.of( "e1", "e8")){
-      assertThat(((King)board.findCell(position).figure()).hasMoved()).isTrue();
+    for (String position : List.of("e1", "e8")) {
+      assertThat(((King) board.findCell(position).figure()).hasMoved()).isTrue();
     }
     assertThat(generateFen(board)).isEqualTo(disableCastling);
   }
 
   @Test
-  void testAvailableCastling(){
+  void testAvailableCastling() {
     Board board = new Board(false);
-
     String availableCastling = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b KQkq - 2 5";
     parseFEN(board, availableCastling);
-    for (String position: List.of( "a1", "a8", "h1", "h8")){
-      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isFalse();
+    for (String position : List.of("a1", "a8", "h1", "h8")) {
+      assertThat(((Rook) board.findCell(position).figure()).hasMoved()).isFalse();
     }
-    for (String position: List.of( "e1", "e8")){
-      assertThat(((King)board.findCell(position).figure()).hasMoved()).isFalse();
+    for (String position : List.of("e1", "e8")) {
+      assertThat(((King) board.findCell(position).figure()).hasMoved()).isFalse();
     }
     assertThat(generateFen(board)).isEqualTo(availableCastling);
   }
 
   @Test
-  void testAvailableQueenCastling(){
+  void testAvailableQueenCastling() {
     Board board = new Board(false);
     String availableQueenCastling = "r3k2r/1pp1pppp/8/p1B2b2/5P2/4p3/PPP3PP/R3K2R b Qq - 2 5";
     parseFEN(board, availableQueenCastling);
-    for (String position: List.of("e1", "e8")){
-      assertThat(((King)board.findCell(position).figure()).hasMoved()).isFalse();
+    for (String position : List.of("e1", "e8")) {
+      assertThat(((King) board.findCell(position).figure()).hasMoved()).isFalse();
     }
-    for (String position: List.of("a1",  "a8")){
-      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isFalse();
+    for (String position : List.of("a1", "a8")) {
+      assertThat(((Rook) board.findCell(position).figure()).hasMoved()).isFalse();
     }
-    for (String position: List.of("h1", "h8")){
-      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isTrue();
+    for (String position : List.of("h1", "h8")) {
+      assertThat(((Rook) board.findCell(position).figure()).hasMoved()).isTrue();
     }
     assertThat(generateFen(board)).isEqualTo(availableQueenCastling);
   }
 
   @Test
-  void testAvailableKingCastling(){
+  void testAvailableKingCastling() {
     Board board = new Board(false);
     String availableQueenCastling = "r3k2r/1pp1pppp/8/p1B2b2/5P2/4p3/PPP3PP/R3K2R b Kk - 2 5";
     parseFEN(board, availableQueenCastling);
-    for (String position: List.of("e1", "e8")){
-      assertThat(((King)board.findCell(position).figure()).hasMoved()).isFalse();
+    for (String position : List.of("e1", "e8")) {
+      assertThat(((King) board.findCell(position).figure()).hasMoved()).isFalse();
     }
-    for (String position: List.of("a1",  "a8")){
-      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isTrue();
+    for (String position : List.of("a1", "a8")) {
+      assertThat(((Rook) board.findCell(position).figure()).hasMoved()).isTrue();
     }
-    for (String position: List.of("h1", "h8")){
-      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isFalse();
+    for (String position : List.of("h1", "h8")) {
+      assertThat(((Rook) board.findCell(position).figure()).hasMoved()).isFalse();
     }
     assertThat(generateFen(board)).isEqualTo(availableQueenCastling);
   }
 
   @Test
-  void testCastlingNoKingSideRook(){
+  void testCastlingNoKingSideRook() {
     Board board = new Board(false);
 
     String noKingSideRook = "r3k3/1p2pppr/2p5/pB3b1p/5P2/4p2P/PPP3PR/R3K3 w Qq - 2 8";
     parseFEN(board, noKingSideRook);
-    for (String position: List.of("e1", "e8")){
-      assertThat(((King)board.findCell(position).figure()).hasMoved()).isFalse();
+    for (String position : List.of("e1", "e8")) {
+      assertThat(((King) board.findCell(position).figure()).hasMoved()).isFalse();
     }
-    for (String position: List.of("a1",  "a8")){
-      assertThat(((Rook)board.findCell(position).figure()).hasMoved()).isFalse();
+    for (String position : List.of("a1", "a8")) {
+      assertThat(((Rook) board.findCell(position).figure()).hasMoved()).isFalse();
     }
     assertThat(generateFen(board)).isEqualTo(noKingSideRook);
   }
 
   @Test
-  void testCastlingKingIsNotStartPosition(){
+  void testCastlingKingIsNotStartPosition() {
     Board board = new Board(false);
     String kingIsNotStartPosition = "r2k3r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R2K3R w - - 2 10";
     parseFEN(board, kingIsNotStartPosition);
-    for (FigureColor color: List.of( FigureColor.WHITE, FigureColor.BLACK)){
-      assertThat(((King)board.findKing(color).figure()).hasMoved()).isTrue();
+    for (FigureColor color : List.of(FigureColor.WHITE, FigureColor.BLACK)) {
+      assertThat(((King) board.findKing(color).figure()).hasMoved()).isTrue();
     }
     assertThat(generateFen(board)).isEqualTo(kingIsNotStartPosition);
   }
 
-  @Test
-  void testInValidFenString(){
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+            "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R2K3R w KkQq - 2 10", // !whiteKingAtInitial
+            "r2k3r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10", // !blackKingAtInitial
+            "r3k3/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10", // !blackRookAtInitialKingSide
+            "4k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10", // !blackRookAtInitialQueenSide
+            "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K3 w KkQq - 2 10", // !whiteRookAtInitialKingSide
+            "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/4K2R w KkQq - 2 10", // !whiteRookAtInitialQueenSide
+    })
+  void testInvalidCastlingFEN(String fen) {
     Board board = new Board(false);
-    String whiteKingIsNotStartPosition = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R2K3R w KkQq - 2 10";
-    assertThatThrownBy(() -> parseFEN(board, whiteKingIsNotStartPosition)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Cannot load position because it is invalid.");
+    assertThatThrownBy(() -> parseFEN(board, fen))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("This is an invalid FEN string!");
+  }
 
-    String blackKingIsNotStartPosition = "r2k3r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10";
-    assertThatThrownBy(() -> parseFEN(board, blackKingIsNotStartPosition)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Cannot load position because it is invalid.");
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "8/8/8/8/8/8/8/8 w - - 0 1",
+    })
+  void testValidFEN(String fen) {
+    assertThat(isValidFEN(fen)).isTrue();
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "rnbqkbnr/pppppppp/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0",
+      "8/8/8/8/8/8/8/8 w - - 0",
+      "rnbqkbnr/pppppppp/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - - 1",
+      "r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/R2Q1RK1 w - - 2 15",
+      "r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/3PBB3/P5PP/R2Q1RK1 w - - 2 15",
+      "rnbqkbn3/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "8/1r7/8/8/8/8/8/8 w - - 0 1",
+    })
+  void testInvalidPartFEN(String fen) {
+    assertThat(isValidFEN(fen)).isFalse();
   }
 }

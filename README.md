@@ -62,18 +62,29 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 | `<FROM>` `<TO>` | Cell coordinates | a4, c7        |
 | `<TYPE>`        | Type of figure   | queen, knight |
 
-| Command              | Description                                         |
-|----------------------|-----------------------------------------------------|
-| `chess` `chess help` | Show the list of supported commands                 |
-| `chess create <ID>`  | Create a new, fresh game (stored in game_\<ID>.csv) |
+### Getting started
+
+- `chess`, `chess help` Show the list of supported commands
+- `chess create <ID>` Create a new, fresh game (stored in game_\<ID>.csv)
 
 ### In-Game Commands `chess on <ID> [...]`
 
-| Command                               | Description                                    |
-|---------------------------------------|------------------------------------------------|
-| `chess on <ID> move <FROM> <TO>`      | Move the figure on FROM to the cell TO         |
-| `chess on <ID> promote <FROM> <TYPE>` | Promote the pawn on cell FROM                  |
-| `chess on <ID> show-moves <FROM>`     | Show where the figure on cell FROM can move to |
+- **Action Commands**
+    - `chess on <ID> move <FROM> <TO>` Move the figure on FROM to the cell TO
+    - `chess on <ID> promote <FROM> <TYPE>` Promote the pawn on cell FROM
+- **Data Commands**
+    - `chess on <ID> show-board` Show the current state of the board
+    - `chess on <ID> show-moves <FROM>` Show where the figure on cell FROM can move to
+    - `chess on <ID> show-moveable` Show figures which can be moved
+    - `chess on <ID> show-stats` Show score of the players
+
+### End of Game Commands `chess on <ID> [...]`
+
+- `chess on <ID> draw offer` Offer draw to the other player
+- `chess on <ID> draw accept` Accept the draw offer
+- `chess on <ID> draw decline` Decline the draw offer
+- `chess on <ID> resign` End the game by accepting a loss
+- `chess on <ID> rematch` Start a new game without resetting your score
 
 ## Feature List
 
@@ -106,10 +117,10 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 | 3      | Show Board          | :heavy_check_mark: | :heavy_check_mark: |
 | 4      | Move Figure         | :heavy_check_mark: | :heavy_check_mark: |
 | 5      | Promotion           | :heavy_check_mark: | :heavy_check_mark: |
-| 6      | Show Possible Moves | :heavy_check_mark: | :x:                |
-| 7      | Surrender           | :x:                | :x:                |
-| 8      | Offer Remi          | :x:                | :x:                |
-| 9      | Accept Remi         | :x:                | :x:                |
+| 6      | Show Possible Moves | :heavy_check_mark: | :heavy_check_mark: |
+| 7      | Surrender           | :heavy_check_mark: | :heavy_check_mark: |
+| 8      | Offer Draw          | :heavy_check_mark: | :heavy_check_mark: |
+| 9      | Accept Draw         | :heavy_check_mark: | :heavy_check_mark: |
 | 10     | Create Tournament   | :x:                | :x:                |
 
 ### Persistence
@@ -118,8 +129,8 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
 |--------|-----------------|--------------------|--------------------|
 | 1      | Player          | :heavy_check_mark: | :heavy_check_mark: |
 | 2      | FEN Notation    | :heavy_check_mark: | :heavy_check_mark: |
-| 3      | Save Game       | :heavy_check_mark: | :x:                |
-| 4      | Load Game       | :heavy_check_mark: | :x:                |
+| 3      | Save Game       | :heavy_check_mark: | :heavy_check_mark: |
+| 4      | Load Game       | :heavy_check_mark: | :heavy_check_mark: |
 | 5      | Save Tournament | :x:                | :x:                |
 | 6      | Load Tournament | :x:                | :x:                |
 

@@ -36,9 +36,9 @@ class KingTest {
   @Test
   void king_hasCorrectSymbol() {
     King whiteKing = new King(FigureColor.WHITE);
-    assertThat(whiteKing.symbol()).isEqualTo('K');
-
     King blackKing = new King(FigureColor.BLACK);
+
+    assertThat(whiteKing.symbol()).isEqualTo('K');
     assertThat(blackKing.symbol()).isEqualTo('k');
   }
 
@@ -69,12 +69,15 @@ class KingTest {
     assertThat(king.canMoveTo(from, to)).isFalse();
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion, try to change the order
+  // or split it into two seperate test.
   @Test
   void testCastlingKingWhite() {
-    Board board = new Board(false);
+    board = new Board(false);
     String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 10";
     FenNotation.parseFEN(board, fenString);
-    Cell king = board.findCell(5, 1);
+    Cell king = board.findCell("e1");
     // Expected only available castling King
     assertThat(king.isFreeInDirection(2, CellDirection.RIGHT)).isTrue();
     assertThat(king.isFreeInDirection(3, CellDirection.RIGHT)).isFalse();
@@ -82,26 +85,29 @@ class KingTest {
     assertThat(king.isFreeInDirection(3, CellDirection.LEFT)).isFalse();
 
     List<Cell> cells = board.availableCellsWithoutCheckMoves(king);
-    assertThat(cells).contains(board.findCell(7, 1));
+    assertThat(cells).contains(board.findCell("g1"));
 
     // Move king
     board.moveFigure("e1", "g1");
-    assertThat(board.findCell(7, 1).figure().symbol()).isEqualTo('K');
-    assertThat(board.findCell(6, 1).figure().symbol()).isEqualTo('R');
-    assertThat(board.findCell(8, 1).figure()).isNull();
-    assertThat(board.findCell(5, 1).figure()).isNull();
+    assertThat(board.findCell("g1").figure().symbol()).isEqualTo('K');
+    assertThat(board.findCell("f1").figure().symbol()).isEqualTo('R');
+    assertThat(board.findCell("h1").figure()).isNull();
+    assertThat(board.findCell("e1").figure()).isNull();
 
     // Check board status
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
-    assertThat(((Rook) board.findCell(6, 1).figure()).hasMoved()).isTrue();
+    assertThat(((Rook) board.findCell("f1").figure()).hasMoved()).isTrue();
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void testCastlingQueenWhite() {
-    Board board = new Board(false);
+    board = new Board(false);
     String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w KQkq - 0 10";
     FenNotation.parseFEN(board, fenString);
-    Cell king = board.findCell(5, 1);
+    Cell king = board.findCell("e1");
     // Expected only available castling King
     assertThat(king.isFreeInDirection(2, CellDirection.RIGHT)).isFalse();
     assertThat(king.isFreeInDirection(3, CellDirection.RIGHT)).isFalse();
@@ -109,17 +115,39 @@ class KingTest {
     assertThat(king.isFreeInDirection(3, CellDirection.LEFT)).isTrue();
 
     List<Cell> cells = board.availableCellsWithoutCheckMoves(king);
-    assertThat(cells).contains(board.findCell(3, 1));
+    assertThat(cells).contains(board.findCell("c1"));
 
     // Move king
     board.moveFigure("e1", "c1");
-    assertThat(board.findCell(3, 1).figure().symbol()).isEqualTo('K');
-    assertThat(board.findCell(4, 1).figure().symbol()).isEqualTo('R');
-    assertThat(board.findCell(1, 1).figure()).isNull();
-    assertThat(board.findCell(5, 1).figure()).isNull();
+    assertThat(board.findCell("c1").figure().symbol()).isEqualTo('K');
+    assertThat(board.findCell("d1").figure().symbol()).isEqualTo('R');
+    assertThat(board.findCell("a1").figure()).isNull();
+    assertThat(board.findCell("e1").figure()).isNull();
 
     // Check board status
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
-    assertThat(((Rook) board.findCell(4, 1).figure()).hasMoved()).isTrue();
+    assertThat(((Rook) board.findCell("d1").figure()).hasMoved()).isTrue();
+  }
+
+  @Test
+  void testCanPerformWhiteKingSideCastling() {
+    board = new Board(false);
+    String fenString = "r3k3/8/8/8/8/8/8/4K2R w Kq - 1 1";
+    FenNotation.parseFEN(board, fenString);
+    Cell whiteKingCell = board.findCell('e', 1);
+    King whiteKing = (King) whiteKingCell.figure();
+    assertThat(whiteKing.canPerformKingSideCastling(whiteKingCell)).isTrue();
+    assertThat(whiteKing.canPerformQueenSideCastling(whiteKingCell)).isFalse();
+  }
+
+  @Test
+  void testCanPerformBlackQueenSideCastling() {
+    board = new Board(false);
+    String fenString = "r3k3/8/8/8/8/8/8/4K2R w Kq - 1 1";
+    FenNotation.parseFEN(board, fenString);
+    Cell blackKingCell = board.findCell('e', 8);
+    King blackKing = (King) blackKingCell.figure();
+    assertThat(blackKing.canPerformKingSideCastling(blackKingCell)).isFalse();
+    assertThat(blackKing.canPerformQueenSideCastling(blackKingCell)).isTrue();
   }
 }

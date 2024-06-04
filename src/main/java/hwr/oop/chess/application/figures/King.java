@@ -15,6 +15,7 @@ public class King implements Figure {
     this.hasMoved = false;
   }
 
+  @Override
   public List<Cell> availableCells(Cell currentCell) {
     List<Cell> cells = new ArrayList<>();
 
@@ -69,19 +70,23 @@ public class King implements Figure {
         && !((Rook) rookCell.figure()).hasMoved();
   }
 
+  @Override
   public boolean canMoveTo(Cell prevCell, Cell nextCell) {
     List<Cell> availableCell = availableCells(prevCell);
     return availableCell.contains(nextCell);
   }
 
+  @Override
   public char symbol() {
     return color == FigureColor.WHITE ? 'K' : 'k';
   }
 
+  @Override
   public FigureColor color() {
     return color;
   }
 
+  @Override
   public FigureType type() {
     return type;
   }

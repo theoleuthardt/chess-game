@@ -1,6 +1,6 @@
 package hwr.oop.chess.cli;
 
-import hwr.oop.chess.persistence.CSVFilePersistence;
+import hwr.oop.chess.persistence.NoPersistence;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,8 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CLIPrinterTest {
 
   private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-  private final CLIAdapter cli =
-      new CLIAdapter(new PrintStream(outputStream), new CSVFilePersistence());
+  private final CLIAdapter cli = new CLIAdapter(new PrintStream(outputStream), new NoPersistence());
   private final CLIPrinter printer = cli.printer();
 
   @BeforeEach

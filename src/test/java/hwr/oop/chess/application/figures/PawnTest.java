@@ -10,10 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.*;
 
 class PawnTest {
   private Board board;
@@ -107,24 +104,24 @@ class PawnTest {
 
   @Test
   void movePawn_noCellAvailableOnLastRow() {
-    Board board = new Board(false);
+    board = new Board(false);
     Figure blackPawn = new Pawn(FigureColor.BLACK);
-    Cell blackPawnCell = board.findCell(3, 1);
+    Cell blackPawnCell = board.findCell("c1");
     blackPawnCell.setFigure(blackPawn);
     assertThat(board.availableCellsWithoutCheckMoves(blackPawnCell)).isEmpty();
 
     Figure whitePawn = new Pawn(FigureColor.WHITE);
-    Cell whitePawnCell = board.findCell(3, 8);
+    Cell whitePawnCell = board.findCell("c8");
     whitePawnCell.setFigure(whitePawn);
     assertThat(board.availableCellsWithoutCheckMoves(whitePawnCell)).isEmpty();
   }
 
   void pawnDiagonalTest(FigureColor pawnColor, FigureColor diagonalColor, boolean expectedResult) {
-    Board board = new Board(false);
+    board = new Board(false);
 
     CellDirection forwards =
         pawnColor == FigureColor.WHITE ? CellDirection.TOP : CellDirection.BOTTOM;
-    Cell from = board.findCell(4, 4);
+    Cell from = board.findCell("d4");
     Cell forwardsLeft = from.cellInDirection(forwards).leftCell();
     Cell forwardsRight = from.cellInDirection(forwards).rightCell();
 
@@ -161,7 +158,7 @@ class PawnTest {
   @Test
   void isAbleToPromote_WhitePawn() {
     Pawn pawn = new Pawn(FigureColor.WHITE);
-    Board board = new Board(true);
+    board = new Board(true);
     Cell cell = board.findCell('a', 8);
     cell.setFigure(pawn);
 
@@ -176,7 +173,7 @@ class PawnTest {
   @Test
   void isAbleToPromote_BlackPawn() {
     Pawn pawn = new Pawn(FigureColor.BLACK);
-    Board board = new Board(true);
+    board = new Board(true);
     Cell cell = board.findCell('a', 1);
     cell.setFigure(pawn);
 
@@ -191,31 +188,34 @@ class PawnTest {
   @Test
   void isAbleToPromote_CellAvailableInForwardDirection() {
     Pawn pawn = new Pawn(FigureColor.WHITE);
-    Board board = new Board(true);
+    board = new Board(true);
     Cell currentCell = board.findCell('a', 7);
 
-    assertFalse(pawn.isAbleToPromote(currentCell));
+    assertThat(pawn.isAbleToPromote(currentCell)).isFalse();
   }
 
   @Test
   void promotePawn_InvalidPromotionType() {
     Pawn pawn = new Pawn(FigureColor.WHITE);
-    Board board = new Board(true);
+    board = new Board(true);
     Cell currentCell = board.findCell('a', 7);
-    assertThrows(
-        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.KING));
-    assertThrows(
-        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.PAWN));
+    assertThatException()
+        .isThrownBy(() -> pawn.promotePawn(currentCell, FigureType.KING))
+        .isInstanceOf(InvalidUserInputException.class);
+    assertThatException()
+        .isThrownBy(() -> pawn.promotePawn(currentCell, FigureType.PAWN))
+        .isInstanceOf(InvalidUserInputException.class);
   }
 
   @Test
   void promotePawn_PawnNotEligibleForPromotion() {
     Pawn pawn = new Pawn(FigureColor.WHITE);
-    Board board = new Board(true);
+    board = new Board(true);
     Cell currentCell = board.findCell('a', 1);
 
-    assertThrows(
-        InvalidUserInputException.class, () -> pawn.promotePawn(currentCell, FigureType.QUEEN));
+    assertThatException()
+        .isThrownBy(() -> pawn.promotePawn(currentCell, FigureType.QUEEN))
+        .isInstanceOf(InvalidUserInputException.class);
   }
 
   @Test
@@ -231,9 +231,12 @@ class PawnTest {
     assertThat(changedStatus).isEqualTo(afterPawnMove);
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void canPerformEnPassant_isAllowed() {
-    Board board = new Board(false);
+    board = new Board(false);
     FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - e6 0 1");
     Cell from = board.findCell('f', 5);
     Pawn pawn = (Pawn) from.figure();
@@ -263,9 +266,12 @@ class PawnTest {
     assertThat(to.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
   }
 
+  // TODO: Every assertion should be at the end of the test function.
+  // If there is a function like "board.moveFigure(...)" after an Assertion,
+  // try to change the order or split it into two seperate test.
   @Test
   void canPerformEnPassant_isNotAllowed() {
-    Board board = new Board(false);
+    board = new Board(false);
     FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - - 0 1");
     Cell from = board.findCell('f', 5);
     Pawn pawn = (Pawn) from.figure();

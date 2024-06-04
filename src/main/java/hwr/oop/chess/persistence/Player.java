@@ -1,31 +1,25 @@
 package hwr.oop.chess.persistence;
 
-import hwr.oop.chess.application.figures.FigureColor;
-
 public class Player {
-  private FigureColor color;
-  private int elo; // rank system: 0=lowest; rank count of won games
+  private int doubleOfScore;
 
-  public Player(FigureColor color, int elo) {
-    this.color = color;
-    this.elo = elo;
+  public Player(String doubleOfScore) {
+    this.doubleOfScore = Integer.parseInt(doubleOfScore);
   }
 
-  // Getter Methods
-  public int elo() {
-    return this.elo;
+  public double score() {
+    return doubleOfScore / 2.0;
   }
 
-  public FigureColor color() {
-    return this.color;
+  public int doubleOfScore() {
+    return doubleOfScore;
   }
 
-  // Setter Methods
-  public void setElo(int elo) {
-    this.elo = elo;
+  public void fullPointOnWin() {
+    doubleOfScore += 2;
   }
 
-  public void setColor(FigureColor color) {
-    this.color = color;
+  public void halfPointOnDraw() {
+    doubleOfScore += 1;
   }
 }

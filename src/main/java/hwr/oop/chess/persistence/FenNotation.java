@@ -2,9 +2,12 @@ package hwr.oop.chess.persistence;
 
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
+import hwr.oop.chess.application.Coordinate;
 import hwr.oop.chess.application.figures.*;
 
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 public class FenNotation {
   private final Board board;
@@ -17,12 +20,11 @@ public class FenNotation {
   }
 
   public static void parseFEN(Board board, String fenString) {
-    List<String> parts = List.of(fenString.split(" "));
-    if (parts.size() != 6) {
-      throw new IllegalArgumentException(
-          "This is an invalid FEN string, as it should have 6 parts!");
+    if(!isValidFEN(fenString)){
+      throw new IllegalArgumentException("This is an invalid FEN string!");
     }
 
+    List<String> parts = List.of(fenString.split(" "));
     FenNotation fen = new FenNotation(board);
     fen.parsePiecePlacement(parts.getFirst());
     fen.parseTurn(parts.get(1));
@@ -33,6 +35,88 @@ public class FenNotation {
     fen.parseFullMove(parts.getLast());
 
     board.initializeWith(fen.turn, fen.halfMove, fen.fullMove);
+  }
+
+  public static boolean isValidFEN(String fen) {
+    String FEN_PATTERN = "^([rnbqkpRNBQKP1-8]{1,8}/){7}[rnbqkpRNBQKP1-8]{1,8} [wb] ([KQkq]{1,4}|-) ([a-h][36]|-) (\\d+) (\\d+)$";
+
+    // Check if the FEN matches the regular expression pattern
+    if (!Pattern.matches(FEN_PATTERN, fen)) {
+      return false;
+    }
+
+    // Validate the first part of the FEN (the board state)
+    List<String> parts = List.of(fen.split(" "));
+    List<String> rows =  List.of(parts.getFirst().split("/"));            ;
+
+    for (String row : rows) {
+      if (!isValidRow(row)) {
+        return false;
+      }
+    }
+
+    // Validate castling availability
+    String castling = parts.get(2);
+    if (!isValidCastling(castling, rows)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private static boolean isValidRow(String row) {
+    int count = 0;
+    for (char c : row.toCharArray()) {
+      if (Character.isDigit(c)) {
+        count += c - '0';  // If it's a digit, add that many empty squares
+      } else {
+        count++;
+      }
+    }
+    return count == 8;  // Each row must have exactly 8 squares
+  }
+
+  private static boolean isValidCastling(String castling, List<String> rows) {
+    boolean whiteKingAtInitial = checkPieceAtPosition(rows.get(7), 'K', 4);
+    boolean blackKingAtInitial = checkPieceAtPosition(rows.get(0), 'k', 4);
+    boolean whiteRookAtInitialKingSide = checkPieceAtPosition(rows.get(7), 'R', 7);
+    boolean whiteRookAtInitialQueenSide = checkPieceAtPosition(rows.get(7), 'R', 0);
+    boolean blackRookAtInitialKingSide = checkPieceAtPosition(rows.get(0), 'r', 7);
+    boolean blackRookAtInitialQueenSide = checkPieceAtPosition(rows.get(0), 'r', 0);
+
+    // Define lambdas for each castling condition
+    Map<Character, Supplier<Boolean>> castlingChecks = new HashMap<>();
+    castlingChecks.put('K', () -> whiteKingAtInitial && whiteRookAtInitialKingSide);
+    castlingChecks.put('Q', () -> whiteKingAtInitial && whiteRookAtInitialQueenSide);
+    castlingChecks.put('k', () -> blackKingAtInitial && blackRookAtInitialKingSide);
+    castlingChecks.put('q', () -> blackKingAtInitial && blackRookAtInitialQueenSide);
+
+    for (char c : castling.toCharArray()) {
+      if (c == '-') {
+        continue; // No castling available, this is always valid
+      }
+      Supplier<Boolean> check = castlingChecks.get(c);
+      if (check == null || !check.get()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private static boolean checkPieceAtPosition(String row, char piece, int position) {
+    int col = 0;
+    for (char c : row.toCharArray()) {
+      if (Character.isDigit(c)) {
+        col += c - '0';
+      } else {
+        if (c == piece && col == position) {
+          return true;
+        }
+        col++;
+      }
+    }
+    return false;
   }
 
   public static String generateFen(Board board) {
@@ -79,9 +163,9 @@ public class FenNotation {
     allCells.sort(
         (c1, c2) -> {
           if (c1.y() != c2.y()) {
-            return Integer.compare(c1.y(), c2.y());
+            return Integer.compare(c1.y().toInt(), c2.y().toInt());
           }
-         return 0;
+          return 0;
         });
 
     for (Cell cell : allCells) {
@@ -120,8 +204,8 @@ public class FenNotation {
         continue;
       }
       FigureColor color = Character.isUpperCase(c) ? FigureColor.WHITE : FigureColor.BLACK;
-      int x = Character.toLowerCase(c) == 'q' ? 1 : 8;
-      int y = Character.isLowerCase(c) ? 8 : 1;
+      Coordinate x = Character.toLowerCase(c) == 'q' ? Coordinate.ONE : Coordinate.EIGHT;
+      Coordinate y = Character.isLowerCase(c) ? Coordinate.EIGHT : Coordinate.ONE;
 
       Cell rookCell = board.findCell(x, y);
       if (rookCell.isOccupiedBy(color, FigureType.ROOK)) {
@@ -140,16 +224,6 @@ public class FenNotation {
       Cell kingCell = board.findKing(FigureColor.BLACK);
       ((King) kingCell.figure()).figureMoved();
     }
-
-    if (this.isKingNotOnStartField(FigureColor.WHITE) && (castling.contains("K") || castling.contains("Q"))){
-      throw new IllegalArgumentException(
-          "Cannot load position because it is invalid.");
-    }
-
-    if (this.isKingNotOnStartField(FigureColor.BLACK) && (castling.contains("k") || castling.contains("q"))){
-      throw new IllegalArgumentException(
-          "Cannot load position because it is invalid.");
-    }
   }
 
   private String generateCastling() {
@@ -162,24 +236,14 @@ public class FenNotation {
         continue;
       }
 
-      int x = Character.toLowerCase(c) == 'q' ? 1 : 8;
-      int y = Character.isLowerCase(c) ? 8 : 1;
+      Coordinate x = Character.toLowerCase(c) == 'q' ? Coordinate.ONE : Coordinate.EIGHT;
+      Coordinate y = Character.isLowerCase(c) ? Coordinate.EIGHT : Coordinate.ONE;
       Cell rookCell = board.findCell(x, y);
       if (rookCell.isOccupiedBy(color, FigureType.ROOK) && !((Rook) rookCell.figure()).hasMoved()) {
         castling.append(c);
       }
     }
     return castling.isEmpty() ? "-" : castling.toString();
-  }
-
-  private boolean isKingNotOnStartField(FigureColor color) {
-    Cell kingCell = board.findKing(color);
-
-    if (color == FigureColor.WHITE) {
-      return kingCell.x() != 5 || kingCell.y() != 1;
-    } else {
-      return kingCell.x() != 5 || kingCell.y() != 8;
-    }
   }
 
   private void parseEnPassant(String enPassantStr) {
@@ -211,12 +275,5 @@ public class FenNotation {
 
   private String generateFullMove() {
     return String.valueOf(board.fullMove());
-  }
-
-  public static boolean isCharValid(char c) {
-    return switch (Character.toLowerCase(c)) {
-      case 'b', 'k', 'n', 'p', 'q', 'r' -> true;
-      default -> false;
-    };
   }
 }

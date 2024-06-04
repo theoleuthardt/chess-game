@@ -25,16 +25,16 @@ public class Board {
     // create the board row by row
     // starts at the bottom left
     // if a row is complete the next row will also be connected from the left
-    for (int y = 1; y <= 8; y++) {
+    for (Coordinate y : Coordinate.values()) {
       Cell leftCell = null;
       Cell bottomCell =
           bottomCellRowStart =
               (bottomCellRowStart == null) ? firstCell : bottomCellRowStart.topCell();
 
-      for (int x = 1; x <= 8; x++) {
+      for (Coordinate x : Coordinate.values()) {
         Cell currentCell = new Cell(x, y);
 
-        if (y == 1 && x == 1) {
+        if (y == Coordinate.ONE && x == Coordinate.ONE) {
           firstCell = currentCell;
           bottomCell = bottomCellRowStart = null;
         }
@@ -71,7 +71,7 @@ public class Board {
   }
 
   public List<Cell> allCells() {
-    ArrayList<Cell> cells = new ArrayList<>();
+    List<Cell> cells = new ArrayList<>();
     Cell cell = firstCell.allCellsInDirection(CellDirection.TOP).getLast();
     Cell rowStart = cell;
 
@@ -91,20 +91,20 @@ public class Board {
       throw new InvalidUserInputException("The XY-Coordinates must be two characters long.");
     }
     cell = cell.toLowerCase();
-    return findCell(cell.charAt(0) - 96, cell.charAt(1) - 48);
+    Coordinate x = Coordinate.fromChar(cell.charAt(0));
+    Coordinate y = Coordinate.fromInt(cell.charAt(1) - 48);
+    return findCell(x, y);
   }
 
   public Cell findCell(char x, int y) {
-    return findCell(x - 96, y);
+    return findCell(Coordinate.fromChar(x), Coordinate.fromInt(y));
   }
 
-  public Cell findCell(int x, int y) {
-    for (Cell cell : allCells()) {
-      if (cell.x() == x && cell.y() == y) {
-        return cell;
-      }
-    }
-    return null;
+  public Cell findCell(Coordinate x, Coordinate y) {
+    return allCells().stream()
+        .filter(cell -> cell.x() == x && cell.y() == y)
+        .findFirst()
+        .orElse(null);
   }
 
   public Cell findKing(FigureColor playerColor) {
@@ -118,48 +118,32 @@ public class Board {
 
   public void addFiguresToBoard() {
     for (Cell cell : allCells()) {
-      FigureColor figureColor = cell.y() <= 2 ? FigureColor.WHITE : FigureColor.BLACK;
+      FigureColor figureColor = cell.y().toInt() <= 2 ? FigureColor.WHITE : FigureColor.BLACK;
 
-      if (cell.y() == 1 || cell.y() == 8) {
+      if (cell.y() == Coordinate.ONE || cell.y() == Coordinate.EIGHT) {
         switch (cell.x()) {
-          case 1, 8 -> cell.setFigure(new Rook(figureColor));
-          case 2, 7 -> cell.setFigure(new Knight(figureColor));
-          case 3, 6 -> cell.setFigure(new Bishop(figureColor));
-          case 4 -> cell.setFigure(new Queen(figureColor));
-          case 5 -> cell.setFigure(new King(figureColor));
-          default -> cell.setFigure(null);
+          case ONE, EIGHT -> cell.setFigure(new Rook(figureColor));
+          case TWO, SEVEN -> cell.setFigure(new Knight(figureColor));
+          case THREE, SIX -> cell.setFigure(new Bishop(figureColor));
+          case FOUR -> cell.setFigure(new Queen(figureColor));
+          case FIVE -> cell.setFigure(new King(figureColor));
+          default -> {
+            // This column does not exist
+          }
         }
       }
 
-      if (cell.y() == 2 || cell.y() == 7) {
+      if (cell.y() == Coordinate.TWO || cell.y() == Coordinate.SEVEN) {
         cell.setFigure(new Pawn(figureColor));
       }
     }
-  }
-
-  // Method to move a piece on the board
-  public void moveFigure(Cell start, Cell end) {
-    moveFigure(start.x(), start.y(), end.x(), end.y());
   }
 
   public void moveFigure(String start, String end) {
     moveFigure(findCell(start), findCell(end));
   }
 
-  public void moveFigure(char startX, int startY, char endX, int endY) {
-    moveFigure(startX - 96, startY, endX - 96, endY);
-  }
-
-  public void moveFigure(int startX, int startY, int endX, int endY) {
-
-    if (firstCell.isInvalidCoordinate(startX, startY)
-        || firstCell.isInvalidCoordinate(endX, endY)) {
-      throw new InvalidUserInputException(
-          "Invalid coordinates. Coordinates must be between 1 and 8.");
-    }
-    // Get the piece at the start position
-    Cell startCell = findCell(startX, startY);
-    Cell endCell = findCell(endX, endY);
+  public void moveFigure(Cell startCell, Cell endCell) {
 
     if (startCell.isFree()) {
       throw new InvalidUserInputException("On the starting cell is no figure");
@@ -221,10 +205,14 @@ public class Board {
   }
 
   public boolean isCheckmate(FigureColor playerColor) {
-    if (!isCheck(playerColor)) {
-      return false;
-    }
+    return isCheck(playerColor) && playerCannotMoveAnyFigure(playerColor);
+  }
 
+  public boolean isStalemate(FigureColor playerColor) {
+    return !isCheck(playerColor) && playerCannotMoveAnyFigure(playerColor);
+  }
+
+  public boolean playerCannotMoveAnyFigure(FigureColor playerColor) {
     for (Cell startCell : cellsWithColor(playerColor)) {
       List<Cell> availableCells = availableCellsWithoutCheckMoves(startCell);
       if (!availableCells.isEmpty()) {
@@ -281,7 +269,8 @@ public class Board {
     startCell.setFigure(null);
     endCell.setFigure(figure);
 
-    if (figure.type() == FigureType.PAWN && Math.abs(startCell.y() - endCell.y()) == 2) {
+    if (figure.type() == FigureType.PAWN
+        && Math.abs(startCell.y().toInt() - endCell.y().toInt()) == 2) {
       startCell.cellInDirection(((Pawn) figure).forwards()).setIsEnPassant(true);
     }
   }
@@ -308,11 +297,11 @@ public class Board {
     Cell endRookCell;
     switch (type) {
       case KING_CASTLING -> {
-        startRookCell = findCell(8, startKingCell.y());
+        startRookCell = findCell(Coordinate.fromChar('h'), startKingCell.y());
         endRookCell = endKingCell.leftCell();
       }
       case QUEEN_CASTLING -> {
-        startRookCell = findCell(1, startKingCell.y());
+        startRookCell = findCell(Coordinate.fromChar('a'), startKingCell.y());
         endRookCell = endKingCell.rightCell();
       }
       default -> throw new UnsupportedOperationException("This is not a valid castling move.");

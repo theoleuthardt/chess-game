@@ -23,10 +23,10 @@ class MainTest {
     setUp(new String[] {});
     assertThat(outputStream.toString())
         .contains(
-            "- chess on <ID> move <FROM> <TO>:",
-            "Move a figure",
-            "- chess create <ID>:",
-            "Create a new game of chess");
+            "chess on <ID> move <FROM> <TO>:",
+            "Move the figure on FROM to the cell TO",
+            "chess create <ID>:",
+            "Create a new, fresh game");
   }
 
   @Test
