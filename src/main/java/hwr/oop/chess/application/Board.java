@@ -339,4 +339,12 @@ public class Board {
   public int halfMove() {
     return this.halfMove;
   }
+
+  public boolean isPawnPromotionPossible() {
+    return !allCells().stream()
+        .filter(cell -> cell.isOccupiedBy(FigureType.PAWN))
+        .filter(cell -> ((Pawn) cell.figure()).isAbleToPromote(cell))
+        .toList()
+        .isEmpty();
+  }
 }

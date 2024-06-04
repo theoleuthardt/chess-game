@@ -9,6 +9,7 @@ public class NoPersistence implements Persistence {
   public enum GameIdType {
     NO_GAME,
     PAWN_PROMOTION,
+    PAWN_PROMOTION_POSSIBLE,
     DEFAULT_POSITIONS,
     WHITE_CHECK_POSSIBLE,
     WHITE_CHECKMATE_POSSIBLE,
@@ -54,6 +55,8 @@ public class NoPersistence implements Persistence {
       case "fen" ->
           switch (type) {
             case PAWN_PROMOTION -> "2PP4/8/8/8/7k/8/PP6/7K w - - 0 1";
+            case PAWN_PROMOTION_POSSIBLE ->
+                "1nbqkbnr/Pppppppp/8/8/8/8/1PPPPPPP/RNBQKBNR w KQk - 0 1";
             case DEFAULT_POSITIONS, GAME_IS_OVER_WHITE_WINS, GAME_IS_OVER_DRAW, DRAW_OFFERED ->
                 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
             case WHITE_CHECK_POSSIBLE -> "8/8/k7/8/8/8/PP3q2/1K6 b - - 0 1";
