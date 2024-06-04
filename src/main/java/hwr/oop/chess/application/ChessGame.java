@@ -1,11 +1,14 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.FigureColor;
+import hwr.oop.chess.cli.InvalidUserInputException;
 import hwr.oop.chess.persistence.FenNotation;
 import hwr.oop.chess.persistence.Persistence;
 import hwr.oop.chess.persistence.Player;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 public class ChessGame {
@@ -14,6 +17,13 @@ public class ChessGame {
   private boolean isOver;
   private boolean isDrawOffered;
   private final Map<FigureColor, Player> players = new EnumMap<>(FigureColor.class);
+
+  private static final String STATE_FEN = "fen";
+  private static final String STATE_WINNER = "winner";
+  private static final String STATE_WHITE_SCORE = "whiteScore";
+  private static final String STATE_BLACK_SCORE = "blackScore";
+  private static final String STATE_IS_OVER = "isOver";
+  private static final String STATE_IS_DRAW_OFFERED = "isDrawOffered";
 
   public ChessGame(Persistence persistence, boolean isNew) {
     this.persistence = persistence;
@@ -35,21 +45,36 @@ public class ChessGame {
 
   private void loadGame() {
     persistence.loadGame();
-    isOver = "1".equals(persistence.loadState("isOver"));
-    isDrawOffered = "1".equals(persistence.loadState("isDrawOffered"));
-    FenNotation.parseFEN(board, persistence.loadState("fen"));
-    players.put(FigureColor.WHITE, new Player(persistence.loadState("whiteScore")));
-    players.put(FigureColor.BLACK, new Player(persistence.loadState("blackScore")));
+    List<String> missingStates =
+        new ArrayList<>(
+            List.of(
+                STATE_IS_OVER,
+                STATE_IS_DRAW_OFFERED,
+                STATE_FEN,
+                STATE_WHITE_SCORE,
+                STATE_BLACK_SCORE));
+    missingStates.removeIf(state -> persistence.loadState(state) != null);
+    if (!missingStates.isEmpty()) {
+      throw new InvalidUserInputException(
+          "Your save-file is invalid because it is missing: "
+              + missingStates
+              + "! Create a new game with 'chess create <ID>'.");
+    }
+    isOver = "1".equals(persistence.loadState(STATE_IS_OVER));
+    isDrawOffered = "1".equals(persistence.loadState(STATE_IS_DRAW_OFFERED));
+    FenNotation.parseFEN(board, persistence.loadState(STATE_FEN));
+    players.put(FigureColor.WHITE, new Player(persistence.loadState(STATE_WHITE_SCORE)));
+    players.put(FigureColor.BLACK, new Player(persistence.loadState(STATE_BLACK_SCORE)));
   }
 
   public void saveGame() {
-    persistence.storeState("isOver", isOver ? "1" : "0");
-    persistence.storeState("isDrawOffered", isDrawOffered ? "1" : "0");
-    persistence.storeState("fen", FenNotation.generateFen(board));
+    persistence.storeState(STATE_IS_OVER, isOver ? "1" : "0");
+    persistence.storeState(STATE_IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
+    persistence.storeState(STATE_FEN, FenNotation.generateFen(board));
     persistence.storeState(
-        "whiteScore", String.valueOf(players.get(FigureColor.WHITE).doubleOfScore()));
+        STATE_WHITE_SCORE, String.valueOf(players.get(FigureColor.WHITE).doubleOfScore()));
     persistence.storeState(
-        "blackScore", String.valueOf(players.get(FigureColor.BLACK).doubleOfScore()));
+        STATE_BLACK_SCORE, String.valueOf(players.get(FigureColor.BLACK).doubleOfScore()));
     persistence.saveGame();
   }
 
@@ -60,13 +85,13 @@ public class ChessGame {
   public void playerHasWon(FigureColor color) {
     isOver = true;
     players.get(color).fullPointOnWin();
-    persistence.storeState("winner", color.name());
+    persistence.storeState(STATE_WINNER, color.name());
   }
 
   public void endsWithDraw() {
     isOver = true;
     isDrawOffered = false;
-    persistence.storeState("winner", "draw");
+    persistence.storeState(STATE_WINNER, "draw");
     players.get(FigureColor.WHITE).halfPointOnDraw();
     players.get(FigureColor.BLACK).halfPointOnDraw();
   }

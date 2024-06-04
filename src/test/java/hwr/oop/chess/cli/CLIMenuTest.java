@@ -818,6 +818,15 @@ class CLIMenuTest {
         .containsIgnoringWhitespaces(
             """
             \033[30;1;103m ERROR \033[0m Please promote your pawn to a different figure. You can choose QUEEN, ROOK, BISHOP or KNIGHT.
+  void showErrorOnInvalidSaveGameFile() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.NO_GAME.ordinal() + " show-board");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m Your save-file is invalid because it is missing:
+            """,
+            """
+            Create a new game with 'chess create <ID>'.
             """);
   }
 }
