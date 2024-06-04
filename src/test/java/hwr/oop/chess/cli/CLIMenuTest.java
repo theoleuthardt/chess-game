@@ -796,4 +796,17 @@ class CLIMenuTest {
     assertThat(persistence.loadState("fen")).isNull();
     assertThat(persistence.loadState("winner")).isNull();
   }
+
+  @Test
+  void showErrorOnInvalidSaveGameFile() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.NO_GAME.ordinal() + " show-board");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m Your save-file is invalid because it is missing:
+            """,
+            """
+            Create a new game with 'chess create <ID>'.
+            """);
+  }
 }
