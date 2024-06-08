@@ -490,17 +490,22 @@ class BoardTest {
   @ValueSource(
   strings = {
     "8/8/8/8/8/8/8/K1k5 w - - 0 1",   // King vs King
-    "8/8/8/8/8/8/8/KBk5 w - - 0 1",   // King and Bishop vs King
-    "8/8/8/8/8/8/8/K1k1B3 w - - 0 1", // King and Bishop vs King
-    "8/8/8/8/8/8/8/KNk5 w - - 0 1",   // King and Knight vs King
-    "8/8/8/8/8/8/8/K1k1N3 w - - 0 1", // King and Knight vs King
-    "8/8/8/8/8/8/8/KBBk4 w - - 0 1",  // King and two Bishops (same color) vs King
+    "8/8/8/8/8/8/8/KBk5 w - - 0 1",   // King and White Bishop vs King
+    "8/8/8/8/8/8/8/kbK5 w - - 0 1",   // King and Black Bishop vs King
+    "8/8/8/8/8/8/8/K1k1B3 w - - 0 1", // King and White Bishop vs King
+    "8/8/8/8/8/8/8/k1K1b3 w - - 0 1", // King and Black Bishop vs King
+    "8/8/8/8/8/8/8/KNk5 w - - 0 1",   // King and White Knight vs King
+    "8/8/8/8/8/8/8/knK5 w - - 0 1",   // King and Black Knight vs King
+    "8/8/8/8/8/8/8/K1k1N3 w - - 0 1", // King and White Knight vs King
+    "8/8/8/8/8/8/8/k1K1n3 w - - 0 1", // King and Black Knight vs King
+    "8/8/8/8/8/8/8/KBBk4 w - - 0 1",  // King and two White Bishops (same color) vs King
+    "8/8/8/8/8/8/8/kbbK4 w - - 0 1",  // King and two Black Bishops (same color) vs King
   })
   void testDeadPostion(String fen){
     Board board = new Board(false);
     FenNotation.parseFEN(board,fen);
     assertThat(board.isDeadPosition()).isTrue();
-    assertThat(board.endType(FigureColor.WHITE)).isEqualTo(EndType.DEAD_POSTION);
+    assertThat(board.endType(FigureColor.WHITE)).isEqualTo(EndType.DEAD_POSITION);
   }
 
   @ParameterizedTest
@@ -513,7 +518,7 @@ class BoardTest {
   "8/8/8/8/8/8/8/KNNk4 w - - 0 1",  // King and Two Knights vs King
   "8/8/8/8/8/8/8/KBkN4 w - - 0 1",  // King and Bishop and Knight vs King
   "8/8/8/8/8/p6P/8/KNBk4 w - - 0 1",  // King, Knight, and Bishop vs King
-  "8/8/8/8/8/p6P/8/KNBk4 w - - 0 1", // another Figures
+  "r7/8/8/8/8/p6P/8/KNBk4 w - - 0 1", // another Figures
   })
   void testNotDeadPostion(String fen){
     Board board = new Board(false);

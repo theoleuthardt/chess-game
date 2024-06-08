@@ -279,7 +279,7 @@ public class Board {
       return EndType.STALEMATE;
     }
     if (isDeadPosition()) {
-      return EndType.DEAD_POSTION;
+      return EndType.DEAD_POSITION;
     }
     return EndType.NOT_END;
   }
