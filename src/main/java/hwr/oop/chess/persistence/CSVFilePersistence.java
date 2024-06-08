@@ -6,8 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CSVFilePersistence implements Persistence {
   final Map<String, String> gameData = new HashMap<>();
@@ -20,6 +19,10 @@ public class CSVFilePersistence implements Persistence {
 
   @Override
   public String loadState(String key) {
+    if (Objects.equals(key, "fen")) {
+      Deque<String> fenHistoryAsDeque = stringToDeque(gameData.get(key));
+      return fenHistoryAsDeque.peek();
+    }
     return gameData.get(key);
   }
 
@@ -75,5 +78,17 @@ public class CSVFilePersistence implements Persistence {
               + e.getMessage()
               + ")");
     }
+  }
+
+  public static Deque<String> stringToDeque(String str) {
+    Deque<String> deque = new ArrayDeque<>();
+    List<String> elements = Optional.ofNullable(str)
+                            .filter(s -> !s.isEmpty())
+                            .map(s -> Arrays.asList(s.split(", ")))
+                            .orElse(Collections.emptyList());
+    for (int i = elements.size() - 1; i >= 0; i--) {
+      deque.push(elements.get(i));
+    }
+    return deque;
   }
 }
