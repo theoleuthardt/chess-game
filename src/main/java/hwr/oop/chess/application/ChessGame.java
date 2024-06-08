@@ -37,7 +37,6 @@ public class ChessGame {
     isOver = false;
     isDrawOffered = false;
     board.addFiguresToBoard();
-    this.fenHistory.push(FenNotation.generateFen(board));
     players.put(FigureColor.WHITE, new Player("0"));
     players.put(FigureColor.BLACK, new Player("0"));
   }
@@ -69,7 +68,6 @@ public class ChessGame {
   public void saveGame() {
     persistence.storeState(STATE_IS_OVER, isOver ? "1" : "0");
     persistence.storeState(STATE_IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
-//    persistence.storeState(STATE_FEN, FenNotation.generateFen(board));
     this.fenHistory.push(FenNotation.generateFen(board));
     persistence.storeState(STATE_FEN, String.join(", ", this.fenHistory));
     persistence.storeState(
@@ -121,5 +119,9 @@ public class ChessGame {
     players.put(FigureColor.WHITE, game.players().get(FigureColor.WHITE));
     players.put(FigureColor.BLACK, game.players().get(FigureColor.BLACK));
     return this;
+  }
+
+  public Deque<String> fenHistory(){
+    return this.fenHistory;
   }
 }

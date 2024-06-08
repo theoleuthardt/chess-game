@@ -19,11 +19,8 @@ public class CSVFilePersistence implements Persistence {
 
   @Override
   public String loadState(String key) {
-    if (Objects.equals(key, "fen")) {
-      Deque<String> fenHistoryAsDeque = stringToDeque(gameData.get(key));
-      return fenHistoryAsDeque.peek();
-    }
-    return gameData.get(key);
+      Deque<String> statesAsDeque = stringToDeque(gameData.get(key));
+      return statesAsDeque.peek();
   }
 
   private String fileName(int gameId) {
@@ -83,7 +80,6 @@ public class CSVFilePersistence implements Persistence {
   public static Deque<String> stringToDeque(String str) {
     Deque<String> deque = new ArrayDeque<>();
     List<String> elements = Optional.ofNullable(str)
-                            .filter(s -> !s.isEmpty())
                             .map(s -> Arrays.asList(s.split(", ")))
                             .orElse(Collections.emptyList());
     for (int i = elements.size() - 1; i >= 0; i--) {
