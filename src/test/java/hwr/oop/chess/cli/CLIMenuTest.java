@@ -268,6 +268,7 @@ class CLIMenuTest {
             """);
     assertThat(cli.game()).isNotNull();
     assertThat(cli.game().board().findCell("a1").figure().type()).isEqualTo(FigureType.ROOK);
+    assertThat(cli.game().fenHistory().peek()).isEqualTo("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
   }
 
   @Test
