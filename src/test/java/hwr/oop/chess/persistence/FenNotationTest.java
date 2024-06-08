@@ -188,6 +188,18 @@ class FenNotationTest {
         .hasMessageContaining("This is an invalid FEN string!");
   }
 
+//  @ParameterizedTest
+  @ValueSource(
+    strings = {
+     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e3 0 1",
+    })
+  void testInvalidEnPassantFEN(String fen) {
+    Board board = new Board(false);
+    assertThatThrownBy(() -> parseFEN(board, fen))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("This is an invalid FEN string!");
+  }
+
   @ParameterizedTest
   @ValueSource(
     strings = {
