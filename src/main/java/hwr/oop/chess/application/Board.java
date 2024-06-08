@@ -116,6 +116,16 @@ public class Board {
     throw new InvalidUserInputException("Impossible state! There is no king on the field.");
   }
 
+  public int numberOfFigures(FigureColor playerColor, FigureType type) {
+    List<Cell> cells = new ArrayList<>();
+    for (Cell cell : allCells()) {
+      if (cell.isOccupiedBy(playerColor, type)) {
+        cells.add(cell);
+      }
+    }
+    return cells.size();
+  }
+
   public void addFiguresToBoard() {
     for (Cell cell : allCells()) {
       FigureColor figureColor = cell.y().toInt() <= 2 ? FigureColor.WHITE : FigureColor.BLACK;
@@ -261,6 +271,19 @@ public class Board {
     return MoveType.NORMAL;
   }
 
+  public EndType endType(FigureColor color) {
+    if (isCheckmate(color)) {
+      return EndType.CHECKMATE;
+    }
+    if (isStalemate(color)) {
+      return EndType.STALEMATE;
+    }
+    if (isDeadPosition()) {
+      return EndType.DEAD_POSTION;
+    }
+    return EndType.NOT_END;
+  }
+
   private void handleNormalMove(Cell startCell, Cell endCell) {
     Figure figure = startCell.figure();
     if (endCell.isOccupied() || figure.type() == FigureType.PAWN) {
@@ -346,5 +369,31 @@ public class Board {
         .filter(cell -> ((Pawn) cell.figure()).isAbleToPromote(cell))
         .toList()
         .isEmpty();
+  }
+
+  public boolean isDeadPosition() {
+    int kings = numberOfFigures(FigureColor.BLACK, FigureType.KING) + numberOfFigures(FigureColor.WHITE, FigureType.KING);
+    int whiteBishops = numberOfFigures(FigureColor.WHITE, FigureType.BISHOP);
+    int blackBishops = numberOfFigures(FigureColor.BLACK, FigureType.BISHOP);
+    int whiteKnights = numberOfFigures(FigureColor.WHITE, FigureType.KNIGHT);
+    int blackKnights = numberOfFigures(FigureColor.BLACK, FigureType.KNIGHT);
+    int otherPieces = cellsWithColor(FigureColor.BLACK).size() + cellsWithColor(FigureColor.WHITE).size() - ( kings + whiteBishops + blackBishops + whiteKnights +blackKnights );
+
+    // Combined conditions: check for dead position when kings and other pieces are minimal
+    if (kings == 2 && otherPieces == 0) {
+      int totalMinorPieces = whiteBishops + blackBishops + whiteKnights + blackKnights;
+      // King and only one minor piece (bishop or knight)
+      if (totalMinorPieces == 0 || totalMinorPieces == 1) {
+        return true;
+      }
+      // King and two bishops of the same color
+      if (whiteBishops == 2 && blackBishops == 0 && whiteKnights == 0 && blackKnights == 0) {
+        return true;
+      }
+      if (whiteBishops == 0 && blackBishops == 2 && whiteKnights == 0 && blackKnights == 0) {
+        return true;
+      }
+    }
+    return false;
   }
 }

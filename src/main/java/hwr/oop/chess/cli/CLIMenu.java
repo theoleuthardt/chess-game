@@ -3,10 +3,7 @@ package hwr.oop.chess.cli;
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.ChessGame;
-import hwr.oop.chess.application.figures.Figure;
-import hwr.oop.chess.application.figures.FigureColor;
-import hwr.oop.chess.application.figures.FigureType;
-import hwr.oop.chess.application.figures.Pawn;
+import hwr.oop.chess.application.figures.*;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -287,10 +284,12 @@ public class CLIMenu {
     Board board = game.board();
 
     for (FigureColor color : FigureColor.values()) {
-      if (board.isStalemate(color)) {
-        game.endsWithDraw();
-      } else if (board.isCheckmate(color)) {
-        game.playerHasWon(color.opposite());
+      switch (board.endType(color)){
+        case EndType.STALEMATE, EndType.DEAD_POSTION ->  game.endsWithDraw();
+        case EndType.CHECKMATE ->  game.playerHasWon(color.opposite());
+        default -> {
+          // The game continues
+        }
       }
     }
   }
