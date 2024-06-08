@@ -1,4 +1,4 @@
-package hwr.oop.chess.application.figures;
+package hwr.oop.chess.application;
 
 public enum MoveType {
   KING_CASTLING,

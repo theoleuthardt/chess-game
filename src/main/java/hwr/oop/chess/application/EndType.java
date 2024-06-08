@@ -1,8 +1,8 @@
-package hwr.oop.chess.application.figures;
+package hwr.oop.chess.application;
 
 public enum EndType {
   CHECKMATE,
   STALEMATE,
-  DEAD_POSTION,
+  DEAD_POSITION,
   NOT_END,
 }
