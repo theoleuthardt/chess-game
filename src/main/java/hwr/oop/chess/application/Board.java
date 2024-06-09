@@ -1,16 +1,15 @@
 package hwr.oop.chess.application;
 
+import static hwr.oop.chess.application.figures.FigureType.*;
 import static hwr.oop.chess.persistence.FenNotation.extractFenKeyParts;
 
 import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.cli.InvalidUserInputException;
-
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class Board {
   private Cell firstCell;
@@ -122,14 +121,16 @@ public class Board {
     throw new InvalidUserInputException("Impossible state! There is no king on the field.");
   }
 
-  public int numberOfFigures(FigureColor playerColor, FigureType type) {
-    List<Cell> cells = new ArrayList<>();
-    for (Cell cell : allCells()) {
-      if (cell.isOccupiedBy(playerColor, type)) {
-        cells.add(cell);
-      }
-    }
-    return cells.size();
+  public List<Cell> cellsWhere(Predicate<Cell> filter) {
+    return allCells().stream().filter(filter).toList();
+  }
+
+  public int countCellsWhere(Predicate<Cell> filter) {
+    return cellsWhere(filter).size();
+  }
+
+  public boolean cellExistsWhere(Predicate<Cell> filter) {
+    return allCells().stream().anyMatch(filter);
   }
 
   public void addFiguresToBoard() {
@@ -276,12 +277,12 @@ public class Board {
 
     return MoveType.NORMAL;
   }
+
   public EndType endType(FigureColor color) {
-    Deque<String> fenHistory = new ArrayDeque<>();
-    return endType(color,fenHistory);
+    return endType(color, null);
   }
 
-  public EndType endType(FigureColor color, Deque<String> fenHistory) {
+  public EndType endType(FigureColor color, List<String> fenHistory) {
     if (isCheckmate(color)) {
       return EndType.CHECKMATE;
     }
@@ -291,7 +292,7 @@ public class Board {
     if (isDeadPosition()) {
       return EndType.DEAD_POSITION;
     }
-    if(isThreeFoldRepetition(fenHistory)) {
+    if (isThreeFoldRepetition(fenHistory)) {
       return EndType.THREE_FOLD_REPETITION;
     }
     return EndType.NOT_END;
@@ -377,53 +378,49 @@ public class Board {
   }
 
   public boolean isPawnPromotionPossible() {
-    return !allCells().stream()
-        .filter(cell -> cell.isOccupiedBy(FigureType.PAWN))
-        .filter(cell -> ((Pawn) cell.figure()).isAbleToPromote(cell))
-        .toList()
-        .isEmpty();
+    Predicate<Cell> pawnCanPromote = cell -> ((Pawn) cell.figure()).isAbleToPromote(cell);
+    return cellExistsWhere(isOccupiedBy(PAWN).and(pawnCanPromote));
+  }
+
+  private Predicate<Cell> isOccupiedBy(FigureType type) {
+    return cell -> cell.isOccupiedBy(type);
   }
 
   public boolean isDeadPosition() {
-    int kings = numberOfFigures(FigureColor.BLACK, FigureType.KING) + numberOfFigures(FigureColor.WHITE, FigureType.KING);
-    int whiteBishops = numberOfFigures(FigureColor.WHITE, FigureType.BISHOP);
-    int blackBishops = numberOfFigures(FigureColor.BLACK, FigureType.BISHOP);
-    int whiteKnights = numberOfFigures(FigureColor.WHITE, FigureType.KNIGHT);
-    int blackKnights = numberOfFigures(FigureColor.BLACK, FigureType.KNIGHT);
-    int otherPieces = cellsWithColor(FigureColor.BLACK).size() + cellsWithColor(FigureColor.WHITE).size() - ( kings + whiteBishops + blackBishops + whiteKnights +blackKnights );
+    // while any major figure is on the board checkmate is still possible.
+    if (cellExistsWhere(isOccupiedBy(ROOK).or(isOccupiedBy(QUEEN).or(isOccupiedBy(PAWN))))) {
+      return false;
+    }
 
-    // Combined conditions: check for dead position when kings and other pieces are minimal
-    if (kings == 2 && otherPieces == 0) {
-      int totalMinorPieces = whiteBishops + blackBishops + whiteKnights + blackKnights;
-      // King and only one minor piece (bishop or knight)
-      if (totalMinorPieces == 0 || totalMinorPieces == 1) {
-        return true;
-      }
-      // King and two bishops of the same color
-      if (whiteBishops == 2 && blackBishops == 0 && whiteKnights == 0 && blackKnights == 0) {
-        return true;
-      }
-      if (whiteBishops == 0 && blackBishops == 2 && whiteKnights == 0 && blackKnights == 0) {
-        return true;
-      }
+    int countOfMinorFigures = countCellsWhere(isOccupiedBy(BISHOP).or(isOccupiedBy(KNIGHT)));
+    // if there are more than 2 minor figures on the board checkmate is still possible.
+    if (countOfMinorFigures > 2) return false;
+    // if there are less than 2 minor figures on the board it is a dead position.
+    if (countOfMinorFigures < 2) return true;
+
+    // there is one bishop of each color
+    // both are on *cells of the same color* -> this is a dead position.
+    List<Cell> bishopCells = cellsWhere(isOccupiedBy(BISHOP));
+    List<FigureColor> bishopColors =
+        bishopCells.stream().map(cell -> cell.figure().color()).toList();
+    if (bishopColors.contains(FigureColor.WHITE) && bishopColors.contains(FigureColor.BLACK)) {
+      Predicate<Cell> isWhiteCell = cell -> (cell.y().toInt() + cell.x().toInt()) % 2 == 1;
+      return isWhiteCell.test(bishopCells.getFirst()) == isWhiteCell.test(bishopCells.getLast());
     }
     return false;
   }
 
-
-  public boolean isThreeFoldRepetition(Deque<String> fenHistory){
+  public boolean isThreeFoldRepetition(List<String> fenHistory) {
+    if (fenHistory == null) {
+      return false;
+    }
     Map<String, Integer> positionCount = new HashMap<>();
 
     for (String fenString : fenHistory) {
       String key = extractFenKeyParts(fenString);
       positionCount.put(key, positionCount.getOrDefault(key, 0) + 1);
-      if (positionCount.get(key) == 3) {
-        return true;
-      }
     }
 
-    return false;
+    return positionCount.containsValue(3);
   }
-
-
 }

@@ -1,7 +1,6 @@
 package hwr.oop.chess.persistence;
 
 import hwr.oop.chess.cli.InvalidUserInputException;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -19,8 +18,7 @@ public class CSVFilePersistence implements Persistence {
 
   @Override
   public String loadState(String key) {
-      Deque<String> statesAsDeque = stringToDeque(gameData.get(key));
-      return statesAsDeque.peek();
+    return gameData.get(key);
   }
 
   private String fileName(int gameId) {
@@ -47,7 +45,9 @@ public class CSVFilePersistence implements Persistence {
       String line;
       while ((line = reader.readLine()) != null) {
         int comma = line.indexOf(',');
-        gameData.put(line.substring(0, comma), line.substring(comma + 1));
+        if (comma != -1) {
+          gameData.put(line.substring(0, comma), line.substring(comma + 1));
+        }
       }
     } catch (IOException e) {
       throw new InvalidUserInputException(
@@ -75,16 +75,5 @@ public class CSVFilePersistence implements Persistence {
               + e.getMessage()
               + ")");
     }
-  }
-
-  public static Deque<String> stringToDeque(String str) {
-    Deque<String> deque = new ArrayDeque<>();
-    List<String> elements = Optional.ofNullable(str)
-                            .map(s -> Arrays.asList(s.split(", ")))
-                            .orElse(Collections.emptyList());
-    for (int i = elements.size() - 1; i >= 0; i--) {
-      deque.push(elements.get(i));
-    }
-    return deque;
   }
 }

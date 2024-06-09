@@ -21,9 +21,8 @@ class CLIMenuTest {
   private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
   private final NoPersistence persistence = new NoPersistence();
   private final CLIAdapter cli = new CLIAdapter(new PrintStream(outputStream), persistence);
-  private CLIMenu menu;
-
   private final int gameWithDefaultFigures = NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal();
+  private CLIMenu menu;
 
   void menuFromArguments(List<String> args) {
     cli.forGameId("123");
@@ -268,7 +267,8 @@ class CLIMenuTest {
             """);
     assertThat(cli.game()).isNotNull();
     assertThat(cli.game().board().findCell("a1").figure().type()).isEqualTo(FigureType.ROOK);
-    assertThat(cli.game().fenHistory().peek()).isEqualTo("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
+    assertThat(cli.game().fenHistory().getLast())
+        .isEqualTo("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
   }
 
   @Test
@@ -762,7 +762,7 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-            - Status:           \033[37mGame Over (draw)\033[0m
+            - Status:           \033[37mGame Over (draw by mutual agreement)\033[0m
             """);
   }
 
@@ -780,7 +780,7 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-            - Status:           \033[37mGame Over (WHITE won)\033[0m
+            - Status:           \033[37mGame Over (WHITE won -> Checkmate)\033[0m
             """);
   }
 
@@ -819,6 +819,19 @@ class CLIMenuTest {
         .containsIgnoringWhitespaces(
             """
             \033[30;1;103m ERROR \033[0m Please promote your pawn to a different figure. You can choose QUEEN, ROOK, BISHOP or KNIGHT.
+            """);
+  }
+
+  @Test
+  void showErrorOnInvalidSaveGameFile() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.NO_GAME.ordinal() + " show-board");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m Your save-file is invalid because it is missing:
+            """,
+            """
+            Create a new game with 'chess create <ID>'.
             """);
   }
 }

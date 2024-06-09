@@ -3,8 +3,6 @@ package hwr.oop.chess.application;
 import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.cli.InvalidUserInputException;
 import hwr.oop.chess.persistence.FenNotation;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -311,12 +309,14 @@ class BoardTest {
       assertThat(board.findCell(x, Coordinate.EIGHT).figure().color()).isEqualTo(FigureColor.BLACK);
     }
   }
+
   @Test
   void testAvailableEnPassant() {
     board = new Board(false);
     FenNotation.parseFEN(board, "rnbqkbnr/ppp1pppp/8/8/3p4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2");
     board.moveFigure("e2", "e4");
-    assertThat(FenNotation.generateFen(board)).isEqualTo("rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2");
+    assertThat(FenNotation.generateFen(board))
+        .isEqualTo("rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2");
   }
 
   @Test
@@ -327,7 +327,8 @@ class BoardTest {
     board.moveFigure("d4", "e3");
     assertThat(board.findCell('e', 3).figure().type()).isEqualTo(FigureType.PAWN);
     assertThat(board.findCell('e', 4).figure()).isNull();
-    assertThat(FenNotation.generateFen(board)).isEqualTo("rnbqkbnr/ppp1pppp/8/8/8/4p3/PPP2PPP/RNBQKBNR w KQkq - 0 3");
+    assertThat(FenNotation.generateFen(board))
+        .isEqualTo("rnbqkbnr/ppp1pppp/8/8/8/4p3/PPP2PPP/RNBQKBNR w KQkq - 0 3");
   }
 
   @Test
@@ -337,7 +338,8 @@ class BoardTest {
     String initialStatus = "rn1qkbnr/ppp1pppp/8/5b2/5P2/4p3/PPP3PP/RNBQKBNR w KQkq - 1 4";
     FenNotation.parseFEN(board, initialStatus);
     board.moveFigure("f1", "b5");
-    assertThat(FenNotation.generateFen(board)).isEqualTo("rn1qkbnr/ppp1pppp/8/1B3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 4");
+    assertThat(FenNotation.generateFen(board))
+        .isEqualTo("rn1qkbnr/ppp1pppp/8/1B3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 4");
   }
 
   @Test
@@ -480,7 +482,8 @@ class BoardTest {
     board.moveFigure("b7", "b6"); // 14... b6
     board.moveFigure("e1", "g1"); // 15. O-O White King Castling
     board.moveFigure("e8", "g8"); // 15. O-O Black King Castling
-    assertThat( FenNotation.generateFen(board)).isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w - - 2 15");
+    assertThat(FenNotation.generateFen(board))
+        .isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w - - 2 15");
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
     assertThat(((Rook) board.findCell("f8").figure()).hasMoved()).isTrue();
     assertThat(((King) board.findCell("g8").figure()).hasMoved()).isTrue();
@@ -490,41 +493,53 @@ class BoardTest {
 
   @ParameterizedTest
   @ValueSource(
-  strings = {
-    "8/8/8/8/8/8/8/K1k5 w - - 0 1",   // King vs King
-    "8/8/8/8/8/8/8/KBk5 w - - 0 1",   // King and White Bishop vs King
-    "8/8/8/8/8/8/8/kbK5 w - - 0 1",   // King and Black Bishop vs King
-    "8/8/8/8/8/8/8/K1k1B3 w - - 0 1", // King and White Bishop vs King
-    "8/8/8/8/8/8/8/k1K1b3 w - - 0 1", // King and Black Bishop vs King
-    "8/8/8/8/8/8/8/KNk5 w - - 0 1",   // King and White Knight vs King
-    "8/8/8/8/8/8/8/knK5 w - - 0 1",   // King and Black Knight vs King
-    "8/8/8/8/8/8/8/K1k1N3 w - - 0 1", // King and White Knight vs King
-    "8/8/8/8/8/8/8/k1K1n3 w - - 0 1", // King and Black Knight vs King
-    "8/8/8/8/8/8/8/KBBk4 w - - 0 1",  // King and two White Bishops (same color) vs King
-    "8/8/8/8/8/8/8/kbbK4 w - - 0 1",  // King and two Black Bishops (same color) vs King
-  })
-  void testDeadPostion(String fen){
-    Board board = new Board(false);
-    FenNotation.parseFEN(board,fen);
+      strings = {
+        "8/8/8/8/8/8/8/K1k5 w - - 0 1", // King vs King
+        "8/8/8/8/8/8/8/KBk5 w - - 0 1", // King and White Bishop vs King
+        "8/8/8/8/8/8/8/kbK5 w - - 0 1", // King and Black Bishop vs King
+        "8/8/8/8/8/8/8/K1k1B3 w - - 0 1", // King and White Bishop vs King
+        "8/8/8/8/8/8/8/k1K1b3 w - - 0 1", // King and Black Bishop vs King
+        "8/8/8/8/8/8/8/KNk5 w - - 0 1", // King and White Knight vs King
+        "8/8/8/8/8/8/8/knK5 w - - 0 1", // King and Black Knight vs King
+        "8/8/8/8/8/8/8/K1k1N3 w - - 0 1", // King and White Knight vs King
+        "8/8/8/8/8/8/8/k1K1n3 w - - 0 1", // King and Black Knight vs King
+        "8/8/8/8/8/8/8/KBkb4 w - - 0 1", // King and two Bishops (different figure color, same cell
+        // color) vs King
+        "8/8/8/8/8/8/8/kbKB4 w - - 0 1", // King and two Bishops (different figure color, same cell
+        // color) vs King
+      })
+  void testDeadPostion(String fen) {
+    board = new Board(false);
+    FenNotation.parseFEN(board, fen);
     assertThat(board.isDeadPosition()).isTrue();
     assertThat(board.endType(FigureColor.WHITE)).isEqualTo(EndType.DEAD_POSITION);
   }
 
   @ParameterizedTest
   @ValueSource(
-  strings = {
-  "8/8/8/8/8/8/8/KNBk4 w - - 0 1",  // King, Knight, and Bishop vs King
-  "8/8/8/8/8/8/8/KQk5 w - - 0 1",   // King and Queen vs King
-  "8/8/8/8/8/8/8/KRk5 w - - 0 1",   // King and Rook vs King
-  "8/8/8/8/8/8/8/KPk5 w - - 0 1",   // King and Pawn vs King
-  "8/8/8/8/8/8/8/KNNk4 w - - 0 1",  // King and Two Knights vs King
-  "8/8/8/8/8/8/8/KBkN4 w - - 0 1",  // King and Bishop and Knight vs King
-  "8/8/8/8/8/p6P/8/KNBk4 w - - 0 1",  // King, Knight, and Bishop vs King
-  "r7/8/8/8/8/p6P/8/KNBk4 w - - 0 1", // another Figures
-  })
-  void testNotDeadPostion(String fen){
-    Board board = new Board(false);
-    FenNotation.parseFEN(board,fen);
+      strings = {
+        "8/8/8/8/8/8/8/KNBk4 w - - 0 1", // King, Knight, and Bishop vs King
+        "8/8/8/8/8/8/8/KQk5 w - - 0 1", // King and Queen vs King
+        "8/8/8/8/8/8/8/KRk5 w - - 0 1", // King and Rook vs King
+        "8/8/8/8/8/8/8/KPk5 w - - 0 1", // King and Pawn vs King
+        "8/8/8/8/8/8/8/KNNk4 w - - 0 1", // King and Two Knights vs King
+        "8/8/8/8/8/8/8/KBkN4 w - - 0 1", // King and Bishop and Knight vs King
+        "8/8/8/8/8/p6P/8/KNBk4 w - - 0 1", // King, Knight, and Bishop vs King
+        "r7/8/8/8/8/p6P/8/KNBk4 w - - 0 1", // another Figures
+        "8/8/8/8/8/8/8/KBBk4 w - - 0 1", // King and two White Bishops (same color) vs King
+        "8/8/8/8/8/8/8/kbbK4 w - - 0 1", // King and two Black Bishops (same color) vs King
+        "8/8/8/8/8/8/8/KBkB4 w - - 0 1", // King and two White Bishops (same color) vs King
+        "8/8/8/8/8/8/8/kbKb4 w - - 0 1", // King and two Black Bishops (same color) vs King
+        "8/8/8/8/8/8/8/KBbk4 w - - 0 1", // King and two Bishops (different figure color, different
+        // cell color) vs King
+        "8/8/8/8/8/8/8/kbBK4 w - - 0 1", // King and two Bishops (different figure color, different
+        // cell color) vs King
+        "8/8/8/8/8/8/8/kbbBK3 w - - 0 1", // three Bishops
+        "8/8/8/8/8/8/8/kbbBBK2 w - - 0 1", // four Bishops
+      })
+  void testNotDeadPostion(String fen) {
+    board = new Board(false);
+    FenNotation.parseFEN(board, fen);
     assertThat(board.isDeadPosition()).isFalse();
     assertThat(board.endType(FigureColor.WHITE)).isEqualTo(EndType.NOT_END);
   }

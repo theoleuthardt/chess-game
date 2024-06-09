@@ -4,6 +4,7 @@ import static hwr.oop.chess.persistence.FenNotation.extractFenKeyParts;
 import static hwr.oop.chess.persistence.FenNotation.generateFen;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.cli.CLIAdapter;
 import hwr.oop.chess.persistence.NoPersistence;
 import java.io.ByteArrayOutputStream;
@@ -42,9 +43,11 @@ class ChessGameTest {
 
     assertThat(fen1).isEqualTo(fen2).isEqualTo(fen3);
     assertThat(cli.game().board().isThreeFoldRepetition(cli.game().fenHistory())).isTrue();
+    assertThat(cli.game().board().endType(FigureColor.WHITE, cli.game().fenHistory()))
+        .isEqualTo(EndType.THREE_FOLD_REPETITION);
   }
 
-  void moveFigureAndSave(String from, String to, CLIAdapter cli ){
+  void moveFigureAndSave(String from, String to, CLIAdapter cli) {
     cli.game().board().moveFigure(from, to);
     cli.game().saveGame();
   }

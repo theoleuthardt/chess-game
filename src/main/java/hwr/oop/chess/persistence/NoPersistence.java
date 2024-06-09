@@ -1,5 +1,7 @@
 package hwr.oop.chess.persistence;
 
+import hwr.oop.chess.application.EndType;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +23,6 @@ public class NoPersistence implements Persistence {
 
   private final Map<String, String> gameData = new HashMap<>();
   private boolean wasSaved = false;
-
   private int gameId;
 
   @Override
@@ -65,10 +66,11 @@ public class NoPersistence implements Persistence {
             default -> null;
           };
 
-      case "isOver" ->
+      case "endType" ->
           switch (type) {
-            case GAME_IS_OVER_WHITE_WINS, GAME_IS_OVER_DRAW -> "1";
-            default -> "0";
+            case GAME_IS_OVER_WHITE_WINS -> EndType.CHECKMATE.name();
+            case GAME_IS_OVER_DRAW -> EndType.MUTUAL_DRAW.name();
+            default -> EndType.NOT_END.name();
           };
 
       case "winner" ->

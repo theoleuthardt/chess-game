@@ -5,7 +5,6 @@ import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.ChessGame;
 import hwr.oop.chess.application.EndType;
 import hwr.oop.chess.application.figures.*;
-
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +44,6 @@ public class CLIMenu {
               "3: chess on <ID> resign", "End the game by accepting a loss"),
           new AbstractMap.SimpleEntry<>(
               "3: chess on <ID> rematch", "Start a new game without resetting your score"));
-
   private final Map<String, String> parameterTypes =
       Map.ofEntries(
           new AbstractMap.SimpleEntry<>("<ID>", "Game ID (e.g. 123)"),
@@ -255,7 +253,7 @@ public class CLIMenu {
           throw new InvalidUserInputException("There is no draw offer to accept.");
         }
         printer.printlnAction("The draw offer has been accepted.");
-        cli.game().endsWithDraw();
+        cli.game().endsWithDraw(EndType.MUTUAL_DRAW);
         cli.game().saveGame();
       }
 
@@ -276,7 +274,7 @@ public class CLIMenu {
   private void performResign() {
     countOfRemainingArgumentsIs(0);
     printer.printlnAction("You resigned the game. Your opponent has won.");
-    cli.game().playerHasWon(cli.game().board().turn().opposite());
+    cli.game().playerHasWon(EndType.RESIGNATION, cli.game().board().turn().opposite());
     cli.game().saveGame();
   }
 
@@ -285,9 +283,11 @@ public class CLIMenu {
     Board board = game.board();
 
     for (FigureColor color : FigureColor.values()) {
-      switch (board.endType(color, game.fenHistory())){
-        case EndType.STALEMATE, EndType.DEAD_POSITION, EndType.THREE_FOLD_REPETITION ->  game.endsWithDraw();
-        case EndType.CHECKMATE ->  game.playerHasWon(color.opposite());
+      EndType endType = board.endType(color, game.fenHistory());
+      switch (endType) {
+        case EndType.STALEMATE, EndType.DEAD_POSITION, EndType.THREE_FOLD_REPETITION ->
+            game.endsWithDraw(endType);
+        case EndType.CHECKMATE -> game.playerHasWon(endType, color.opposite());
         default -> {
           // The game continues
         }
@@ -329,10 +329,21 @@ public class CLIMenu {
     Map<String, String> stats = new HashMap<>();
 
     stats.put("Game ID", "" + cli.persistence().gameId());
-    String gameStatus = "Game in Progress";
-    if (game.isOver()) {
-      String winner = cli.persistence().loadState("winner");
-      gameStatus = "Game Over (" + (winner.equals("draw") ? "draw)" : winner + " won)");
+    String winnerColor = cli.persistence().loadState("winner");
+    String gameStatus =
+        switch (EndType.valueOf(cli.persistence().loadState("endType"))) {
+          case NOT_END -> "Game in Progress";
+
+          case CHECKMATE -> winnerColor + " won -> Checkmate";
+          case RESIGNATION -> winnerColor + " won -> Resignation";
+
+          case MUTUAL_DRAW -> "draw by mutual agreement";
+          case STALEMATE -> "draw by stalemate";
+          case DEAD_POSITION -> "draw by dead position";
+          case THREE_FOLD_REPETITION -> "draw by threefold repetition";
+        };
+    if (!gameStatus.equals("Game in Progress")) {
+      gameStatus = "Game Over (" + gameStatus + ")";
     }
     stats.put("Status", gameStatus);
 
