@@ -14,7 +14,7 @@ public class ChessGame {
   private boolean isOver;
   private boolean isDrawOffered;
   private final Map<FigureColor, Player> players = new EnumMap<>(FigureColor.class);
-  private Deque<String> fenHistory;
+  private final Deque<String> fenHistory;
   private static final String STATE_FEN_HISTORY = "fen";
   private static final String STATE_WINNER = "winner";
   private static final String STATE_WHITE_SCORE = "whiteScore";
@@ -69,6 +69,7 @@ public class ChessGame {
     persistence.storeState(STATE_IS_OVER, isOver ? "1" : "0");
     persistence.storeState(STATE_IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
     this.fenHistory.push(FenNotation.generateFen(board));
+    String str = String.join(", ", this.fenHistory);
     persistence.storeState(STATE_FEN_HISTORY, String.join(", ", this.fenHistory));
     persistence.storeState(
         STATE_WHITE_SCORE, String.valueOf(players.get(FigureColor.WHITE).doubleOfScore()));

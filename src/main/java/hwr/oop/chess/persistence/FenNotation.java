@@ -133,6 +133,11 @@ public class FenNotation {
     return joiner.toString();
   }
 
+  public static String extractFenKeyParts(String fen) {
+    String[] parts = fen.split(" ");
+    return parts[0] + " " + parts[2] + " " + parts[3];
+  }
+
   private void parsePiecePlacement(String pieces) {
     List<Cell> allCells = board.allCells();
     List<String> rows = List.of(pieces.split("/"));

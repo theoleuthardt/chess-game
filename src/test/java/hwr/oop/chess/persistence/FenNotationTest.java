@@ -224,4 +224,15 @@ class FenNotationTest {
   void testInvalidPartFEN(String fen) {
     assertThat(isValidFEN(fen)).isFalse();
   }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 2",
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 5 1",
+    })
+  void testExtractFenKeyParts(String fen) {
+    assertThat(extractFenKeyParts(fen)).isEqualTo("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR KQkq -");
+  }
 }

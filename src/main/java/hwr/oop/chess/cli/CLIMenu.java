@@ -285,8 +285,8 @@ public class CLIMenu {
     Board board = game.board();
 
     for (FigureColor color : FigureColor.values()) {
-      switch (board.endType(color)){
-        case EndType.STALEMATE, EndType.DEAD_POSITION ->  game.endsWithDraw();
+      switch (board.endType(color, game.fenHistory())){
+        case EndType.STALEMATE, EndType.DEAD_POSITION, EndType.THREE_FOLD_REPETITION ->  game.endsWithDraw();
         case EndType.CHECKMATE ->  game.playerHasWon(color.opposite());
         default -> {
           // The game continues

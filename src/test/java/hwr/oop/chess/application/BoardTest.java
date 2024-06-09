@@ -3,6 +3,8 @@ package hwr.oop.chess.application;
 import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.cli.InvalidUserInputException;
 import hwr.oop.chess.persistence.FenNotation;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

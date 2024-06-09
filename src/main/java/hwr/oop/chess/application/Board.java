@@ -1,10 +1,16 @@
 package hwr.oop.chess.application;
 
+import static hwr.oop.chess.persistence.FenNotation.extractFenKeyParts;
+
 import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.cli.InvalidUserInputException;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Board {
   private Cell firstCell;
@@ -270,8 +276,12 @@ public class Board {
 
     return MoveType.NORMAL;
   }
-
   public EndType endType(FigureColor color) {
+    Deque<String> fenHistory = new ArrayDeque<>();
+    return endType(color,fenHistory);
+  }
+
+  public EndType endType(FigureColor color, Deque<String> fenHistory) {
     if (isCheckmate(color)) {
       return EndType.CHECKMATE;
     }
@@ -280,6 +290,9 @@ public class Board {
     }
     if (isDeadPosition()) {
       return EndType.DEAD_POSITION;
+    }
+    if(isThreeFoldRepetition(fenHistory)) {
+      return EndType.THREE_FOLD_REPETITION;
     }
     return EndType.NOT_END;
   }
@@ -396,4 +409,21 @@ public class Board {
     }
     return false;
   }
+
+
+  public boolean isThreeFoldRepetition(Deque<String> fenHistory){
+    Map<String, Integer> positionCount = new HashMap<>();
+
+    for (String fenString : fenHistory) {
+      String key = extractFenKeyParts(fenString);
+      positionCount.put(key, positionCount.getOrDefault(key, 0) + 1);
+      if (positionCount.get(key) == 3) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
 }
