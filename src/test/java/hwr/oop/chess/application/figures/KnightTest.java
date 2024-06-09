@@ -67,9 +67,6 @@ class KnightTest {
     assertThat(knight.canMoveTo(from, to)).isFalse();
   }
 
-  // TODO: Every assertion should be at the end of the test function.
-  // If there is a function like "board.moveFigure(...)" after an Assertion,
-  // try to change the order or split it into two seperate test.
   @Test
   void moveWhiteKnight_cannotMoveIntoVoid1() {
     Cell from = board.findCell('b', 1);
@@ -78,6 +75,14 @@ class KnightTest {
     Figure knight = from.figure();
     assertThat(knight.type()).isEqualTo(FigureType.KNIGHT);
     assertThat(knight.canMoveTo(from, to)).isTrue();
+  }
+
+  @Test
+  void moveWhiteKnight_cannotMoveIntoVoid2() {
+    Cell from = board.findCell('b', 1);
+    Cell to = board.findCell('a', 3);
+
+    Figure knight = from.figure();
     board.moveFigure(from, to);
     assertThat(knight.canMoveTo(to, from)).isTrue();
   }
