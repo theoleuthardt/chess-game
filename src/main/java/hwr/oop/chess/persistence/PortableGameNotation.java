@@ -5,9 +5,8 @@ import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.figures.FigureColor;
 
 public class PortableGameNotation {
-  private final Board board;
 
-  public String generatePGN(Cell startCell, Cell endCell) {
+  public String generatePGN(Board board, Cell startCell, Cell endCell) {
     char charFigure = startCell.figure().symbol();
     String endPosition = endCell.toCoordinates().toLowerCase();
     String pgnString = "";
