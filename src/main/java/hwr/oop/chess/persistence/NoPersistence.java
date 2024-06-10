@@ -96,6 +96,7 @@ public class NoPersistence implements Persistence {
 
       case State.WHITE_SCORE, State.BLACK_SCORE -> type == GAME_IS_OVER_DRAW ? "1" : "0";
       case State.IS_DRAW_OFFERED -> type == DRAW_OFFERED ? "1" : "0";
+      case State.PGN_HISTORY -> "";
       default -> null;
     };
   }

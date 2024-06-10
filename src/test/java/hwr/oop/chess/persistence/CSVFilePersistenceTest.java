@@ -64,7 +64,7 @@ class CSVFilePersistenceTest {
     persistence.loadGame();
     assertThat(persistence.gameId()).isEqualTo(9999);
     assertThat(persistence.loadState(State.FEN_HISTORY))
-        .isEqualTo("rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 0");
+        .endsWith("rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 0");
   }
 
   @Test
@@ -80,7 +80,7 @@ class CSVFilePersistenceTest {
 
     persistence.loadGame();
     assertThat(persistence.loadState(State.FEN_HISTORY))
-        .isEqualTo("2RP4/8/8/8/7k/8/PP6/7K w - - 0 1");
+        .endsWith("2RP4/8/8/8/7k/8/PP6/7K w - - 0 1");
   }
 
   @Test

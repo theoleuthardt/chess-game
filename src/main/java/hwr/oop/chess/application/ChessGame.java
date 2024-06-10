@@ -61,7 +61,7 @@ public class ChessGame implements Game {
     String currentFen = parseListAndGetLast(fenHistory, persistence.loadState(State.FEN_HISTORY));
     FenNotation.parseFEN(board, currentFen);
 
-    String currentPgn = parseListAndGetLast(fenHistory, persistence.loadState(State.PGN_HISTORY));
+    String currentPgn = parseListAndGetLast(pgnHistory, persistence.loadState(State.PGN_HISTORY));
     board.setPgn(currentPgn);
   }
 
@@ -138,5 +138,9 @@ public class ChessGame implements Game {
 
   public List<String> fenHistory() {
     return this.fenHistory;
+  }
+
+  public List<String> pgnHistory() {
+    return this.pgnHistory;
   }
 }

@@ -29,4 +29,6 @@ public interface Game {
   Game keepPlayersOf(Game game);
 
   List<String> fenHistory();
+
+  List<String> pgnHistory();
 }

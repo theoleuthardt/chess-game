@@ -26,7 +26,7 @@ public class PortableGameNotation {
             }
             if (startFigure.isPresent() && endFigure.isPresent() && startFigure.get().color() != endFigure.get().color()) {
               if (charFigure == 'p' || charFigure == 'P') {
-                newPgn.append(startCell.x().toInt());
+                newPgn.append((char) (startCell.x().toInt() + 96));
               }
               newPgn.append('x');
             }
@@ -34,6 +34,9 @@ public class PortableGameNotation {
             yield newPgn.toString();
           }
         };
+
+    boolean white = board.isCheck(FigureColor.WHITE);
+    boolean black = board.isCheck(FigureColor.BLACK);
 
     if (board.isCheck(board.turn() == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE)) {
       pgnString += "+";
