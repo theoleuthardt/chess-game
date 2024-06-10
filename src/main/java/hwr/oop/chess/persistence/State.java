@@ -36,7 +36,7 @@ public enum State {
     public String toString() {
       return "isDrawOffered";
     }
-  };
+  }, PGN;
 
   @Override
   public abstract String toString();

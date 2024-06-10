@@ -78,6 +78,8 @@ public class ChessGame implements Game {
         State.WHITE_SCORE, String.valueOf(players.get(FigureColor.WHITE).doubleOfScore()));
     persistence.storeState(
         State.BLACK_SCORE, String.valueOf(players.get(FigureColor.BLACK).doubleOfScore()));
+    String oldPGN = persistence.loadState(State.PGN);
+    persistence.storeState(State.PGN, oldPGN + board.pgn());
     persistence.saveGame();
   }
 

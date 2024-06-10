@@ -2,6 +2,7 @@ package hwr.oop.chess.application;
 
 import static hwr.oop.chess.application.figures.FigureType.*;
 import static hwr.oop.chess.persistence.FenNotation.extractFenKeyParts;
+import static hwr.oop.chess.persistence.PortableGameNotation.generatePGN;
 
 import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.cli.InvalidUserInputException;
@@ -16,6 +17,7 @@ public class Board {
   private int halfMove = 0;
   private int fullMove = 0;
   private FigureColor turn = FigureColor.WHITE;
+  private String pgn = "";
 
   public Board(boolean setFigures) {
     initializeBoard();
@@ -161,27 +163,8 @@ public class Board {
   }
 
   public void moveFigure(Cell startCell, Cell endCell) {
-
-    if (startCell.isFree()) {
-      throw new InvalidUserInputException("On the starting cell is no figure");
-    }
-
-    Figure figure = startCell.figure();
-    if (figure.color() != turn) {
-      throw new InvalidUserInputException(
-          "It is not your turn! Try to move a figure of color " + turn.name() + ".");
-    }
-
-    if (!figure.canMoveTo(startCell, endCell)) {
-      throw new InvalidUserInputException("The figure can't move to that cell");
-    }
-
-    if (wouldBeCheckAfterMove(startCell, endCell)) {
-      throw new InvalidUserInputException(
-          "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
-    }
-
     MoveType moveType = moveType(startCell, endCell);
+    this.pgn = generatePGN(this, startCell, endCell, moveType);
     switch (moveType) {
       case EN_PASSANT -> handleEnPassant(startCell, endCell);
       case KING_CASTLING, QUEEN_CASTLING -> handleCastling(startCell, endCell, moveType);
@@ -254,7 +237,25 @@ public class Board {
   }
 
   private MoveType moveType(Cell startCell, Cell endCell) {
+    if (startCell.isFree()) {
+      throw new InvalidUserInputException("On the starting cell is no figure");
+    }
+
     Figure figure = startCell.figure();
+    if (figure.color() != turn) {
+      throw new InvalidUserInputException(
+          "It is not your turn! Try to move a figure of color " + turn.name() + ".");
+    }
+
+    if (!figure.canMoveTo(startCell, endCell)) {
+      throw new InvalidUserInputException("The figure can't move to that cell");
+    }
+
+    if (wouldBeCheckAfterMove(startCell, endCell)) {
+      throw new InvalidUserInputException(
+          "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
+    }
+
     if (figure.type() == FigureType.KING) {
       King king = (King) figure;
       if (king.canPerformKingSideCastling(startCell)
@@ -421,5 +422,9 @@ public class Board {
     }
 
     return positionCount.containsValue(3);
+  }
+
+  public String pgn() {
+    return pgn;
   }
 }
