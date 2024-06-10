@@ -487,6 +487,47 @@ class BoardTest {
     assertThat(board.cellsWithColor(FigureColor.BLACK)).hasSize(13);
   }
 
+  @Test
+  void testGeneratePGN() {
+    board = new Board(true);
+    board.moveFigure("d2", "d4"); // 1. d4
+    board.moveFigure("g8", "f6"); // 1... Nf6
+    board.moveFigure("c2", "c4"); // 2. c4
+    board.moveFigure("e7", "e6"); // 2... e6
+    board.moveFigure("b1", "c3"); // 3. Nc3
+    board.moveFigure("f8", "b4"); // 3... Bb4
+    board.moveFigure("g1", "f3"); // 4. Nf3
+    board.moveFigure("c7", "c5"); // 4... c5
+    board.moveFigure("e2", "e3"); // 5. e3
+    board.moveFigure("b8", "c6"); // 5... Nc6
+    board.moveFigure("f1", "d3"); // 6. Bd3
+    board.moveFigure("b4", "c3"); // 6... Bxc3+
+    board.moveFigure("b2", "c3"); // 7. bxc3
+    board.moveFigure("d7", "d6"); // 7... d6
+    board.moveFigure("e3", "e4"); // 8. e4
+    board.moveFigure("e6", "e5"); // 8... e5
+    board.moveFigure("d4", "d5"); // 9. d5
+    board.moveFigure("c6", "e7"); // 9... Ne7
+    board.moveFigure("f3", "h4"); // 10. Nh4
+    board.moveFigure("h7", "h6"); // 10... h6
+    board.moveFigure("f2", "f4"); // 11. f4
+    board.moveFigure("e7", "g6"); // 11... Ng6
+    board.moveFigure("h4", "g6"); // 12. Bxg6
+    board.moveFigure("f7", "g6"); // 12... fxg6
+    board.moveFigure("f4", "e5"); // 13. fxe5
+    board.moveFigure("d6", "e5"); // 13... dxe5
+    board.moveFigure("c1", "e3"); // 14. Be3
+    board.moveFigure("b7", "b6"); // 14... b6
+    board.moveFigure("e1", "g1"); // 15. O-O White King Castling
+    board.moveFigure("e8", "g8"); // 15. O-O Black King Castling
+    assertThat(FenNotation.generateFen(board))
+        .isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w - - 2 15");
+    assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
+    assertThat(((Rook) board.findCell("f8").figure()).hasMoved()).isTrue();
+    assertThat(((King) board.findCell("g8").figure()).hasMoved()).isTrue();
+    assertThat(board.cellsWithColor(FigureColor.WHITE)).hasSize(13);
+    assertThat(board.cellsWithColor(FigureColor.BLACK)).hasSize(13);
+  }
   @ParameterizedTest
   @ValueSource(
       strings = {
