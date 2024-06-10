@@ -1,21 +1,22 @@
 package hwr.oop.chess.persistence;
 
+import static org.assertj.core.api.Assertions.*;
+
 import hwr.oop.chess.cli.InvalidUserInputException;
 import hwr.oop.chess.cli.Main;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class CSVFilePersistenceTest {
   private final Persistence persistence = new CSVFilePersistence();
-  private final Path gameCsvFile = Paths.get("game_9999.csv");
+  private Path gameCsvFile = Paths.get("game_9999.csv");
 
   @BeforeEach
   @AfterEach
@@ -29,10 +30,12 @@ class CSVFilePersistenceTest {
     }
   }
 
-  @Test
-  void createGameAndLoadGame() throws IOException {
-    Main.main(new String[] {"create", "9999"});
-    persistence.setGameId(9999);
+  @ParameterizedTest
+  @ValueSource(ints = {9999, 1234})
+  void LoadGame(int gameId) throws IOException {
+    gameCsvFile = Paths.get("game_" + gameId + ".csv");
+    createGame(gameId);
+    persistence.setGameId(gameId);
     persistence.loadGame();
 
     assertThat(persistence.loadState("fen"))
@@ -47,12 +50,16 @@ class CSVFilePersistenceTest {
     assertThat(Files.deleteIfExists(gameCsvFile)).isTrue();
     assertThatThrownBy(persistence::loadGame)
         .isInstanceOf(InvalidUserInputException.class)
-        .hasMessageContaining("game_9999.csv");
+        .hasMessageContaining("game_" + gameId + ".csv");
     assertThat(persistence.loadState("fen")).isNull();
     assertThat(persistence.loadState("endType")).isNull();
     assertThat(persistence.loadState("isDrawOffered")).isNull();
     assertThat(persistence.loadState("whiteScore")).isNull();
     assertThat(persistence.loadState("blackScore")).isNull();
+  }
+
+  private void createGame(int gameId) {
+    Main.main(new String[] {"create", String.valueOf(gameId)});
   }
 
   @Test
