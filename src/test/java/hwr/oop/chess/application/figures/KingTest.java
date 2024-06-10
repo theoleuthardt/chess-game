@@ -98,6 +98,14 @@ class KingTest {
     assertThat(king.isFreeInDirection(3, CellDirection.RIGHT)).isFalse();
     assertThat(king.isFreeInDirection(2, CellDirection.LEFT)).isFalse();
     assertThat(king.isFreeInDirection(3, CellDirection.LEFT)).isFalse();
+  }
+
+  @Test
+  void testThreeCastlingKingWhite() {
+    board = new Board(false);
+    String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 10";
+    FenNotation.parseFEN(board, fenString);
+    Cell king = board.findCell("e1");
 
     List<Cell> cells = board.availableCellsWithoutCheckMoves(king);
     assertThat(cells).contains(board.findCell("g1"));
@@ -131,6 +139,14 @@ class KingTest {
     assertThat(king.isFreeInDirection(3, CellDirection.RIGHT)).isFalse();
     assertThat(king.isFreeInDirection(4, CellDirection.LEFT)).isFalse();
     assertThat(king.isFreeInDirection(3, CellDirection.LEFT)).isTrue();
+  }
+
+  @Test
+  void testThreeCastlingQueenWhite() {
+    board = new Board(false);
+    String fenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w KQkq - 0 10";
+    FenNotation.parseFEN(board, fenString);
+    Cell king = board.findCell("e1");
 
     List<Cell> cells = board.availableCellsWithoutCheckMoves(king);
     assertThat(cells).contains(board.findCell("c1"));
