@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -54,7 +51,7 @@ class CSVFilePersistenceTest {
     assertThat(Files.deleteIfExists(gameCsvFile)).isTrue();
     assertThatThrownBy(persistence::loadGame)
         .isInstanceOf(InvalidUserInputException.class)
-        .hasMessageContaining("game_9999.csv");
+        .hasMessageContaining("game_" + gameId + ".csv");
     assertThat(persistence.loadState(State.FEN_HISTORY)).isNull();
     assertThat(persistence.loadState(State.END_TYPE)).isNull();
     assertThat(persistence.loadState(State.IS_DRAW_OFFERED)).isNull();
