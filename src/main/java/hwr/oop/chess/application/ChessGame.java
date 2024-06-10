@@ -5,6 +5,7 @@ import hwr.oop.chess.cli.InvalidUserInputException;
 import hwr.oop.chess.persistence.FenNotation;
 import hwr.oop.chess.persistence.Persistence;
 import hwr.oop.chess.persistence.Player;
+import hwr.oop.chess.persistence.State;
 
 import java.util.*;
 
@@ -15,12 +16,6 @@ public class ChessGame implements Game {
   private final Map<FigureColor, Player> players = new EnumMap<>(FigureColor.class);
   private final List<String> fenHistory = new ArrayList<>();
   private EndType endType = EndType.NOT_END;
-  private static final String STATE_FEN_HISTORY = "fen";
-  private static final String STATE_WINNER = "winner";
-  private static final String STATE_WHITE_SCORE = "whiteScore";
-  private static final String STATE_BLACK_SCORE = "blackScore";
-  private static final String STATE_END_TYPE = "endType";
-  private static final String STATE_IS_DRAW_OFFERED = "isDrawOffered";
 
   public ChessGame(Persistence persistence, boolean isNew) {
     this.persistence = persistence;
@@ -41,14 +36,14 @@ public class ChessGame implements Game {
 
   private void loadGame() {
     persistence.loadGame();
-    List<String> missingStates =
+    List<State> missingStates =
         new ArrayList<>(
             List.of(
-                STATE_END_TYPE,
-                STATE_IS_DRAW_OFFERED,
-                STATE_FEN_HISTORY,
-                STATE_WHITE_SCORE,
-                STATE_BLACK_SCORE));
+                State.END_TYPE,
+                State.IS_DRAW_OFFERED,
+                State.FEN_HISTORY,
+                State.WHITE_SCORE,
+                State.BLACK_SCORE));
     missingStates.removeIf(state -> persistence.loadState(state) != null);
     if (!missingStates.isEmpty()) {
       throw new InvalidUserInputException(
@@ -56,12 +51,12 @@ public class ChessGame implements Game {
               + missingStates
               + "! Create a new game with 'chess create <ID>'.");
     }
-    endType = EndType.valueOf(persistence.loadState(STATE_END_TYPE));
-    isDrawOffered = "1".equals(persistence.loadState(STATE_IS_DRAW_OFFERED));
-    players.put(FigureColor.WHITE, new Player(persistence.loadState(STATE_WHITE_SCORE)));
-    players.put(FigureColor.BLACK, new Player(persistence.loadState(STATE_BLACK_SCORE)));
+    endType = EndType.valueOf(persistence.loadState(State.END_TYPE));
+    isDrawOffered = "1".equals(persistence.loadState(State.IS_DRAW_OFFERED));
+    players.put(FigureColor.WHITE, new Player(persistence.loadState(State.WHITE_SCORE)));
+    players.put(FigureColor.BLACK, new Player(persistence.loadState(State.BLACK_SCORE)));
 
-    String currentFen = parseHistoryAndGetCurrentFen(persistence.loadState(STATE_FEN_HISTORY));
+    String currentFen = parseHistoryAndGetCurrentFen(persistence.loadState(State.FEN_HISTORY));
     FenNotation.parseFEN(board, currentFen);
   }
 
@@ -76,13 +71,13 @@ public class ChessGame implements Game {
   }
 
   public void saveGame() {
-    persistence.storeState(STATE_END_TYPE, endType.name());
-    persistence.storeState(STATE_IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
-    persistence.storeState(STATE_FEN_HISTORY, historyOfMoves());
+    persistence.storeState(State.END_TYPE, endType.name());
+    persistence.storeState(State.IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
+    persistence.storeState(State.FEN_HISTORY, historyOfMoves());
     persistence.storeState(
-        STATE_WHITE_SCORE, String.valueOf(players.get(FigureColor.WHITE).doubleOfScore()));
+        State.WHITE_SCORE, String.valueOf(players.get(FigureColor.WHITE).doubleOfScore()));
     persistence.storeState(
-        STATE_BLACK_SCORE, String.valueOf(players.get(FigureColor.BLACK).doubleOfScore()));
+        State.BLACK_SCORE, String.valueOf(players.get(FigureColor.BLACK).doubleOfScore()));
     persistence.saveGame();
   }
 
@@ -93,13 +88,13 @@ public class ChessGame implements Game {
   public void playerHasWon(EndType type, FigureColor color) {
     endType = type;
     players.get(color).fullPointOnWin();
-    persistence.storeState(STATE_WINNER, color.name());
+    persistence.storeState(State.WINNER, color.name());
   }
 
   public void endsWithDraw(EndType type) {
     endType = type;
     isDrawOffered = false;
-    persistence.storeState(STATE_WINNER, "draw");
+    persistence.storeState(State.WINNER, "draw");
     players.get(FigureColor.WHITE).halfPointOnDraw();
     players.get(FigureColor.BLACK).halfPointOnDraw();
   }
