@@ -191,6 +191,27 @@ public class Board {
     changeTurnAndCountMoves();
   }
 
+  // TODO move to another Class for PGN
+  public void generatePGN(Cell startCell, Cell endCell){
+    char charFigure = startCell.figure().symbol();
+    String endPostion = endCell.toCoordinates().toLowerCase();
+    String pgnString = "";
+    if(charFigure != 'p' && charFigure != 'P'){
+      pgnString = "" + charFigure;
+    }
+    if(startCell.figure().color() != endCell.figure().color()){
+      if(charFigure == 'p' || charFigure == 'P'){
+        pgnString += startCell.x().toInt();
+      }
+      pgnString += 'x';
+    }
+    pgnString += endPostion;
+    if(isCheck(turn == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE)){
+      pgnString += "+";
+    }
+    System.out.println(pgnString); // TODO write other function;
+  }
+
   public List<Cell> availableCellsWithoutCheckMoves(Cell startCell) {
     Figure figure = startCell.figure();
     List<Cell> availableCells = figure.availableCells(startCell);
