@@ -8,7 +8,7 @@ import hwr.oop.chess.persistence.Player;
 
 import java.util.*;
 
-public class ChessGame {
+public class ChessGame implements Game {
   private final Persistence persistence;
   private final Board board;
   private boolean isDrawOffered;
@@ -124,7 +124,7 @@ public class ChessGame {
     isDrawOffered = false;
   }
 
-  public ChessGame keepPlayersOf(ChessGame game) {
+  public Game keepPlayersOf(Game game) {
     players.put(FigureColor.WHITE, game.players().get(FigureColor.WHITE));
     players.put(FigureColor.BLACK, game.players().get(FigureColor.BLACK));
     return this;

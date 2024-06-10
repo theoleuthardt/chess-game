@@ -2,6 +2,7 @@ package hwr.oop.chess.cli;
 
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.ChessGame;
+import hwr.oop.chess.application.Game;
 import hwr.oop.chess.persistence.NoPersistence;
 import hwr.oop.chess.persistence.Persistence;
 import java.io.OutputStream;
@@ -11,7 +12,7 @@ public class CLIAdapter {
 
   private final CLIPrinter printer;
   private final Persistence persistence;
-  private ChessGame game;
+  private Game game;
 
   public CLIAdapter(OutputStream outputStream) {
     this(outputStream, new NoPersistence());
@@ -47,11 +48,11 @@ public class CLIAdapter {
     persistence.setGameId(Integer.parseInt(gameNumber));
   }
 
-  public ChessGame game() {
+  public Game game() {
     return game;
   }
 
-  public ChessGame initializeGame(boolean isNew) {
+  public Game initializeGame(boolean isNew) {
     game = new ChessGame(persistence, isNew);
     return game;
   }
