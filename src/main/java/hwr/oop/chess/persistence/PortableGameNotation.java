@@ -3,12 +3,14 @@ package hwr.oop.chess.persistence;
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.MoveType;
+import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureColor;
+import java.util.Optional;
 
 public class PortableGameNotation {
   private PortableGameNotation(){}
 
-  public static String generatePGN(Board board, Cell startCell, Cell endCell, MoveType moveType) {
+  public static String generatePgn(Board board, Cell startCell, Cell endCell, MoveType moveType) {
     String pgnString =
         switch (moveType) {
           case MoveType.KING_CASTLING -> "O-O";
@@ -16,11 +18,13 @@ public class PortableGameNotation {
           default -> {
             char charFigure = startCell.figure().symbol();
             String endPosition = endCell.toCoordinates().toLowerCase();
+            Optional<Figure> startFigure = Optional.ofNullable(startCell.figure());
+            Optional<Figure> endFigure = Optional.ofNullable(endCell.figure());
             StringBuilder newPgn = new StringBuilder();
             if (charFigure != 'p' && charFigure != 'P') {
               newPgn.append(charFigure);
             }
-            if (startCell.figure().color() != endCell.figure().color()) {
+            if (startFigure.isPresent() && endFigure.isPresent() && startFigure.get().color() != endFigure.get().color()) {
               if (charFigure == 'p' || charFigure == 'P') {
                 newPgn.append(startCell.x().toInt());
               }

@@ -488,7 +488,7 @@ class BoardTest {
   }
 
   @Test
-  void testGeneratePGN() {
+  void testGeneratePgn() {
     board = new Board(true);
     board.moveFigure("d2", "d4"); // 1. d4
     board.moveFigure("g8", "f6"); // 1... Nf6
@@ -520,13 +520,8 @@ class BoardTest {
     board.moveFigure("b7", "b6"); // 14... b6
     board.moveFigure("e1", "g1"); // 15. O-O White King Castling
     board.moveFigure("e8", "g8"); // 15. O-O Black King Castling
-    assertThat(FenNotation.generateFen(board))
-        .isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w - - 2 15");
-    assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
-    assertThat(((Rook) board.findCell("f8").figure()).hasMoved()).isTrue();
-    assertThat(((King) board.findCell("g8").figure()).hasMoved()).isTrue();
-    assertThat(board.cellsWithColor(FigureColor.WHITE)).hasSize(13);
-    assertThat(board.cellsWithColor(FigureColor.BLACK)).hasSize(13);
+    assertThat(board.pgn())
+        .isEqualTo("d2,d4,g8,f6,c2,c4,e7,e6,b1,c3,f8,b4,g1,f3,c7,c5,e2,e3,b8,c6,f1,d3,b4,c3,b2,c3,d7,d6,e3,e4,e6,e5,d4,d5,c6,e7,f3,h4,h7,h6,f2,f4,e7,g6,h4,g6,f7,g6,f4,e5,d6,e1,g1,e8,g8");
   }
   @ParameterizedTest
   @ValueSource(

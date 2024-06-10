@@ -36,7 +36,13 @@ public enum State {
     public String toString() {
       return "isDrawOffered";
     }
-  }, PGN;
+  },
+  PGN_HISTORY{
+    @Override
+    public String toString() {
+      return "pgn";
+    }
+  };
 
   @Override
   public abstract String toString();

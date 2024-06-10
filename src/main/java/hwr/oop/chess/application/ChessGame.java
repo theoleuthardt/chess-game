@@ -15,6 +15,7 @@ public class ChessGame implements Game {
   private boolean isDrawOffered;
   private final Map<FigureColor, Player> players = new EnumMap<>(FigureColor.class);
   private final List<String> fenHistory = new ArrayList<>();
+  private final List<String> pgnHistory = new ArrayList<>();
   private EndType endType = EndType.NOT_END;
 
   public ChessGame(Persistence persistence, boolean isNew) {
@@ -42,6 +43,7 @@ public class ChessGame implements Game {
                 State.END_TYPE,
                 State.IS_DRAW_OFFERED,
                 State.FEN_HISTORY,
+                State.PGN_HISTORY,
                 State.WHITE_SCORE,
                 State.BLACK_SCORE));
     missingStates.removeIf(state -> persistence.loadState(state) != null);
@@ -56,30 +58,37 @@ public class ChessGame implements Game {
     players.put(FigureColor.WHITE, new Player(persistence.loadState(State.WHITE_SCORE)));
     players.put(FigureColor.BLACK, new Player(persistence.loadState(State.BLACK_SCORE)));
 
-    String currentFen = parseHistoryAndGetCurrentFen(persistence.loadState(State.FEN_HISTORY));
+    String currentFen = parseListAndGetLast(fenHistory, persistence.loadState(State.FEN_HISTORY));
     FenNotation.parseFEN(board, currentFen);
+
+    String currentPgn = parseListAndGetLast(fenHistory, persistence.loadState(State.PGN_HISTORY));
+    board.setPgn(currentPgn);
   }
 
-  private String parseHistoryAndGetCurrentFen(String history) {
-    Collections.addAll(fenHistory, history.split(","));
-    return fenHistory.removeLast();
+   private String parseListAndGetLast(List<String> list, String listAsString) {
+    Collections.addAll(list, listAsString.split(","));
+    return list.getLast();
   }
 
-  private String historyOfMoves() {
+  private String fenHistoryOfMoves() {
     this.fenHistory.add(FenNotation.generateFen(board));
     return String.join(",", this.fenHistory);
+  }
+
+  private String pgnHistoryOfMoves() {
+    this.pgnHistory.add(board.pgn());
+    return String.join(",", this.pgnHistory);
   }
 
   public void saveGame() {
     persistence.storeState(State.END_TYPE, endType.name());
     persistence.storeState(State.IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
-    persistence.storeState(State.FEN_HISTORY, historyOfMoves());
+    persistence.storeState(State.FEN_HISTORY, fenHistoryOfMoves());
+    persistence.storeState(State.PGN_HISTORY, pgnHistoryOfMoves());
     persistence.storeState(
         State.WHITE_SCORE, String.valueOf(players.get(FigureColor.WHITE).doubleOfScore()));
     persistence.storeState(
         State.BLACK_SCORE, String.valueOf(players.get(FigureColor.BLACK).doubleOfScore()));
-    String oldPGN = persistence.loadState(State.PGN);
-    persistence.storeState(State.PGN, oldPGN + board.pgn());
     persistence.saveGame();
   }
 

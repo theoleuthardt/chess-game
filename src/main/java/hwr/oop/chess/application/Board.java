@@ -2,7 +2,7 @@ package hwr.oop.chess.application;
 
 import static hwr.oop.chess.application.figures.FigureType.*;
 import static hwr.oop.chess.persistence.FenNotation.extractFenKeyParts;
-import static hwr.oop.chess.persistence.PortableGameNotation.generatePGN;
+import static hwr.oop.chess.persistence.PortableGameNotation.generatePgn;
 
 import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.cli.InvalidUserInputException;
@@ -164,7 +164,7 @@ public class Board {
 
   public void moveFigure(Cell startCell, Cell endCell) {
     MoveType moveType = moveType(startCell, endCell);
-    this.pgn = generatePGN(this, startCell, endCell, moveType);
+    this.pgn = generatePgn(this, startCell, endCell, moveType);
     switch (moveType) {
       case EN_PASSANT -> handleEnPassant(startCell, endCell);
       case KING_CASTLING, QUEEN_CASTLING -> handleCastling(startCell, endCell, moveType);
@@ -426,5 +426,9 @@ public class Board {
 
   public String pgn() {
     return pgn;
+  }
+
+  public void setPgn(String pgn) {
+    this.pgn = pgn;
   }
 }
