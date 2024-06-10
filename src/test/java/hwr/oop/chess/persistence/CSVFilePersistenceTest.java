@@ -93,17 +93,13 @@ class CSVFilePersistenceTest {
   }
 
   @Test
-  void writeFileIsLocked() {
-    try {
-      Files.createDirectories(gameCsvFile);
-      persistence.setGameId(9999);
-      assertThatThrownBy(persistence::saveGame)
-          .isInstanceOf(InvalidUserInputException.class)
-          .hasMessageContaining("game_9999.csv")
-          .hasMessageContaining(
-              "The Game #9999 could not be saved. Please verify that the current folder is not protected.");
-    } catch (IOException e) {
-      fail("Unexpected IOException: " + e.getMessage());
-    }
+  void writeFileIsLocked() throws IOException {
+    Files.createDirectories(gameCsvFile);
+    persistence.setGameId(9999);
+    assertThatThrownBy(persistence::saveGame)
+        .isInstanceOf(InvalidUserInputException.class)
+        .hasMessageContaining("game_9999.csv")
+        .hasMessageContaining(
+            "The Game #9999 could not be saved. Please verify that the current folder is not protected.");
   }
 }
