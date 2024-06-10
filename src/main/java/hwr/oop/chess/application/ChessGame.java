@@ -1,11 +1,9 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.FigureColor;
+import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.cli.InvalidUserInputException;
-import hwr.oop.chess.persistence.FenNotation;
-import hwr.oop.chess.persistence.Persistence;
-import hwr.oop.chess.persistence.Player;
-import hwr.oop.chess.persistence.State;
+import hwr.oop.chess.persistence.*;
 
 import java.util.*;
 
@@ -17,6 +15,7 @@ public class ChessGame implements Game {
   private final List<String> fenHistory = new ArrayList<>();
   private final List<String> pgnHistory = new ArrayList<>();
   private EndType endType = EndType.NOT_END;
+  private final AlgebraicNotation algebraicNotation = new AlgebraicNotation();
 
   public ChessGame(Persistence persistence, boolean isNew) {
     this.persistence = persistence;
@@ -37,20 +36,7 @@ public class ChessGame implements Game {
 
   private void loadGame() {
     persistence.loadGame();
-    List<State> missingStates =
-        new ArrayList<>(
-            List.of(
-                State.END_TYPE,
-                State.IS_DRAW_OFFERED,
-                State.FEN_HISTORY,
-                State.PGN_HISTORY,
-                State.WHITE_SCORE,
-                State.BLACK_SCORE,
-                State.WHITE_ELO,
-                State.BLACK_ELO,
-                State.WHITE_GAME_COUNT,
-                State.BLACK_GAME_COUNT));
-    missingStates.removeIf(state -> persistence.loadState(state) != null);
+    List<State> missingStates = missingStatesInPersistence();
     if (!missingStates.isEmpty()) {
       throw new InvalidUserInputException(
           "Your save-file is invalid because it is missing: "
@@ -72,32 +58,53 @@ public class ChessGame implements Game {
             persistence.loadState(State.BLACK_ELO),
             persistence.loadState(State.BLACK_GAME_COUNT)));
 
-    String currentFen = parseListAndGetLast(fenHistory, persistence.loadState(State.FEN_HISTORY));
-    FenNotation.parseFEN(board, currentFen);
+    parseIntoList(fenHistory, persistence.loadState(State.FEN_HISTORY));
+    FenNotation.parseFEN(board, fenHistory.getLast());
 
-    String currentPgn = parseListAndGetLast(pgnHistory, persistence.loadState(State.PGN_HISTORY));
-    board.setPgn(currentPgn);
+    parseIntoList(pgnHistory, persistence.loadState(State.PGN_HISTORY));
   }
 
-   private String parseListAndGetLast(List<String> list, String listAsString) {
+  private List<State> missingStatesInPersistence() {
+    List<State> missingStates =
+        new ArrayList<>(
+            List.of(
+                State.END_TYPE,
+                State.IS_DRAW_OFFERED,
+                State.FEN_HISTORY,
+                State.PGN_HISTORY,
+                State.WHITE_SCORE,
+                State.BLACK_SCORE,
+                State.WHITE_ELO,
+                State.BLACK_ELO,
+                State.WHITE_GAME_COUNT,
+                State.BLACK_GAME_COUNT));
+    missingStates.removeIf(state -> persistence.loadState(state) != null);
+    return missingStates;
+  }
+
+  private void parseIntoList(List<String> list, String listAsString) {
+    if (listAsString.isEmpty()) {
+      return;
+    }
     Collections.addAll(list, listAsString.split(","));
-    return list.getLast();
   }
 
-  private String fenHistoryOfMoves() {
-    this.fenHistory.add(FenNotation.generateFen(board));
-    return String.join(",", this.fenHistory);
+  private String fenHistoryOfBoard() {
+    String currentFen = FenNotation.generateFen(board);
+    if (fenHistory.isEmpty() || !currentFen.equals(fenHistory.getLast())) {
+      fenHistory.add(currentFen);
+    }
+    return String.join(",", fenHistory);
   }
 
   private String pgnHistoryOfMoves() {
-    this.pgnHistory.add(board.pgn());
-    return String.join(",", this.pgnHistory);
+    return String.join(",", pgnHistory);
   }
 
   public void saveGame() {
     persistence.storeState(State.END_TYPE, endType.name());
     persistence.storeState(State.IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
-    persistence.storeState(State.FEN_HISTORY, fenHistoryOfMoves());
+    persistence.storeState(State.FEN_HISTORY, fenHistoryOfBoard());
     persistence.storeState(State.PGN_HISTORY, pgnHistoryOfMoves());
     Player whitePlayer = players.get(FigureColor.WHITE);
     persistence.storeState(State.WHITE_SCORE, String.valueOf(whitePlayer.score()));
@@ -118,6 +125,7 @@ public class ChessGame implements Game {
   public void playerHasWon(EndType type, FigureColor color) {
     endType = type;
     persistence.storeState(State.WINNER, color.name());
+    pgnHistory.add(color == FigureColor.WHITE ? "1-0" : "0-1");
 
     Player winner = players.get(color);
     Player looser = players.get(color.opposite());
@@ -132,6 +140,7 @@ public class ChessGame implements Game {
     endType = type;
     isDrawOffered = false;
     persistence.storeState(State.WINNER, "draw");
+    pgnHistory.add("1/2-1/2");
 
     Player white = players.get(FigureColor.WHITE);
     Player black = players.get(FigureColor.BLACK);
@@ -186,7 +195,7 @@ public class ChessGame implements Game {
   @Override
   public boolean isThreeFoldRepetition() {
     String currentFen = FenNotation.generateFen(board);
-    if (!fenHistory.getLast().equals(currentFen)) {
+    if (!fenHistory.isEmpty() && !fenHistory.getLast().equals(currentFen)) {
       fenHistory.add(FenNotation.generateFen(board));
       boolean isThreeFoldRepetition = isThreeFoldRepetition();
       fenHistory.removeLast();
@@ -201,4 +210,22 @@ public class ChessGame implements Game {
     return positionCount.values().stream().anyMatch(x -> x >= 3);
   }
 
+  @Override
+  public void rememberAndPerformPawnPromotion(Cell startCell, FigureType toFigure) {
+    algebraicNotation.recordPawnPromotion(board, startCell, toFigure);
+    board.promotePawn(startCell, toFigure);
+    if (!startCell.isOccupiedBy(FigureType.PAWN)) {
+      pgnHistory.add(algebraicNotation.toString());
+    }
+  }
+
+  @Override
+  public void rememberAndPerformMove(Cell from, Cell to) {
+    algebraicNotation.recordAction(board, from, to);
+    board.moveFigure(from, to);
+    algebraicNotation.actionFinished();
+    if (from.isFree()) {
+      pgnHistory.add(algebraicNotation.toString());
+    }
+  }
 }

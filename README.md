@@ -78,6 +78,7 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
     - `chess on <ID> show-moveable` Show figures which can be moved
     - `chess on <ID> show-stats` Show score and elo number of the players and the status of the game
     - `chess on <ID> show-fen` Export the current game state in FEN notation
+    - `chess on <ID> show-pgn` Export the current game state in PGN notation
 
 ### End of Game Commands `chess on <ID> [...]`
 

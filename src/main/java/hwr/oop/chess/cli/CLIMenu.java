@@ -6,6 +6,8 @@ import hwr.oop.chess.application.Game;
 import hwr.oop.chess.application.EndType;
 import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.persistence.FenNotation;
+import hwr.oop.chess.persistence.Player;
+import hwr.oop.chess.persistence.PortableGameNotation;
 import hwr.oop.chess.persistence.State;
 
 import java.util.AbstractMap;
@@ -39,6 +41,8 @@ public class CLIMenu {
           new AbstractMap.SimpleEntry<>("2: chess on <ID> show-stats", "Show score of the players"),
           new AbstractMap.SimpleEntry<>(
               "2: chess on <ID> show-fen", "Show the current game as a FEN-String"),
+          new AbstractMap.SimpleEntry<>(
+              "2: chess on <ID> show-pgn", "Show the current game as PGN-String"),
           new AbstractMap.SimpleEntry<>(
               "3  End of Game", "--------------------------------------------------"),
           new AbstractMap.SimpleEntry<>(
@@ -151,6 +155,7 @@ public class CLIMenu {
       case "show-moves" -> showMovesOfFigure();
       case "show-moveable" -> showMoveableFigures();
       case "show-fen" -> exportAsFenNotation();
+      case "show-pgn" -> exportAsPgnNotation();
 
       case "draw" -> performDraw();
       case "resign" -> performResign();
@@ -180,7 +185,7 @@ public class CLIMenu {
             + to.toCoordinates()
             + ".");
 
-    board.moveFigure(from, to);
+    cli.game().rememberAndPerformMove(from, to);
     printImportantGameStatus();
     handleAutomaticGameEnd();
     cli.game().saveGame();
@@ -208,8 +213,7 @@ public class CLIMenu {
             + promoteToType.name()
             + ".");
 
-    Pawn pawn = (Pawn) figure;
-    pawn.promotePawn(from, promoteToType);
+    cli.game().rememberAndPerformPawnPromotion(from, promoteToType);
     cli.game().saveGame();
     cli.printBoard();
   }
@@ -360,10 +364,10 @@ public class CLIMenu {
     }
     stats.put("Status", gameStatus);
 
-    stats.put("Score > White", game.players().get(FigureColor.WHITE).score() + " points");
-    stats.put("Score > Black", game.players().get(FigureColor.BLACK).score() + " points");
-    stats.put("Elo > White", game.players().get(FigureColor.WHITE).elo() + " points");
-    stats.put("Elo > Black", game.players().get(FigureColor.BLACK).elo() + " points");
+    Player whitePlayer = game.players().get(FigureColor.WHITE);
+    Player blackPlayer = game.players().get(FigureColor.BLACK);
+    stats.put("Score > White", whitePlayer.score() + " points (Elo: " + whitePlayer.elo() + ")");
+    stats.put("Score > Black", blackPlayer.score() + " points (Elo: " + blackPlayer.elo() + ")");
 
     printer.printAsTable("Game Stats:", 20, stats);
   }
@@ -451,5 +455,11 @@ public class CLIMenu {
     countOfRemainingArgumentsIs(0);
     printer.printlnAction("This is the current game as a FEN-String:");
     printer.println(FenNotation.generateFen(cli.game().board()));
+  }
+
+  private void exportAsPgnNotation() {
+    countOfRemainingArgumentsIs(0);
+    printer.printlnAction("This is the current game as a PGN-String:");
+    printer.println((new PortableGameNotation()).pgnFile(cli.game()));
   }
 }

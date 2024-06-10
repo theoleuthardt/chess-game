@@ -166,6 +166,7 @@ class CLIMenuTest {
         "on <ID> show-stats xyz",
         "on <ID> show-moveable xyz",
         "on <ID> show-fen xyz",
+        "on <ID> show-pgn xyz",
         "on <ID> draw offer xyz",
         "on <ID> resign xyz",
         "on <ID> rematch xyz",
@@ -751,15 +752,11 @@ class CLIMenuTest {
             \033[30;1;104mGame Stats:\033[0m
             """,
             """
-            - Elo > Black:    \033[37m1200 points\033[0m
-            - Elo > White:    \033[37m1200 points\033[0m
-            """,
-            """
             - Game ID:          \033[37m
             """,
             """
-            - Score > Black:    \033[37m0.0 points\033[0m
-            - Score > White:    \033[37m0.0 points\033[0m
+            - Score > Black:    \033[37m0.0 points (Elo: 1200)\033[0m
+            - Score > White:    \033[37m0.0 points (Elo: 1200)\033[0m
             - Status:           \033[37mGame in Progress\033[0m
             """);
   }
@@ -796,6 +793,17 @@ class CLIMenuTest {
                     \033[30;1;104m ACTION \033[0m This is the current game as a FEN-String:
                     rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
                     """);
+  }
+
+  @Test
+  void showPgnString() {
+    realCLIFromArguments("on " + NoPersistence.GameIdType.PGN_HISTORY.ordinal() + " show-pgn");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;104m ACTION \033[0m This is the current game as a PGN-String:
+            """)
+        .contains("1. a4 Na6 2. Ra3 *");
   }
 
   @Test

@@ -1,6 +1,7 @@
 package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.FigureColor;
+import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.persistence.Player;
 import java.util.List;
 
@@ -33,4 +34,8 @@ public interface Game {
   List<String> pgnHistory();
 
   boolean isThreeFoldRepetition();
+
+  void rememberAndPerformPawnPromotion(Cell startCell, FigureType toFigure);
+
+  void rememberAndPerformMove(Cell from, Cell to);
 }

@@ -2,7 +2,6 @@ package hwr.oop.chess.application;
 
 import static hwr.oop.chess.application.figures.FigureType.*;
 import static hwr.oop.chess.persistence.FenNotation.extractFenKeyParts;
-import static hwr.oop.chess.persistence.PortableGameNotation.generatePgn;
 
 import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.cli.InvalidUserInputException;
@@ -17,7 +16,6 @@ public class Board {
   private int halfMove = 0;
   private int fullMove = 0;
   private FigureColor turn = FigureColor.WHITE;
-  private String pgn = "";
 
   public Board(boolean setFigures) {
     initializeBoard();
@@ -164,7 +162,6 @@ public class Board {
 
   public void moveFigure(Cell startCell, Cell endCell) {
     MoveType moveType = moveType(startCell, endCell);
-    this.pgn = generatePgn(this, startCell, endCell, moveType);
     switch (moveType) {
       case EN_PASSANT -> handleEnPassant(startCell, endCell);
       case KING_CASTLING, QUEEN_CASTLING -> handleCastling(startCell, endCell, moveType);
@@ -194,8 +191,7 @@ public class Board {
 
   public boolean isCheck(FigureColor playerColor) {
     Cell kingCell = findKing(playerColor);
-    List<Cell> opponentCells =
-        cellsWithColor(playerColor == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE);
+    List<Cell> opponentCells = cellsWithColor(playerColor.opposite());
     for (Cell cell : opponentCells) {
       if (cell.figure().canMoveTo(cell, kingCell)) {
         return true;
@@ -236,7 +232,7 @@ public class Board {
     this.turn = turn.opposite();
   }
 
-  private MoveType moveType(Cell startCell, Cell endCell) {
+  public MoveType moveType(Cell startCell, Cell endCell) {
     if (startCell.isFree()) {
       throw new InvalidUserInputException("On the starting cell is no figure");
     }
@@ -431,11 +427,8 @@ public class Board {
     return positionCount.containsValue(3);
   }
 
-  public String pgn() {
-    return pgn;
-  }
-
-  public void setPgn(String pgn) {
-    this.pgn = pgn;
+  public void promotePawn(Cell startCell, FigureType promoteToType) {
+    Pawn pawn = (Pawn) startCell.figure();
+    pawn.promotePawn(startCell, promoteToType);
   }
 }

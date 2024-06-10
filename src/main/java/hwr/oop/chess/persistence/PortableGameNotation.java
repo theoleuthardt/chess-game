@@ -1,52 +1,50 @@
 package hwr.oop.chess.persistence;
 
-import hwr.oop.chess.application.Board;
-import hwr.oop.chess.application.Cell;
-import hwr.oop.chess.application.MoveType;
-import hwr.oop.chess.application.figures.Figure;
-import hwr.oop.chess.application.figures.FigureColor;
-import java.util.Optional;
+import hwr.oop.chess.application.Game;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PortableGameNotation {
-  private PortableGameNotation(){}
 
-  public static String generatePgn(Board board, Cell startCell, Cell endCell, MoveType moveType) {
-    String pgnString =
-        switch (moveType) {
-          case MoveType.KING_CASTLING -> "O-O";
-          case MoveType.QUEEN_CASTLING -> "O-O-O";
-          default -> {
-            char charFigure = startCell.figure().symbol();
-            String endPosition = endCell.toCoordinates().toLowerCase();
-            Optional<Figure> startFigure = Optional.ofNullable(startCell.figure());
-            Optional<Figure> endFigure = Optional.ofNullable(endCell.figure());
-            StringBuilder newPgn = new StringBuilder();
-            if (charFigure != 'p' && charFigure != 'P') {
-              newPgn.append(charFigure);
-            }
-            if (startFigure.isPresent() && endFigure.isPresent() && startFigure.get().color() != endFigure.get().color()) {
-              if (charFigure == 'p' || charFigure == 'P') {
-                newPgn.append((char) (startCell.x().toInt() + 96));
-              }
-              newPgn.append('x');
-            }
-            newPgn.append(endPosition);
-            yield newPgn.toString();
-          }
-        };
-
-    boolean white = board.isCheck(FigureColor.WHITE);
-    boolean black = board.isCheck(FigureColor.BLACK);
-
-    if (board.isCheck(board.turn() == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE)) {
-      pgnString += "+";
+  private String wrapLongLines(String pgnString) {
+    StringBuilder wrappedPgn = new StringBuilder();
+    int lineLength = 0;
+    for (String word : pgnString.split(" ")) {
+      if (lineLength + word.length() > 80) {
+        wrappedPgn.append("\n");
+        lineLength = 0;
+      }
+      if (lineLength > 0) {
+        wrappedPgn.append(" ");
+        lineLength++;
+      }
+      wrappedPgn.append(word);
+      lineLength += word.length();
     }
+    return wrappedPgn.toString();
+  }
 
-    if (board.isCheckmate(
-        board.turn() == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE)) {
-        pgnString = pgnString.substring(0, pgnString.length() - 1) + "#";
+  private List<String> addCounter(List<String> pgnHistory) {
+    List<String> moves = new ArrayList<>();
+    int moveCount = 0;
+    int i = 0;
+    for (String move : pgnHistory) {
+      if (i++ % 2 == 0) {
+        moves.add(++moveCount + ". " + move);
+      } else {
+        moves.add(move);
+      }
     }
+    return moves;
+  }
 
-    return pgnString;
+  public String pgnFile(Game game) {
+    List<String> pgnHistory = game.pgnHistory();
+    pgnHistory = addCounter(pgnHistory);
+    if (!game.isOver()) {
+      pgnHistory.add("*");
+    }
+    return wrapLongLines(String.join(" ", pgnHistory));
   }
 }

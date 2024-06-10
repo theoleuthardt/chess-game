@@ -7,18 +7,14 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 class CellTest {
 
   @Test
   void positionIsValid() {
     Cell position = new Cell(Coordinate.SIX, Coordinate.FIVE);
-    assertSoftly(
-        softly -> {
-          softly.assertThat(position.x()).isEqualTo(Coordinate.SIX);
-          softly.assertThat(position.y()).isEqualTo(Coordinate.FIVE);
-        });
+    assertThat(position.x()).isEqualTo(Coordinate.SIX);
+    assertThat(position.y()).isEqualTo(Coordinate.FIVE);
   }
 
   @Test

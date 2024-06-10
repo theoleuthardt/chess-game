@@ -27,6 +27,7 @@ public class NoPersistence implements Persistence {
     FIFTY_MOVE_POSSIBLE,
     THREEFOLD_REPETITION_POSSIBLE,
     DEAD_POSITION_POSSIBLE,
+    PGN_HISTORY,
   }
 
   private final Map<State, String> gameData = new EnumMap<>(State.class);
@@ -72,6 +73,7 @@ public class NoPersistence implements Persistence {
                     GAME_IS_OVER_RESIGNATION,
                     GAME_IS_OVER_FIFTY_MOVE_RULE,
                     GAME_IS_OVER_THREEFOLD_REPETITION,
+                    PGN_HISTORY,
                     DRAW_OFFERED ->
                 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
             case GAME_IS_OVER_DRAW_STALEMATE -> "8/8/8/8/8/1K6/B7/k7 w - - 0 1";
@@ -109,7 +111,7 @@ public class NoPersistence implements Persistence {
       case State.WHITE_GAME_COUNT, State.BLACK_GAME_COUNT -> "0";
       case State.WHITE_SCORE, State.BLACK_SCORE -> type == GAME_IS_OVER_DRAW ? "1" : "0";
       case State.IS_DRAW_OFFERED -> type == DRAW_OFFERED ? "1" : "0";
-      case State.PGN_HISTORY -> "";
+      case State.PGN_HISTORY -> type == PGN_HISTORY ? "a4,Na6,Ra3" : "";
     };
   }
 
