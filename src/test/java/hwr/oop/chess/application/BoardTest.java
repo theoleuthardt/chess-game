@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 
+import static hwr.oop.chess.persistence.FenNotation.generateFen;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -315,7 +316,7 @@ class BoardTest {
     board = new Board(false);
     FenNotation.parseFEN(board, "rnbqkbnr/ppp1pppp/8/8/3p4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2");
     board.moveFigure("e2", "e4");
-    assertThat(FenNotation.generateFen(board))
+    assertThat(generateFen(board))
         .isEqualTo("rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2");
   }
 
@@ -327,7 +328,7 @@ class BoardTest {
     board.moveFigure("d4", "e3");
     assertThat(board.findCell('e', 3).figure().type()).isEqualTo(FigureType.PAWN);
     assertThat(board.findCell('e', 4).figure()).isNull();
-    assertThat(FenNotation.generateFen(board))
+    assertThat(generateFen(board))
         .isEqualTo("rnbqkbnr/ppp1pppp/8/8/8/4p3/PPP2PPP/RNBQKBNR w KQkq - 0 3");
   }
 
@@ -338,7 +339,7 @@ class BoardTest {
     String initialStatus = "rn1qkbnr/ppp1pppp/8/5b2/5P2/4p3/PPP3PP/RNBQKBNR w KQkq - 1 4";
     FenNotation.parseFEN(board, initialStatus);
     board.moveFigure("f1", "b5");
-    assertThat(FenNotation.generateFen(board))
+    assertThat(generateFen(board))
         .isEqualTo("rn1qkbnr/ppp1pppp/8/1B3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 4");
   }
 
@@ -470,6 +471,7 @@ class BoardTest {
     board.moveFigure("h7", "h6"); // 10... h6
     board.moveFigure("f2", "f4"); // 11. f4
     board.moveFigure("e7", "g6"); // 11... Ng6
+    String str = generateFen(board);
     board.moveFigure("h4", "g6"); // 12. Bxg6
     board.moveFigure("f7", "g6"); // 12... fxg6
     board.moveFigure("f4", "e5"); // 13. fxe5
@@ -478,7 +480,7 @@ class BoardTest {
     board.moveFigure("b7", "b6"); // 14... b6
     board.moveFigure("e1", "g1"); // 15. O-O White King Castling
     board.moveFigure("e8", "g8"); // 15. O-O Black King Castling
-    assertThat(FenNotation.generateFen(board))
+    assertThat(generateFen(board))
         .isEqualTo("r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/P5PP/R2Q1RK1 w - - 2 15");
     assertThat(board.canPerformKingSideCastling(FigureColor.WHITE)).isFalse();
     assertThat(((Rook) board.findCell("f8").figure()).hasMoved()).isTrue();

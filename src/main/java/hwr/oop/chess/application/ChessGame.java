@@ -15,6 +15,7 @@ public class ChessGame implements Game {
   private boolean isDrawOffered;
   private final Map<FigureColor, Player> players = new EnumMap<>(FigureColor.class);
   private final List<String> fenHistory = new ArrayList<>();
+  private final List<String> pgnHistory = new ArrayList<>();
   private EndType endType = EndType.NOT_END;
 
   public ChessGame(Persistence persistence, boolean isNew) {
@@ -42,6 +43,7 @@ public class ChessGame implements Game {
                 State.END_TYPE,
                 State.IS_DRAW_OFFERED,
                 State.FEN_HISTORY,
+                State.PGN_HISTORY,
                 State.WHITE_SCORE,
                 State.BLACK_SCORE,
                 State.WHITE_ELO,
@@ -70,44 +72,44 @@ public class ChessGame implements Game {
             persistence.loadState(State.BLACK_ELO),
             persistence.loadState(State.BLACK_GAME_COUNT)));
 
-    String currentFen = parseHistoryAndGetCurrentFen(persistence.loadState(State.FEN_HISTORY));
+    String currentFen = parseListAndGetLast(fenHistory, persistence.loadState(State.FEN_HISTORY));
     FenNotation.parseFEN(board, currentFen);
+
+    String currentPgn = parseListAndGetLast(pgnHistory, persistence.loadState(State.PGN_HISTORY));
+    board.setPgn(currentPgn);
   }
 
-  private String parseHistoryAndGetCurrentFen(String history) {
-    Collections.addAll(fenHistory, history.split(","));
-    return fenHistory.getLast();
+   private String parseListAndGetLast(List<String> list, String listAsString) {
+    Collections.addAll(list, listAsString.split(","));
+    return list.getLast();
   }
 
-  private String historyOfMoves() {
+  private String fenHistoryOfMoves() {
     this.fenHistory.add(FenNotation.generateFen(board));
     return String.join(",", this.fenHistory);
   }
 
-  @Override
+  private String pgnHistoryOfMoves() {
+    this.pgnHistory.add(board.pgn());
+    return String.join(",", this.pgnHistory);
+  }
+
   public void saveGame() {
     persistence.storeState(State.END_TYPE, endType.name());
     persistence.storeState(State.IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
-    persistence.storeState(State.FEN_HISTORY, historyOfMoves());
-
-    Player whitePlayer = players.get(FigureColor.WHITE);
-    persistence.storeState(State.WHITE_SCORE, String.valueOf(whitePlayer.score()));
-    persistence.storeState(State.WHITE_ELO, String.valueOf(whitePlayer.elo()));
-    persistence.storeState(State.WHITE_GAME_COUNT, String.valueOf(whitePlayer.gameCount()));
-
-    Player blackPlayer = players.get(FigureColor.BLACK);
-    persistence.storeState(State.BLACK_SCORE, String.valueOf(blackPlayer.score()));
-    persistence.storeState(State.BLACK_ELO, String.valueOf(blackPlayer.elo()));
-    persistence.storeState(State.BLACK_GAME_COUNT, String.valueOf(blackPlayer.gameCount()));
+    persistence.storeState(State.FEN_HISTORY, fenHistoryOfMoves());
+    persistence.storeState(State.PGN_HISTORY, pgnHistoryOfMoves());
+    persistence.storeState(
+        State.WHITE_SCORE, String.valueOf(players.get(FigureColor.WHITE).doubleOfScore()));
+    persistence.storeState(
+        State.BLACK_SCORE, String.valueOf(players.get(FigureColor.BLACK).doubleOfScore()));
     persistence.saveGame();
   }
 
-  @Override
   public Board board() {
     return board;
   }
 
-  @Override
   public void playerHasWon(EndType type, FigureColor color) {
     endType = type;
     persistence.storeState(State.WINNER, color.name());
@@ -172,6 +174,11 @@ public class ChessGame implements Game {
   }
 
   @Override
+  public List<String> pgnHistory() {
+    return this.pgnHistory;
+  }
+
+  @Override
   public boolean isThreeFoldRepetition() {
     String currentFen = FenNotation.generateFen(board);
     if (!fenHistory.getLast().equals(currentFen)) {
@@ -188,4 +195,5 @@ public class ChessGame implements Game {
     }
     return positionCount.values().stream().anyMatch(x -> x >= 3);
   }
+
 }

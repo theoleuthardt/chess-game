@@ -30,5 +30,7 @@ public interface Game {
 
   List<String> fenHistory();
 
+  List<String> pgnHistory();
+
   boolean isThreeFoldRepetition();
 }

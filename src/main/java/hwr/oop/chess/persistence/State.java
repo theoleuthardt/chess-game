@@ -11,4 +11,5 @@ public enum State {
   BLACK_GAME_COUNT,
   END_TYPE,
   IS_DRAW_OFFERED,
+  PGN_HISTORY,
 }

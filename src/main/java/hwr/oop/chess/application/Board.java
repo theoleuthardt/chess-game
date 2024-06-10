@@ -1,11 +1,15 @@
 package hwr.oop.chess.application;
 
 import static hwr.oop.chess.application.figures.FigureType.*;
+import static hwr.oop.chess.persistence.FenNotation.extractFenKeyParts;
+import static hwr.oop.chess.persistence.PortableGameNotation.generatePgn;
 
 import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.cli.InvalidUserInputException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 public class Board {
@@ -13,6 +17,7 @@ public class Board {
   private int halfMove = 0;
   private int fullMove = 0;
   private FigureColor turn = FigureColor.WHITE;
+  private String pgn = "";
 
   public Board(boolean setFigures) {
     initializeBoard();
@@ -94,7 +99,7 @@ public class Board {
     }
     cell = cell.toLowerCase();
     Coordinate x = Coordinate.fromChar(cell.charAt(0));
-    Coordinate y = Coordinate.fromInt(cell.charAt(1) - '0');
+    Coordinate y = Coordinate.fromInt(cell.charAt(1) - 48);
     return findCell(x, y);
   }
 
@@ -158,27 +163,8 @@ public class Board {
   }
 
   public void moveFigure(Cell startCell, Cell endCell) {
-
-    if (startCell.isFree()) {
-      throw new InvalidUserInputException("On the starting cell is no figure");
-    }
-
-    Figure figure = startCell.figure();
-    if (figure.color() != turn) {
-      throw new InvalidUserInputException(
-          "It is not your turn! Try to move a figure of color " + turn.name() + ".");
-    }
-
-    if (!figure.canMoveTo(startCell, endCell)) {
-      throw new InvalidUserInputException("The figure can't move to that cell");
-    }
-
-    if (wouldBeCheckAfterMove(startCell, endCell)) {
-      throw new InvalidUserInputException(
-          "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
-    }
-
     MoveType moveType = moveType(startCell, endCell);
+    this.pgn = generatePgn(this, startCell, endCell, moveType);
     switch (moveType) {
       case EN_PASSANT -> handleEnPassant(startCell, endCell);
       case KING_CASTLING, QUEEN_CASTLING -> handleCastling(startCell, endCell, moveType);
@@ -251,7 +237,25 @@ public class Board {
   }
 
   private MoveType moveType(Cell startCell, Cell endCell) {
+    if (startCell.isFree()) {
+      throw new InvalidUserInputException("On the starting cell is no figure");
+    }
+
     Figure figure = startCell.figure();
+    if (figure.color() != turn) {
+      throw new InvalidUserInputException(
+          "It is not your turn! Try to move a figure of color " + turn.name() + ".");
+    }
+
+    if (!figure.canMoveTo(startCell, endCell)) {
+      throw new InvalidUserInputException("The figure can't move to that cell");
+    }
+
+    if (wouldBeCheckAfterMove(startCell, endCell)) {
+      throw new InvalidUserInputException(
+          "This move is not allowed as your king would be in check! Move a figure so that your king is not in check (anymore).");
+    }
+
     if (figure.type() == FigureType.KING) {
       King king = (King) figure;
       if (king.canPerformKingSideCastling(startCell)
@@ -276,6 +280,10 @@ public class Board {
   }
 
   public EndType endType(FigureColor color) {
+    return endType(color, null);
+  }
+
+  public EndType endType(FigureColor color, List<String> fenHistory) {
     if (isCheckmate(color)) {
       return EndType.CHECKMATE;
     }
@@ -284,6 +292,9 @@ public class Board {
     }
     if (isDeadPosition()) {
       return EndType.DEAD_POSITION;
+    }
+    if (isThreeFoldRepetition(fenHistory)) {
+      return EndType.THREE_FOLD_REPETITION;
     }
     if (isFiftyMoveEnd()) {
       return EndType.FIFTY_MOVE_RULE;
@@ -404,5 +415,27 @@ public class Board {
       return bishopCells.getFirst().isWhiteCell() == bishopCells.getLast().isWhiteCell();
     }
     return false;
+  }
+
+  public boolean isThreeFoldRepetition(List<String> fenHistory) {
+    if (fenHistory == null) {
+      return false;
+    }
+    Map<String, Integer> positionCount = new HashMap<>();
+
+    for (String fenString : fenHistory) {
+      String key = extractFenKeyParts(fenString);
+      positionCount.put(key, positionCount.getOrDefault(key, 0) + 1);
+    }
+
+    return positionCount.containsValue(3);
+  }
+
+  public String pgn() {
+    return pgn;
+  }
+
+  public void setPgn(String pgn) {
+    this.pgn = pgn;
   }
 }
