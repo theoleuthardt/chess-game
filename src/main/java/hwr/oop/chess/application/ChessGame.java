@@ -62,7 +62,7 @@ public class ChessGame implements Game {
 
   private String parseHistoryAndGetCurrentFen(String history) {
     Collections.addAll(fenHistory, history.split(","));
-    return fenHistory.removeLast();
+    return fenHistory.getLast();
   }
 
   private String historyOfMoves() {
@@ -70,6 +70,7 @@ public class ChessGame implements Game {
     return String.join(",", this.fenHistory);
   }
 
+  @Override
   public void saveGame() {
     persistence.storeState(State.END_TYPE, endType.name());
     persistence.storeState(State.IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
@@ -81,16 +82,19 @@ public class ChessGame implements Game {
     persistence.saveGame();
   }
 
+  @Override
   public Board board() {
     return board;
   }
 
+  @Override
   public void playerHasWon(EndType type, FigureColor color) {
     endType = type;
     players.get(color).fullPointOnWin();
     persistence.storeState(State.WINNER, color.name());
   }
 
+  @Override
   public void endsWithDraw(EndType type) {
     endType = type;
     isDrawOffered = false;
@@ -99,33 +103,58 @@ public class ChessGame implements Game {
     players.get(FigureColor.BLACK).halfPointOnDraw();
   }
 
+  @Override
   public Map<FigureColor, Player> players() {
     return players;
   }
 
+  @Override
   public boolean isOver() {
-    return endType != EndType.NOT_END;
+    return board.endType(board.turn()) != EndType.NOT_END || endType != EndType.NOT_END;
   }
 
+  @Override
   public boolean isDrawOffered() {
     return isDrawOffered;
   }
 
+  @Override
   public void offerDraw() {
     isDrawOffered = true;
   }
 
+  @Override
   public void denyDrawOffer() {
     isDrawOffered = false;
   }
 
+  @Override
   public Game keepPlayersOf(Game game) {
     players.put(FigureColor.WHITE, game.players().get(FigureColor.WHITE));
     players.put(FigureColor.BLACK, game.players().get(FigureColor.BLACK));
     return this;
   }
 
+  @Override
   public List<String> fenHistory() {
     return this.fenHistory;
+  }
+
+  @Override
+  public boolean isThreeFoldRepetition() {
+    String currentFen = FenNotation.generateFen(board);
+    if (!fenHistory.getLast().equals(currentFen)) {
+      fenHistory.add(FenNotation.generateFen(board));
+      boolean isThreeFoldRepetition = isThreeFoldRepetition();
+      fenHistory.removeLast();
+      return isThreeFoldRepetition;
+    }
+
+    Map<String, Integer> positionCount = new HashMap<>();
+    for (String fenString : fenHistory) {
+      String key = FenNotation.extractFenKeyParts(fenString);
+      positionCount.put(key, positionCount.getOrDefault(key, 0) + 1);
+    }
+    return positionCount.values().stream().anyMatch(x -> x >= 3);
   }
 }

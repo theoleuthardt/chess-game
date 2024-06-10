@@ -1,14 +1,11 @@
 package hwr.oop.chess.application;
 
 import static hwr.oop.chess.application.figures.FigureType.*;
-import static hwr.oop.chess.persistence.FenNotation.extractFenKeyParts;
 
 import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.cli.InvalidUserInputException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class Board {
@@ -279,10 +276,6 @@ public class Board {
   }
 
   public EndType endType(FigureColor color) {
-    return endType(color, null);
-  }
-
-  public EndType endType(FigureColor color, List<String> fenHistory) {
     if (isCheckmate(color)) {
       return EndType.CHECKMATE;
     }
@@ -292,10 +285,14 @@ public class Board {
     if (isDeadPosition()) {
       return EndType.DEAD_POSITION;
     }
-    if (isThreeFoldRepetition(fenHistory)) {
-      return EndType.THREE_FOLD_REPETITION;
+    if (isFiftyMoveEnd()) {
+      return EndType.FIFTY_MOVE_RULE;
     }
     return EndType.NOT_END;
+  }
+
+  public boolean isFiftyMoveEnd() {
+    return halfMove >= 100;
   }
 
   private void handleNormalMove(Cell startCell, Cell endCell) {
@@ -407,19 +404,5 @@ public class Board {
       return bishopCells.getFirst().isWhiteCell() == bishopCells.getLast().isWhiteCell();
     }
     return false;
-  }
-
-  public boolean isThreeFoldRepetition(List<String> fenHistory) {
-    if (fenHistory == null) {
-      return false;
-    }
-    Map<String, Integer> positionCount = new HashMap<>();
-
-    for (String fenString : fenHistory) {
-      String key = extractFenKeyParts(fenString);
-      positionCount.put(key, positionCount.getOrDefault(key, 0) + 1);
-    }
-
-    return positionCount.containsValue(3);
   }
 }

@@ -791,8 +791,8 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                            - Status:           \033[37mGame Over (draw by stalemate)\033[0m
-                            """);
+            - Status:           \033[37mGame Over (draw by stalemate)\033[0m
+            """);
   }
 
   @Test
@@ -802,7 +802,31 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-                    - Status:           \033[37mGame Over (draw by dead position)\033[0m
+            - Status:           \033[37mGame Over (draw by dead position)\033[0m
+            """);
+  }
+
+  @Test
+  void testEndGameByFiftyMoveRule() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.GAME_IS_OVER_FIFTY_MOVE_RULE.ordinal() + " show-stats");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    - Status:           \033[37mGame Over (draw by fifty move rule)\033[0m
+                    """);
+  }
+
+  @Test
+  void testEndGameByThreefoldRepetition() {
+    realCLIFromArguments(
+        "on "
+            + NoPersistence.GameIdType.GAME_IS_OVER_THREEFOLD_REPETITION.ordinal()
+            + " show-stats");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    - Status:           \033[37mGame Over (draw by threefold repetition)\033[0m
                     """);
   }
 
@@ -851,7 +875,40 @@ class CLIMenuTest {
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
             """
-            \033[30;1;103m ERROR \033[0m Please promote your pawn to a different figure. You can choose QUEEN, ROOK, BISHOP or KNIGHT.
+                    \033[30;1;103m ERROR \033[0m Please promote your pawn to a different figure. You can choose QUEEN, ROOK, BISHOP or KNIGHT.
+                    """);
+  }
+
+  @Test
+  void fiftyMoveRuleHintIsShown() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.FIFTY_MOVE_POSSIBLE.ordinal() + " move a8 b8");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;103m ERROR \033[0m Fifty moves have been reached. The game ended with a draw
+                    """);
+  }
+
+  @Test
+  void deadPositionRuleHintIsShown() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.DEAD_POSITION_POSSIBLE.ordinal() + " move a8 b7");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m There are too few figures to result in a checkmate. The game ended with a draw
+            """);
+  }
+
+  @Test
+  void threefoldRepetitionHintIsShown() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.THREEFOLD_REPETITION_POSSIBLE.ordinal() + " move b8 a8");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+            \033[30;1;103m ERROR \033[0m The game ended in a draw by threefold repetition.
             """);
   }
 

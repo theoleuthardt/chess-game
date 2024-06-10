@@ -8,4 +8,5 @@ public enum EndType {
   THREE_FOLD_REPETITION,
   RESIGNATION,
   MUTUAL_DRAW,
+  FIFTY_MOVE_RULE,
 }

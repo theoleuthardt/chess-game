@@ -125,11 +125,9 @@ public class CLIMenu {
     }
     String command = remainingArguments.removeFirst();
 
-    if (cli.game().isOver() && !command.equals("rematch")) {
-      printImportantGameStatus();
-      if (!command.equals("show-stats") && !command.equals("show-board")) {
-        return;
-      }
+    printImportantGameStatus();
+    if (cli.game().isOver() && !List.of("rematch", "show-stats", "show-board").contains(command)) {
+      return;
     }
 
     if (cli.game().isDrawOffered() && !command.equals("draw")) {
@@ -285,7 +283,7 @@ public class CLIMenu {
     Board board = game.board();
 
     for (FigureColor color : FigureColor.values()) {
-      EndType endType = board.endType(color, game.fenHistory());
+      EndType endType = board.endType(color);
       switch (endType) {
         case EndType.STALEMATE, EndType.DEAD_POSITION, EndType.THREE_FOLD_REPETITION ->
             game.endsWithDraw(endType);
@@ -302,19 +300,26 @@ public class CLIMenu {
     for (FigureColor color : FigureColor.values()) {
       if (board.isStalemate(color)) {
         printer.printlnError("The " + color.name() + " king is in stalemate. The game is over.");
+        return;
       } else if (board.isCheckmate(color)) {
         printer.printlnError("The " + color.name() + " king is in checkmate. The game is over.");
+        return;
       } else if (board.isCheck(color)) {
         printer.printlnError("The " + color.name() + " king is in check.");
       }
     }
 
-    if (cli.game().board().isPawnPromotionPossible()) {
+    if (board.isFiftyMoveEnd()) {
+      printer.printlnError("Fifty moves have been reached. The game ended with a draw");
+    } else if (board.isDeadPosition()) {
+      printer.printlnError(
+          "There are too few figures to result in a checkmate. The game ended with a draw.");
+    } else if (cli.game().isThreeFoldRepetition()) {
+      printer.printlnError("The game ended in a draw by threefold repetition.");
+    } else if (cli.game().board().isPawnPromotionPossible()) {
       printer.printlnError(
           "Please promote your pawn to a different figure. You can choose QUEEN, ROOK, BISHOP or KNIGHT.");
-    }
-
-    if (cli.game().isOver()) {
+    } else if (cli.game().isOver()) {
       String winner = cli.persistence().loadState(State.WINNER);
       if (winner == null || winner.equals("draw")) {
         printer.printlnError("The game ended with a draw. Both players got half a point.");
@@ -343,6 +348,7 @@ public class CLIMenu {
           case STALEMATE -> "draw by stalemate";
           case DEAD_POSITION -> "draw by dead position";
           case THREE_FOLD_REPETITION -> "draw by threefold repetition";
+          case FIFTY_MOVE_RULE -> "draw by fifty move rule";
         };
     if (!gameStatus.equals("Game in Progress")) {
       gameStatus = "Game Over (" + gameStatus + ")";
