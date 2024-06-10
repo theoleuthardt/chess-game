@@ -767,10 +767,43 @@ class CLIMenuTest {
   }
 
   @Test
+  void resignationOfGame() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.GAME_IS_OVER_RESIGNATION.ordinal() + " show-stats");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    - Status:           \033[37mGame Over (BLACK won -> Resignation)\033[0m
+                    """);
+  }
+
+  @Test
   void boardOfEndedGame() {
     realCLIFromArguments(
         "on " + NoPersistence.GameIdType.GAME_IS_OVER_DRAW.ordinal() + " show-board");
     assertThat(outputStream.toString()).contains("Here is game ").contains("A B C D E F G H");
+  }
+
+  @Test
+  void testEndGameByDrawStalemate() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.GAME_IS_OVER_DRAW_STALEMATE.ordinal() + " show-stats");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                            - Status:           \033[37mGame Over (draw by stalemate)\033[0m
+                            """);
+  }
+
+  @Test
+  void testEndGameByDeadPosition() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.GAME_IS_OVER_DRAW_DEAD_POSITION.ordinal() + " show-stats");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    - Status:           \033[37mGame Over (draw by dead position)\033[0m
+                    """);
   }
 
   @Test

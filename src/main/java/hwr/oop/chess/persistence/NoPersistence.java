@@ -16,8 +16,11 @@ public class NoPersistence implements Persistence {
     WHITE_CHECK_POSSIBLE,
     WHITE_CHECKMATE_POSSIBLE,
     WHITE_STALEMATE_POSSIBLE,
+    GAME_IS_OVER_RESIGNATION,
     GAME_IS_OVER_WHITE_WINS,
     GAME_IS_OVER_DRAW,
+    GAME_IS_OVER_DRAW_STALEMATE,
+    GAME_IS_OVER_DRAW_DEAD_POSITION,
     DRAW_OFFERED,
   }
 
@@ -58,8 +61,14 @@ public class NoPersistence implements Persistence {
             case PAWN_PROMOTION -> "2PP4/8/8/8/7k/8/PP6/7K w - - 0 1";
             case PAWN_PROMOTION_POSSIBLE ->
                 "1nbqkbnr/Pppppppp/8/8/8/8/1PPPPPPP/RNBQKBNR w KQk - 0 1";
-            case DEFAULT_POSITIONS, GAME_IS_OVER_WHITE_WINS, GAME_IS_OVER_DRAW, DRAW_OFFERED ->
+            case DEFAULT_POSITIONS,
+                    GAME_IS_OVER_WHITE_WINS,
+                    GAME_IS_OVER_DRAW,
+                    GAME_IS_OVER_DRAW_STALEMATE,
+                    GAME_IS_OVER_RESIGNATION,
+                    DRAW_OFFERED ->
                 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            case GAME_IS_OVER_DRAW_DEAD_POSITION -> "8/8/3K4/8/8/8/8/4k3 w - - 0 1";
             case WHITE_CHECK_POSSIBLE -> "8/8/k7/8/8/8/PP3q2/1K6 b - - 0 1";
             case WHITE_CHECKMATE_POSSIBLE -> "K7/8/8/1r6/1r6/8/8/7k b - - 0 1";
             case WHITE_STALEMATE_POSSIBLE -> "K7/7q/8/8/8/8/8/k7 b - - 0 1";
@@ -70,13 +79,18 @@ public class NoPersistence implements Persistence {
           switch (type) {
             case GAME_IS_OVER_WHITE_WINS -> EndType.CHECKMATE.name();
             case GAME_IS_OVER_DRAW -> EndType.MUTUAL_DRAW.name();
+            case GAME_IS_OVER_DRAW_STALEMATE -> EndType.STALEMATE.name();
+            case GAME_IS_OVER_DRAW_DEAD_POSITION -> EndType.DEAD_POSITION.name();
+            case GAME_IS_OVER_RESIGNATION -> EndType.RESIGNATION.name();
             default -> EndType.NOT_END.name();
           };
 
       case "winner" ->
           switch (type) {
             case GAME_IS_OVER_WHITE_WINS -> "WHITE";
-            case GAME_IS_OVER_DRAW -> "draw";
+            case GAME_IS_OVER_RESIGNATION -> "BLACK";
+            case GAME_IS_OVER_DRAW, GAME_IS_OVER_DRAW_STALEMATE, GAME_IS_OVER_DRAW_DEAD_POSITION ->
+                "draw";
             default -> null;
           };
 
