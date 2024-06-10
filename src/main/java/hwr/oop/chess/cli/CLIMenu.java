@@ -5,6 +5,8 @@ import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.Game;
 import hwr.oop.chess.application.EndType;
 import hwr.oop.chess.application.figures.*;
+import hwr.oop.chess.persistence.State;
+
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
@@ -313,7 +315,7 @@ public class CLIMenu {
     }
 
     if (cli.game().isOver()) {
-      String winner = cli.persistence().loadState("winner");
+      String winner = cli.persistence().loadState(State.WINNER);
       if (winner == null || winner.equals("draw")) {
         printer.printlnError("The game ended with a draw. Both players got half a point.");
       } else {
@@ -329,9 +331,9 @@ public class CLIMenu {
     Map<String, String> stats = new HashMap<>();
 
     stats.put("Game ID", "" + cli.persistence().gameId());
-    String winnerColor = cli.persistence().loadState("winner");
+    String winnerColor = cli.persistence().loadState(State.WINNER);
     String gameStatus =
-        switch (EndType.valueOf(cli.persistence().loadState("endType"))) {
+        switch (EndType.valueOf(cli.persistence().loadState(State.END_TYPE))) {
           case NOT_END -> "Game in Progress";
 
           case CHECKMATE -> winnerColor + " won -> Checkmate";

@@ -12,13 +12,13 @@ public class CSVFilePersistence implements Persistence {
   int gameId;
 
   @Override
-  public void storeState(String key, String value) {
-    gameData.put(key, value);
+  public void storeState(State key, String value) {
+    gameData.put(key.toString(), value);
   }
 
   @Override
-  public String loadState(String key) {
-    return gameData.get(key);
+  public String loadState(State key) {
+    return gameData.get(key.toString());
   }
 
   private String fileName(int gameId) {

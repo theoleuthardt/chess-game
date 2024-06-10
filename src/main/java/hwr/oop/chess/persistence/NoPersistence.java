@@ -39,14 +39,14 @@ public class NoPersistence implements Persistence {
   }
 
   @Override
-  public void storeState(String key, String value) {
-    gameData.put(key, value);
+  public void storeState(State key, String value) {
+    gameData.put(key.toString(), value);
   }
 
   @Override
-  public String loadState(String key) {
-    if (gameData.containsKey(key)) {
-      return gameData.get(key);
+  public String loadState(State key) {
+    if (gameData.containsKey(key.toString())) {
+      return gameData.get(key.toString());
     }
 
     GameIdType type =
@@ -56,7 +56,7 @@ public class NoPersistence implements Persistence {
             .orElse(NO_GAME);
 
     return switch (key) {
-      case "fen" ->
+      case State.FEN_HISTORY ->
           switch (type) {
             case PAWN_PROMOTION -> "2PP4/8/8/8/7k/8/PP6/7K w - - 0 1";
             case PAWN_PROMOTION_POSSIBLE ->
@@ -75,7 +75,7 @@ public class NoPersistence implements Persistence {
             default -> null;
           };
 
-      case "endType" ->
+      case State.END_TYPE ->
           switch (type) {
             case GAME_IS_OVER_WHITE_WINS -> EndType.CHECKMATE.name();
             case GAME_IS_OVER_DRAW -> EndType.MUTUAL_DRAW.name();
@@ -85,7 +85,7 @@ public class NoPersistence implements Persistence {
             default -> EndType.NOT_END.name();
           };
 
-      case "winner" ->
+      case State.WINNER ->
           switch (type) {
             case GAME_IS_OVER_WHITE_WINS -> "WHITE";
             case GAME_IS_OVER_RESIGNATION -> "BLACK";
@@ -94,9 +94,8 @@ public class NoPersistence implements Persistence {
             default -> null;
           };
 
-      case "whiteScore", "blackScore" -> type == GAME_IS_OVER_DRAW ? "1" : "0";
-      case "isDrawOffered" -> type == DRAW_OFFERED ? "1" : "0";
-      default -> null;
+      case State.WHITE_SCORE, State.BLACK_SCORE -> type == GAME_IS_OVER_DRAW ? "1" : "0";
+      case State.IS_DRAW_OFFERED -> type == DRAW_OFFERED ? "1" : "0";
     };
   }
 
