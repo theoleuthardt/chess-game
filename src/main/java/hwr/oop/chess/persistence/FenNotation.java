@@ -56,7 +56,14 @@ public class FenNotation {
 
     // Validate castling availability
     String castling = parts.get(2);
-    return isValidCastling(castling, rows);
+    if(!isValidCastling(castling, rows)){
+      return false;
+    }
+
+    String enPassant = parts.get(3);
+    char activeColor = parts.get(1).charAt(0);
+    return isValidEnPassant(enPassant, activeColor, rows);
+
   }
 
   private static boolean isValidRow(String row) {
@@ -97,6 +104,23 @@ public class FenNotation {
     }
 
     return true;
+  }
+
+  private static boolean isValidEnPassant(String enPassant, char activeColor, List<String> rows) {
+    if (enPassant.equals("-")) {
+      return true; // No en passant target square is always valid
+    }
+
+    int x = enPassant.charAt(0) - 'a';
+    char y = enPassant.charAt(1);
+
+    if (activeColor == 'w') {
+      // White's turn to move: en passant target must be on the 6th rank and a black pawn must be on the 5th rank
+      return y == '6' && checkPieceAtPosition(rows.get(3), 'p', x);
+    } else {
+      // Black's turn to move: en passant target must be on the 3rd rank and a white pawn must be on the 4th rank
+      return y == '3' && checkPieceAtPosition(rows.get(4), 'P', x);
+    }
   }
 
   private static boolean checkPieceAtPosition(String row, char piece, int position) {
