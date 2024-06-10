@@ -231,68 +231,66 @@ class PawnTest {
     assertThat(changedStatus).isEqualTo(afterPawnMove);
   }
 
-  // TODO: Every assertion should be at the end of the test function.
-  // If there is a function like "board.moveFigure(...)" after an Assertion,
-  // try to change the order or split it into two seperate test.
   @Test
   void canPerformEnPassant_isAllowed() {
     board = new Board(false);
     FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - e6 0 1");
     Cell from = board.findCell('f', 5);
     Pawn pawn = (Pawn) from.figure();
-    Cell opponent = board.findCell('e', 5);
     Cell to = board.findCell('e', 6);
 
     assertThat(pawn.canPerformEnPassant(from, to)).isTrue();
     Cell f6 = board.findCell('f', 6);
     f6.setIsEnPassant(true);
     assertThat(pawn.canPerformEnPassant(from, f6)).isFalse();
-
     Cell f4 = board.findCell('f', 4);
     f4.setIsEnPassant(true);
     assertThat(pawn.canPerformEnPassant(from, f4)).isFalse();
-
     Cell g6 = board.findCell('g', 6);
     g6.setIsEnPassant(true);
     assertThat(pawn.canPerformEnPassant(from, g6)).isFalse();
-    assertThat(from.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
-    assertThat(opponent.isOccupiedBy(FigureColor.BLACK, FigureType.PAWN)).isTrue();
-    assertThat(to.isFree()).isTrue();
+  }
+
+  @Test
+  void canPerformEnPassant_boardState() {
+    board = new Board(false);
+    FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - e6 0 1");
+    Cell from = board.findCell('f', 5);
+    Cell opponent = board.findCell('e', 5);
+    Cell to = board.findCell('e', 6);
 
     board.moveFigure(from, to);
-
     assertThat(from.isFree()).isTrue();
     assertThat(opponent.isFree()).isTrue();
     assertThat(to.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
   }
 
-  // TODO: Every assertion should be at the end of the test function.
-  // If there is a function like "board.moveFigure(...)" after an Assertion,
-  // try to change the order or split it into two seperate test.
   @Test
   void canPerformEnPassant_isNotAllowed() {
     board = new Board(false);
     FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - - 0 1");
     Cell from = board.findCell('f', 5);
     Pawn pawn = (Pawn) from.figure();
-    Cell opponent = board.findCell('e', 5);
     Cell to = board.findCell('e', 6);
 
     assertThat(pawn.canPerformEnPassant(from, to)).isFalse();
     Cell f6 = board.findCell('f', 6);
     f6.setIsEnPassant(true);
     assertThat(pawn.canPerformEnPassant(from, f6)).isFalse();
-
     Cell f4 = board.findCell('f', 4);
     f4.setIsEnPassant(true);
     assertThat(pawn.canPerformEnPassant(from, f4)).isFalse();
-
     Cell g6 = board.findCell('g', 6);
     g6.setIsEnPassant(true);
     assertThat(pawn.canPerformEnPassant(from, g6)).isFalse();
-    assertThat(from.isOccupiedBy(FigureColor.WHITE, FigureType.PAWN)).isTrue();
-    assertThat(opponent.isOccupiedBy(FigureColor.BLACK, FigureType.PAWN)).isTrue();
-    assertThat(to.isFree()).isTrue();
+  }
+
+  @Test
+  void canPerformEnPassant_isNotAllowed_boardState() {
+    board = new Board(false);
+    FenNotation.parseFEN(board, "4k3/8/8/4pP2/8/8/8/4K3 w - - 0 1");
+    Cell from = board.findCell('f', 5);
+    Cell to = board.findCell('e', 4);
 
     assertThatThrownBy(() -> board.moveFigure(from, to))
         .isInstanceOf(InvalidUserInputException.class)

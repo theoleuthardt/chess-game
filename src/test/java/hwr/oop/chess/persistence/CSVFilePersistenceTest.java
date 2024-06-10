@@ -37,7 +37,7 @@ class CSVFilePersistenceTest {
 
     assertThat(persistence.loadState("fen"))
         .isEqualTo("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
-    assertThat(persistence.loadState("isOver")).isEqualTo("0");
+    assertThat(persistence.loadState("endType")).isEqualTo("NOT_END");
     assertThat(persistence.loadState("isDrawOffered")).isEqualTo("0");
     assertThat(persistence.loadState("whiteScore")).isEqualTo("0");
     assertThat(persistence.loadState("blackScore")).isEqualTo("0");
@@ -49,7 +49,7 @@ class CSVFilePersistenceTest {
         .isInstanceOf(InvalidUserInputException.class)
         .hasMessageContaining("game_9999.csv");
     assertThat(persistence.loadState("fen")).isNull();
-    assertThat(persistence.loadState("isOver")).isNull();
+    assertThat(persistence.loadState("endType")).isNull();
     assertThat(persistence.loadState("isDrawOffered")).isNull();
     assertThat(persistence.loadState("whiteScore")).isNull();
     assertThat(persistence.loadState("blackScore")).isNull();

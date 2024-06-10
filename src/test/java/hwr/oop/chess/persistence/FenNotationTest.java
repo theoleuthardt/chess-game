@@ -4,7 +4,6 @@ import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.figures.Figure;
 import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
-
 import hwr.oop.chess.application.figures.King;
 import hwr.oop.chess.application.figures.Rook;
 import java.util.List;
@@ -65,14 +64,6 @@ class FenNotationTest {
   }
 
   @Test
-  void testIsCharValid() {
-    assertThat(isCharValid('a')).isFalse();
-    assertThat(isCharValid('b')).isTrue(); // Bishop
-    assertThat(isCharValid('c')).isFalse();
-    assertThat(isCharValid('d')).isFalse();
-  }
-
-  @Test
   void testGenerateFenByCastling() {
     Board board = new Board(false);
     String initialStatus = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
@@ -86,13 +77,12 @@ class FenNotationTest {
     String invalidFenString = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R";
     assertThatThrownBy(() -> parseFEN(board, invalidFenString))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("This is an invalid FEN string, as it should have 6 parts!");
+        .hasMessageContaining("This is an invalid FEN string!");
   }
 
   @Test
   void testParseCastling() {
     Board board = new Board(false);
-
     String disableCastling = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b - - 2 5";
     parseFEN(board, disableCastling);
     for (String position : List.of("a1", "a8", "h1", "h8")) {
@@ -107,7 +97,6 @@ class FenNotationTest {
   @Test
   void testAvailableCastling() {
     Board board = new Board(false);
-
     String availableCastling = "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R b KQkq - 2 5";
     parseFEN(board, availableCastling);
     for (String position : List.of("a1", "a8", "h1", "h8")) {
@@ -179,19 +168,58 @@ class FenNotationTest {
     assertThat(generateFen(board)).isEqualTo(kingIsNotStartPosition);
   }
 
-  @Test
-  void testInValidFenString() {
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R2K3R w KkQq - 2 10", // !whiteKingAtInitial
+        "r2k3r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10", // !blackKingAtInitial
+        "r3k3/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10", // !blackRookAtInitialKingSide
+        "4k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10", // !blackRookAtInitialQueenSide
+        "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K3 w KkQq - 2 10", // !whiteRookAtInitialKingSide
+        "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/4K2R w KkQq - 2 10", // !whiteRookAtInitialQueenSide
+        "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/4K2R w abc - 2 10", // wrong castling rights
+      })
+  void testInvalidCastlingFEN(String fen) {
     Board board = new Board(false);
-    String whiteKingIsNotStartPosition =
-        "r3k2r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R2K3R w KkQq - 2 10";
-    assertThatThrownBy(() -> parseFEN(board, whiteKingIsNotStartPosition))
+    assertThatThrownBy(() -> parseFEN(board, fen))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Cannot load position because it is invalid.");
+        .hasMessageContaining("This is an invalid FEN string!");
+  }
 
-    String blackKingIsNotStartPosition =
-        "r2k3r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R3K2R w KkQq - 2 10";
-    assertThatThrownBy(() -> parseFEN(board, blackKingIsNotStartPosition))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Cannot load position because it is invalid.");
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "8/8/8/8/8/8/8/8 w - - 0 1",
+      })
+  void testValidFEN(String fen) {
+    assertThat(isValidFEN(fen)).isTrue();
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "rnbqkbnr/pppppppp/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0",
+        "8/8/8/8/8/8/8/8 w - - 0",
+        "rnbqkbnr/pppppppp/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - - 1",
+        "r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/2PBB3/R2Q1RK1 w - - 2 15",
+        "r1bq1rk1/p5p1/1p3npp/2pPp3/2P1P3/3PBB3/P5PP/R2Q1RK1 w - - 2 15",
+        "rnbqkbn3/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "8/1r7/8/8/8/8/8/8 w - - 0 1",
+      })
+  void testInvalidPartFEN(String fen) {
+    assertThat(isValidFEN(fen)).isFalse();
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 2",
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 5 1",
+      })
+  void testExtractFenKeyParts(String fen) {
+    assertThat(extractFenKeyParts(fen))
+        .isEqualTo("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR KQkq -");
   }
 }

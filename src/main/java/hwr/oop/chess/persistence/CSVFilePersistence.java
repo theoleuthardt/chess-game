@@ -1,17 +1,15 @@
 package hwr.oop.chess.persistence;
 
 import hwr.oop.chess.cli.InvalidUserInputException;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CSVFilePersistence implements Persistence {
-  private final Map<String, String> gameData = new HashMap<>();
-  private int gameId;
+  final Map<String, String> gameData = new HashMap<>();
+  int gameId;
 
   @Override
   public void storeState(String key, String value) {
@@ -47,7 +45,9 @@ public class CSVFilePersistence implements Persistence {
       String line;
       while ((line = reader.readLine()) != null) {
         int comma = line.indexOf(',');
-        gameData.put(line.substring(0, comma), line.substring(comma + 1));
+        if (comma != -1) {
+          gameData.put(line.substring(0, comma), line.substring(comma + 1));
+        }
       }
     } catch (IOException e) {
       throw new InvalidUserInputException(
