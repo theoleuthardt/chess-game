@@ -5,9 +5,9 @@ public interface Persistence {
 
   void saveGame();
 
-  void storeState(String key, String value);
+  void storeState(State key, String value);
 
-  String loadState(String key);
+  String loadState(State key);
 
   void setGameId(int gameId);
 

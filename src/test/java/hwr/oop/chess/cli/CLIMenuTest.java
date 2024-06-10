@@ -6,6 +6,7 @@ import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
 import hwr.oop.chess.persistence.FenNotation;
 import hwr.oop.chess.persistence.NoPersistence;
+import hwr.oop.chess.persistence.State;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -67,11 +68,10 @@ class CLIMenuTest {
   void usesGameIdOnCreation() {
     menuFromArguments(List.of("create", "123"));
     assertThat(cli.game()).isNotNull();
-    assertThat(persistence.loadState("figures")).isNull();
     assertThatNoException().isThrownBy(persistence::loadGame);
     assertThatNoException().isThrownBy(persistence::saveGame);
-    assertThatNoException().isThrownBy(() -> persistence.loadState("figures"));
-    assertThatNoException().isThrownBy(() -> persistence.storeState("figures", "abc"));
+    assertThatNoException().isThrownBy(() -> persistence.loadState(State.WINNER));
+    assertThatNoException().isThrownBy(() -> persistence.storeState(State.WINNER, "abc"));
     assertThat(persistence.gameId()).isEqualTo(123);
   }
 
@@ -496,7 +496,7 @@ class CLIMenuTest {
         "on " + NoPersistence.GameIdType.WHITE_CHECKMATE_POSSIBLE.ordinal() + " move b4 a4");
     assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.0);
     assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(1.0);
-    assertThat(persistence.loadState("winner")).isEqualTo(FigureColor.BLACK.name());
+    assertThat(persistence.loadState(State.WINNER)).isEqualTo(FigureColor.BLACK.name());
     assertThat(persistence.wasSaved()).isTrue();
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
@@ -522,7 +522,7 @@ class CLIMenuTest {
         "on " + NoPersistence.GameIdType.WHITE_STALEMATE_POSSIBLE.ordinal() + " move h7 c7");
     assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.5);
     assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(0.5);
-    assertThat(persistence.loadState("winner")).isEqualTo("draw");
+    assertThat(persistence.loadState(State.WINNER)).isEqualTo("draw");
     assertThat(persistence.wasSaved()).isTrue();
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
@@ -613,7 +613,7 @@ class CLIMenuTest {
     realCLIFromArguments("on " + gameWithDefaultFigures + " resign");
     assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.0);
     assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(1.0);
-    assertThat(persistence.loadState("winner")).isEqualTo(FigureColor.BLACK.name());
+    assertThat(persistence.loadState(State.WINNER)).isEqualTo(FigureColor.BLACK.name());
     assertThat(persistence.wasSaved()).isTrue();
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
@@ -658,7 +658,7 @@ class CLIMenuTest {
   void drawGameRequest() {
     realCLIFromArguments("on " + gameWithDefaultFigures + " draw offer");
     System.out.println(persistence);
-    assertThat(persistence.loadState("isDrawOffered")).isEqualTo("1");
+    assertThat(persistence.loadState(State.IS_DRAW_OFFERED)).isEqualTo("1");
     assertThat(persistence.wasSaved()).isTrue();
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
@@ -696,7 +696,7 @@ class CLIMenuTest {
     realCLIFromArguments("on " + NoPersistence.GameIdType.DRAW_OFFERED.ordinal() + " draw decline");
     assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.0);
     assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(0.0);
-    assertThat(persistence.loadState("isDrawOffered")).isEqualTo("0");
+    assertThat(persistence.loadState(State.IS_DRAW_OFFERED)).isEqualTo("0");
     assertThat(persistence.wasSaved()).isTrue();
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
@@ -830,8 +830,8 @@ class CLIMenuTest {
   @Test
   void noGameDoesNotHaveFenSaved() {
     persistence.setGameId(NoPersistence.GameIdType.NO_GAME.ordinal());
-    assertThat(persistence.loadState("fen")).isNull();
-    assertThat(persistence.loadState("winner")).isNull();
+    assertThat(persistence.loadState(State.FEN_HISTORY)).isNull();
+    assertThat(persistence.loadState(State.WINNER)).isNull();
   }
 
   @Test
