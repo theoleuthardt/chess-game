@@ -99,10 +99,15 @@ public class ChessGame implements Game {
     persistence.storeState(State.IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
     persistence.storeState(State.FEN_HISTORY, fenHistoryOfMoves());
     persistence.storeState(State.PGN_HISTORY, pgnHistoryOfMoves());
-    persistence.storeState(
-        State.WHITE_SCORE, String.valueOf(players.get(FigureColor.WHITE).doubleOfScore()));
-    persistence.storeState(
-        State.BLACK_SCORE, String.valueOf(players.get(FigureColor.BLACK).doubleOfScore()));
+    Player whitePlayer = players.get(FigureColor.WHITE);
+    persistence.storeState(State.WHITE_SCORE, String.valueOf(whitePlayer.score()));
+    persistence.storeState(State.WHITE_ELO, String.valueOf(whitePlayer.elo()));
+    persistence.storeState(State.WHITE_GAME_COUNT, String.valueOf(whitePlayer.gameCount()));
+
+    Player blackPlayer = players.get(FigureColor.BLACK);
+    persistence.storeState(State.BLACK_SCORE, String.valueOf(blackPlayer.score()));
+    persistence.storeState(State.BLACK_ELO, String.valueOf(blackPlayer.elo()));
+    persistence.storeState(State.BLACK_GAME_COUNT, String.valueOf(blackPlayer.gameCount()));
     persistence.saveGame();
   }
 

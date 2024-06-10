@@ -82,7 +82,7 @@ class ChessGameTest {
     assertThat(String.join(",", cli.game().pgnHistory()))
         .isEqualTo("d4,nf6,c4,e6,Nc3,bb4,Nf3,c5,e3,nc6,Bd3,bxc3,bxc3,d6,e4,e5,d5,ne7,Nh4,h6,f4,ng6,Nxg6,fxg6,fxe5,dxe5,Be3,b6,O-O,O-O");
   }
-  // "d4,nf6,c4,e6,Nc3,bb4,Nf3,c5,e3,nc6,Bd3,bxc3+,bxc3,d6,e4,e5,d5,ne7,Nh4,h6,f4,ng6,Nxg6,fxg6,fxe5,dxe5,Be3,b6,O-O,O-O"
+  // TODO "d4,nf6,c4,e6,Nc3,bb4,Nf3,c5,e3,nc6,Bd3,bxc3+,bxc3,d6,e4,e5,d5,ne7,Nh4,h6,f4,ng6,Nxg6,fxg6,fxe5,dxe5,Be3,b6,O-O,O-O"
   void moveFigureAndSave(String from, String to, CLIAdapter cli) {
     cli.game().board().moveFigure(from, to);
     cli.game().saveGame();
