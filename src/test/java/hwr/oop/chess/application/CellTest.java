@@ -105,4 +105,18 @@ class CellTest {
     Cell cell = new Cell(Coordinate.THREE, Coordinate.THREE);
     assertThat(cell.isFreeInDirection(10, CellDirection.RIGHT)).isFalse();
   }
+
+  @Test
+  void isBlackCell() {
+    Cell cell = new Cell(Coordinate.ONE, Coordinate.ONE);
+    assertThat(cell.isWhiteCell()).isFalse();
+  }
+
+  @Test
+  void isWhiteCell() {
+    Cell cell1 = new Cell(Coordinate.TWO, Coordinate.ONE);
+    Cell cell2 = new Cell(Coordinate.ONE, Coordinate.TWO);
+    assertThat(cell1.isWhiteCell()).isTrue();
+    assertThat(cell2.isWhiteCell()).isTrue();
+  }
 }

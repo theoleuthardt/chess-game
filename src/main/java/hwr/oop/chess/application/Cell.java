@@ -266,4 +266,8 @@ public class Cell {
   public void setIsEnPassant(boolean enPassant) {
     isEnPassant = enPassant;
   }
+
+  public boolean isWhiteCell() {
+    return (x.toInt() + y.toInt()) % 2 == 1;
+  }
 }
