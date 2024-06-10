@@ -76,7 +76,7 @@ If `chess` does not work in your terminal, try `./chess` or `.\chess` instead.
     - `chess on <ID> show-board` Show the current state of the board
     - `chess on <ID> show-moves <FROM>` Show where the figure on cell FROM can move to
     - `chess on <ID> show-moveable` Show figures which can be moved
-    - `chess on <ID> show-stats` Show score of the players
+    - `chess on <ID> show-stats` Show score and elo number of the players and the status of the game
 
 ### End of Game Commands `chess on <ID> [...]`
 
