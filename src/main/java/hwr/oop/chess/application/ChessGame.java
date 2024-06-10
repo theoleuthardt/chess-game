@@ -30,8 +30,8 @@ public class ChessGame implements Game {
   private void newGame() {
     isDrawOffered = false;
     board.addFiguresToBoard();
-    players.put(FigureColor.WHITE, new Player("0"));
-    players.put(FigureColor.BLACK, new Player("0"));
+    players.put(FigureColor.WHITE, new Player(0, 1200, 0));
+    players.put(FigureColor.BLACK, new Player(0, 1200, 0));
   }
 
   private void loadGame() {
@@ -43,7 +43,11 @@ public class ChessGame implements Game {
                 State.IS_DRAW_OFFERED,
                 State.FEN_HISTORY,
                 State.WHITE_SCORE,
-                State.BLACK_SCORE));
+                State.BLACK_SCORE,
+                State.WHITE_ELO,
+                State.BLACK_ELO,
+                State.WHITE_GAME_COUNT,
+                State.BLACK_GAME_COUNT));
     missingStates.removeIf(state -> persistence.loadState(state) != null);
     if (!missingStates.isEmpty()) {
       throw new InvalidUserInputException(
@@ -53,8 +57,18 @@ public class ChessGame implements Game {
     }
     endType = EndType.valueOf(persistence.loadState(State.END_TYPE));
     isDrawOffered = "1".equals(persistence.loadState(State.IS_DRAW_OFFERED));
-    players.put(FigureColor.WHITE, new Player(persistence.loadState(State.WHITE_SCORE)));
-    players.put(FigureColor.BLACK, new Player(persistence.loadState(State.BLACK_SCORE)));
+    players.put(
+        FigureColor.WHITE,
+        new Player(
+            persistence.loadState(State.WHITE_SCORE),
+            persistence.loadState(State.WHITE_ELO),
+            persistence.loadState(State.WHITE_GAME_COUNT)));
+    players.put(
+        FigureColor.BLACK,
+        new Player(
+            persistence.loadState(State.BLACK_SCORE),
+            persistence.loadState(State.BLACK_ELO),
+            persistence.loadState(State.BLACK_GAME_COUNT)));
 
     String currentFen = parseHistoryAndGetCurrentFen(persistence.loadState(State.FEN_HISTORY));
     FenNotation.parseFEN(board, currentFen);
@@ -75,10 +89,16 @@ public class ChessGame implements Game {
     persistence.storeState(State.END_TYPE, endType.name());
     persistence.storeState(State.IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
     persistence.storeState(State.FEN_HISTORY, historyOfMoves());
-    persistence.storeState(
-        State.WHITE_SCORE, String.valueOf(players.get(FigureColor.WHITE).doubleOfScore()));
-    persistence.storeState(
-        State.BLACK_SCORE, String.valueOf(players.get(FigureColor.BLACK).doubleOfScore()));
+
+    Player whitePlayer = players.get(FigureColor.WHITE);
+    persistence.storeState(State.WHITE_SCORE, String.valueOf(whitePlayer.score()));
+    persistence.storeState(State.WHITE_ELO, String.valueOf(whitePlayer.elo()));
+    persistence.storeState(State.WHITE_GAME_COUNT, String.valueOf(whitePlayer.gameCount()));
+
+    Player blackPlayer = players.get(FigureColor.BLACK);
+    persistence.storeState(State.BLACK_SCORE, String.valueOf(blackPlayer.score()));
+    persistence.storeState(State.BLACK_ELO, String.valueOf(blackPlayer.elo()));
+    persistence.storeState(State.BLACK_GAME_COUNT, String.valueOf(blackPlayer.gameCount()));
     persistence.saveGame();
   }
 
@@ -90,8 +110,14 @@ public class ChessGame implements Game {
   @Override
   public void playerHasWon(EndType type, FigureColor color) {
     endType = type;
-    players.get(color).fullPointOnWin();
     persistence.storeState(State.WINNER, color.name());
+
+    Player winner = players.get(color);
+    Player looser = players.get(color.opposite());
+    double winnerElo = winner.elo();
+    double looserElo = looser.elo();
+    winner.adjustScoreOnGameEnd(1, looserElo);
+    looser.adjustScoreOnGameEnd(0, winnerElo);
   }
 
   @Override
@@ -99,8 +125,13 @@ public class ChessGame implements Game {
     endType = type;
     isDrawOffered = false;
     persistence.storeState(State.WINNER, "draw");
-    players.get(FigureColor.WHITE).halfPointOnDraw();
-    players.get(FigureColor.BLACK).halfPointOnDraw();
+
+    Player white = players.get(FigureColor.WHITE);
+    Player black = players.get(FigureColor.BLACK);
+    double whiteElo = white.elo();
+    double blackElo = black.elo();
+    white.adjustScoreOnGameEnd(0.5, blackElo);
+    black.adjustScoreOnGameEnd(0.5, whiteElo);
   }
 
   @Override

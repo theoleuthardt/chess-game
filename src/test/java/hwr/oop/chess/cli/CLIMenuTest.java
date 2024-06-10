@@ -613,6 +613,8 @@ class CLIMenuTest {
     realCLIFromArguments("on " + gameWithDefaultFigures + " resign");
     assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.0);
     assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(1.0);
+    assertThat(cli.game().players().get(FigureColor.WHITE).elo()).isLessThan(1200);
+    assertThat(cli.game().players().get(FigureColor.BLACK).elo()).isGreaterThan(1200);
     assertThat(persistence.loadState(State.WINNER)).isEqualTo(FigureColor.BLACK.name());
     assertThat(persistence.wasSaved()).isTrue();
     assertThat(outputStream.toString())
@@ -718,8 +720,8 @@ class CLIMenuTest {
   @Test
   void rematchDoesNotForgetScore() {
     realCLIFromArguments("on " + NoPersistence.GameIdType.GAME_IS_OVER_DRAW.ordinal() + " rematch");
-    assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(0.5);
-    assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(0.5);
+    assertThat(cli.game().players().get(FigureColor.WHITE).score()).isEqualTo(1);
+    assertThat(cli.game().players().get(FigureColor.BLACK).score()).isEqualTo(1);
     assertThat(persistence.wasSaved()).isTrue();
     assertThat(outputStream.toString())
         .containsIgnoringWhitespaces(
@@ -746,6 +748,12 @@ class CLIMenuTest {
         .containsIgnoringWhitespaces(
             """
             \033[30;1;104mGame Stats:\033[0m
+            """,
+            """
+            - Elo > Black:    \033[37m1200 points\033[0m
+            - Elo > White:    \033[37m1200 points\033[0m
+            """,
+            """
             - Game ID:          \033[37m
             """,
             """

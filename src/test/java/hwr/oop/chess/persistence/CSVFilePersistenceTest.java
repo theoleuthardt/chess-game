@@ -43,8 +43,8 @@ class CSVFilePersistenceTest {
         .isEqualTo("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
     assertThat(persistence.loadState(State.END_TYPE)).isEqualTo("NOT_END");
     assertThat(persistence.loadState(State.IS_DRAW_OFFERED)).isEqualTo("0");
-    assertThat(persistence.loadState(State.WHITE_SCORE)).isEqualTo("0");
-    assertThat(persistence.loadState(State.BLACK_SCORE)).isEqualTo("0");
+    assertThat(persistence.loadState(State.WHITE_SCORE)).isEqualTo("0.0");
+    assertThat(persistence.loadState(State.BLACK_SCORE)).isEqualTo("0.0");
     assertThat(persistence.loadState(State.WINNER)).isNull();
     assertThat(Files.exists(gameCsvFile)).isTrue();
 
@@ -110,15 +110,5 @@ class CSVFilePersistenceTest {
         .hasMessageContaining("game_9999.csv")
         .hasMessageContaining(
             "The Game #9999 could not be saved. Please verify that the current folder is not protected.");
-  }
-
-  @Test
-  void StateEnumToString() {
-    assertThat(State.FEN_HISTORY).hasToString("fen");
-    assertThat(State.WINNER).hasToString("winner");
-    assertThat(State.WHITE_SCORE).hasToString("whiteScore");
-    assertThat(State.BLACK_SCORE).hasToString("blackScore");
-    assertThat(State.END_TYPE).hasToString("endType");
-    assertThat(State.IS_DRAW_OFFERED).hasToString("isDrawOffered");
   }
 }

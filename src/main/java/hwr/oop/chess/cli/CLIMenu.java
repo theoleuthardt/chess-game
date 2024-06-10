@@ -357,6 +357,8 @@ public class CLIMenu {
 
     stats.put("Score > White", game.players().get(FigureColor.WHITE).score() + " points");
     stats.put("Score > Black", game.players().get(FigureColor.BLACK).score() + " points");
+    stats.put("Elo > White", game.players().get(FigureColor.WHITE).elo() + " points");
+    stats.put("Elo > Black", game.players().get(FigureColor.BLACK).elo() + " points");
 
     printer.printAsTable("Game Stats:", 20, stats);
   }
