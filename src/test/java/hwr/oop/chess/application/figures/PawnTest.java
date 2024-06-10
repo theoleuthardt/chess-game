@@ -109,7 +109,11 @@ class PawnTest {
     Cell blackPawnCell = board.findCell("c1");
     blackPawnCell.setFigure(blackPawn);
     assertThat(board.availableCellsWithoutCheckMoves(blackPawnCell)).isEmpty();
+  }
 
+  @Test
+  void movePawn_noCellAvailableOnLastRow1() {
+    board = new Board(false);
     Figure whitePawn = new Pawn(FigureColor.WHITE);
     Cell whitePawnCell = board.findCell("c8");
     whitePawnCell.setFigure(whitePawn);
@@ -238,16 +242,16 @@ class PawnTest {
     Cell from = board.findCell('f', 5);
     Pawn pawn = (Pawn) from.figure();
     Cell to = board.findCell('e', 6);
-
-    assertThat(pawn.canPerformEnPassant(from, to)).isTrue();
     Cell f6 = board.findCell('f', 6);
     f6.setIsEnPassant(true);
-    assertThat(pawn.canPerformEnPassant(from, f6)).isFalse();
     Cell f4 = board.findCell('f', 4);
     f4.setIsEnPassant(true);
-    assertThat(pawn.canPerformEnPassant(from, f4)).isFalse();
     Cell g6 = board.findCell('g', 6);
     g6.setIsEnPassant(true);
+
+    assertThat(pawn.canPerformEnPassant(from, to)).isTrue();
+    assertThat(pawn.canPerformEnPassant(from, f6)).isFalse();
+    assertThat(pawn.canPerformEnPassant(from, f4)).isFalse();
     assertThat(pawn.canPerformEnPassant(from, g6)).isFalse();
   }
 
@@ -272,16 +276,16 @@ class PawnTest {
     Cell from = board.findCell('f', 5);
     Pawn pawn = (Pawn) from.figure();
     Cell to = board.findCell('e', 6);
-
-    assertThat(pawn.canPerformEnPassant(from, to)).isFalse();
     Cell f6 = board.findCell('f', 6);
     f6.setIsEnPassant(true);
-    assertThat(pawn.canPerformEnPassant(from, f6)).isFalse();
     Cell f4 = board.findCell('f', 4);
     f4.setIsEnPassant(true);
-    assertThat(pawn.canPerformEnPassant(from, f4)).isFalse();
     Cell g6 = board.findCell('g', 6);
     g6.setIsEnPassant(true);
+
+    assertThat(pawn.canPerformEnPassant(from, to)).isFalse();
+    assertThat(pawn.canPerformEnPassant(from, f6)).isFalse();
+    assertThat(pawn.canPerformEnPassant(from, f4)).isFalse();
     assertThat(pawn.canPerformEnPassant(from, g6)).isFalse();
   }
 

@@ -360,21 +360,17 @@ class BoardTest {
     FenNotation.parseFEN(board, initialStatus);
 
     Cell cellKingBlack = board.findKing(FigureColor.BLACK);
-    assertThat(board.availableCellsWithoutCheckMoves(cellKingBlack)).isEmpty();
-
     Cell cellQueenBlack = board.findCell("d8");
-    assertThat(board.availableCellsWithoutCheckMoves(cellQueenBlack)).hasSize(1);
-
     Cell cellPawnBlack = board.findCell("c7");
-    assertThat(board.availableCellsWithoutCheckMoves(cellPawnBlack)).hasSize(1);
-
     Cell cellBishopBlack = board.findCell("a8");
-    assertThat(board.availableCellsWithoutCheckMoves(cellBishopBlack)).isEmpty();
-
     Cell cellKnightBlack = board.findCell("g8");
-    assertThat(board.availableCellsWithoutCheckMoves(cellKnightBlack)).isEmpty();
-
     Cell cellRookBlack = board.findCell("a8");
+
+    assertThat(board.availableCellsWithoutCheckMoves(cellKingBlack)).isEmpty();
+    assertThat(board.availableCellsWithoutCheckMoves(cellQueenBlack)).hasSize(1);
+    assertThat(board.availableCellsWithoutCheckMoves(cellPawnBlack)).hasSize(1);
+    assertThat(board.availableCellsWithoutCheckMoves(cellBishopBlack)).isEmpty();
+    assertThat(board.availableCellsWithoutCheckMoves(cellKnightBlack)).isEmpty();
     assertThat(board.availableCellsWithoutCheckMoves(cellRookBlack)).isEmpty();
 
     assertThatThrownBy(() -> board.moveFigure("d8", "c8"))
