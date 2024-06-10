@@ -6,13 +6,8 @@ import hwr.oop.chess.application.CellDirection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Bishop implements Figure {
+public record Bishop(FigureColor color) implements Figure {
   private static final FigureType type = FigureType.BISHOP;
-  private final FigureColor color;
-
-  public Bishop(FigureColor color) {
-    this.color = color;
-  }
 
   @Override
   public List<Cell> availableCells(Cell currentCell) {
@@ -35,11 +30,6 @@ public class Bishop implements Figure {
   @Override
   public char symbol() {
     return color == FigureColor.WHITE ? 'B' : 'b';
-  }
-
-  @Override
-  public FigureColor color() {
-    return color;
   }
 
   @Override

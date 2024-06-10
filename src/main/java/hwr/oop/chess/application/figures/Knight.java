@@ -6,13 +6,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.List;
 
-public class Knight implements Figure {
+public record Knight(FigureColor color) implements Figure {
   private static final FigureType type = FigureType.KNIGHT;
-  private final FigureColor color;
-
-  public Knight(FigureColor color) {
-    this.color = color;
-  }
 
   @Override
   public List<Cell> availableCells(Cell currentCell) {
@@ -53,11 +48,6 @@ public class Knight implements Figure {
   @Override
   public char symbol() {
     return color == FigureColor.WHITE ? 'N' : 'n';
-  }
-
-  @Override
-  public FigureColor color() {
-    return color;
   }
 
   @Override

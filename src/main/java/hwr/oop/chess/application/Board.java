@@ -97,7 +97,7 @@ public class Board {
     }
     cell = cell.toLowerCase();
     Coordinate x = Coordinate.fromChar(cell.charAt(0));
-    Coordinate y = Coordinate.fromInt(cell.charAt(1) - 48);
+    Coordinate y = Coordinate.fromInt(cell.charAt(1) - '0');
     return findCell(x, y);
   }
 

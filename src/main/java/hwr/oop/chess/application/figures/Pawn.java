@@ -9,16 +9,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Pawn implements Figure {
+public record Pawn(FigureColor color) implements Figure {
   private static final FigureType type = FigureType.PAWN;
-  private final FigureColor color;
-
-  public Pawn(FigureColor color) {
-    this.color = color;
-  }
 
   private boolean isInStartPosition(Cell cell) {
-    return cell.y() == (color == FigureColor.WHITE ? Coordinate.TWO : Coordinate.SEVEN);
+    Coordinate startingRank = (color == FigureColor.WHITE ? Coordinate.TWO : Coordinate.SEVEN);
+    return cell.y() == startingRank;
   }
 
   private boolean isAtLastRank(Cell cell) {
@@ -32,13 +28,13 @@ public class Pawn implements Figure {
 
   @Override
   public List<Cell> availableCells(Cell currentCell) {
-
-    Cell oneFieldForwards = currentCell.cellInDirection(forwards());
     if (!currentCell.hasCellInDirection(forwards())) {
       return Collections.emptyList();
     }
+
     List<Cell> cells = new ArrayList<>();
     // move one field forwards
+    Cell oneFieldForwards = currentCell.cellInDirection(forwards());
     if (oneFieldForwards.isFree()) {
       cells.add(oneFieldForwards);
     }
@@ -94,11 +90,6 @@ public class Pawn implements Figure {
   @Override
   public char symbol() {
     return color == FigureColor.WHITE ? 'P' : 'p';
-  }
-
-  @Override
-  public FigureColor color() {
-    return color;
   }
 
   @Override
