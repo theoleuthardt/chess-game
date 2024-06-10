@@ -64,10 +64,10 @@ public class NoPersistence implements Persistence {
             case DEFAULT_POSITIONS,
                     GAME_IS_OVER_WHITE_WINS,
                     GAME_IS_OVER_DRAW,
-                    GAME_IS_OVER_DRAW_STALEMATE,
                     GAME_IS_OVER_RESIGNATION,
                     DRAW_OFFERED ->
                 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            case GAME_IS_OVER_DRAW_STALEMATE -> "8/8/8/8/8/1K6/B7/k7 w - - 0 1";
             case GAME_IS_OVER_DRAW_DEAD_POSITION -> "8/8/3K4/8/8/8/8/4k3 w - - 0 1";
             case WHITE_CHECK_POSSIBLE -> "8/8/k7/8/8/8/PP3q2/1K6 b - - 0 1";
             case WHITE_CHECKMATE_POSSIBLE -> "K7/8/8/1r6/1r6/8/8/7k b - - 0 1";
