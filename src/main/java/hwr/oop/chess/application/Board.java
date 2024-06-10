@@ -404,8 +404,7 @@ public class Board {
     List<FigureColor> bishopColors =
         bishopCells.stream().map(cell -> cell.figure().color()).toList();
     if (bishopColors.contains(FigureColor.WHITE) && bishopColors.contains(FigureColor.BLACK)) {
-      Predicate<Cell> isWhiteCell = cell -> (cell.y().toInt() + cell.x().toInt()) % 2 == 1;
-      return isWhiteCell.test(bishopCells.getFirst()) == isWhiteCell.test(bishopCells.getLast());
+      return bishopCells.getFirst().isWhiteCell() == bishopCells.getLast().isWhiteCell();
     }
     return false;
   }

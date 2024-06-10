@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>hwr.oop.projects</groupId>
     <artifactId>chess-game</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>chess-game</name>
     <description>chess implemented in java with cli tools as interface</description>
     <properties>

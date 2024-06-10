@@ -2,7 +2,7 @@ package hwr.oop.chess.cli;
 
 import hwr.oop.chess.application.Board;
 import hwr.oop.chess.application.Cell;
-import hwr.oop.chess.application.ChessGame;
+import hwr.oop.chess.application.Game;
 import hwr.oop.chess.application.EndType;
 import hwr.oop.chess.application.figures.*;
 import java.util.AbstractMap;
@@ -279,7 +279,7 @@ public class CLIMenu {
   }
 
   private void handleAutomaticGameEnd() {
-    ChessGame game = cli.game();
+    Game game = cli.game();
     Board board = game.board();
 
     for (FigureColor color : FigureColor.values()) {
@@ -324,7 +324,7 @@ public class CLIMenu {
 
   private void printStats() {
     countOfRemainingArgumentsIs(0);
-    ChessGame game = cli.game();
+    Game game = cli.game();
 
     Map<String, String> stats = new HashMap<>();
 
@@ -359,7 +359,7 @@ public class CLIMenu {
       throw new InvalidUserInputException("You can only request a rematch after the game is over.");
     }
     printer.printlnAction("You have started a new game with the same players.");
-    ChessGame oldGame = cli.game();
+    Game oldGame = cli.game();
     cli.initializeGame(true).keepPlayersOf(oldGame).saveGame();
     cli.printBoard();
   }
