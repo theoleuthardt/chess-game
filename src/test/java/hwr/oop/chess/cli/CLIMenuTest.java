@@ -165,6 +165,7 @@ class CLIMenuTest {
         "on <ID> show-board xyz",
         "on <ID> show-stats xyz",
         "on <ID> show-moveable xyz",
+        "on <ID> show-fen xyz",
         "on <ID> draw offer xyz",
         "on <ID> resign xyz",
         "on <ID> rematch xyz",
@@ -782,6 +783,18 @@ class CLIMenuTest {
         .containsIgnoringWhitespaces(
             """
                     - Status:           \033[37mGame Over (BLACK won -> Resignation)\033[0m
+                    """);
+  }
+
+  @Test
+  void showFenString() {
+    realCLIFromArguments(
+        "on " + NoPersistence.GameIdType.DEFAULT_POSITIONS.ordinal() + " show-fen");
+    assertThat(outputStream.toString())
+        .containsIgnoringWhitespaces(
+            """
+                    \033[30;1;104m ACTION \033[0m This is the current game as a FEN-String:
+                    rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
                     """);
   }
 

@@ -5,6 +5,7 @@ import hwr.oop.chess.application.Cell;
 import hwr.oop.chess.application.Game;
 import hwr.oop.chess.application.EndType;
 import hwr.oop.chess.application.figures.*;
+import hwr.oop.chess.persistence.FenNotation;
 import hwr.oop.chess.persistence.State;
 
 import java.util.AbstractMap;
@@ -36,6 +37,8 @@ public class CLIMenu {
           new AbstractMap.SimpleEntry<>(
               "2: chess on <ID> show-moveable", "Show figures which can be moved"),
           new AbstractMap.SimpleEntry<>("2: chess on <ID> show-stats", "Show score of the players"),
+          new AbstractMap.SimpleEntry<>(
+              "2: chess on <ID> show-fen", "Show the current game as a FEN-String"),
           new AbstractMap.SimpleEntry<>(
               "3  End of Game", "--------------------------------------------------"),
           new AbstractMap.SimpleEntry<>(
@@ -126,7 +129,8 @@ public class CLIMenu {
     String command = remainingArguments.removeFirst();
 
     printImportantGameStatus();
-    if (cli.game().isOver() && !List.of("rematch", "show-stats", "show-board").contains(command)) {
+    if (cli.game().isOver()
+        && !List.of("rematch", "show-stats", "show-board", "show-fen").contains(command)) {
       return;
     }
 
@@ -146,6 +150,7 @@ public class CLIMenu {
       case "show-board" -> showBoardStatus();
       case "show-moves" -> showMovesOfFigure();
       case "show-moveable" -> showMoveableFigures();
+      case "show-fen" -> exportAsFenNotation();
 
       case "draw" -> performDraw();
       case "resign" -> performResign();
@@ -440,5 +445,11 @@ public class CLIMenu {
               + (actuallyHasCount - shouldHaveCount)
               + " argument(s) more than needed.");
     }
+  }
+
+  private void exportAsFenNotation() {
+    countOfRemainingArgumentsIs(0);
+    printer.printlnAction("This is the current game as a FEN-String:");
+    printer.println(FenNotation.generateFen(cli.game().board()));
   }
 }
