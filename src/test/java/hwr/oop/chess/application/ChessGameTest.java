@@ -146,7 +146,8 @@ class ChessGameTest {
     String file_disambiguation = "r1bqkbnr/pp1ppppp/8/2n5/4P3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 3";
     FenNotation.parseFEN(board, file_disambiguation);
     moveFigureAndSave("b1", "c3");
-    assertThat(cli.game().algebraicNotation().toString()).hasToString("Nc3");
+    assertThat(cli.game().algebraicNotation().toString())
+        .hasToString("Nc3"); // TODO Nbc3 funktioniert nicht
   }
 
   @Test
@@ -157,7 +158,8 @@ class ChessGameTest {
     String rank_disambiguation = "rnbqk2r/ppppppbp/6p1/8/8/5N2/PPPPPPRP/RNBQKB1R w KQkq - 0 1";
     FenNotation.parseFEN(board, rank_disambiguation);
     moveFigureAndSave("g2", "g1");
-    assertThat(cli.game().algebraicNotation().toString()).hasToString("Rg1");
+    assertThat(cli.game().algebraicNotation().toString())
+        .hasToString("Rg1"); // TODO Rgg1 funktioniert auch nicht
   }
 
   @Test
