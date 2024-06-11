@@ -9,7 +9,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static hwr.oop.chess.persistence.FenNotation.generateFen;
@@ -150,11 +149,6 @@ class BoardTest {
     }
   }
 
-  @Test
-  void firstCellIsNotNull() {
-    assertThat(board.firstCell()).isNotNull();
-  }
-
   private CellDirection getOppositeDirection(CellDirection direction) {
     return switch (direction) {
       case TOP -> CellDirection.BOTTOM;
@@ -199,7 +193,7 @@ class BoardTest {
     FenNotation.parseFEN(board, fenString);
 
     // King can only move to "d8"
-    Cell kingCell = board.findKing(FigureColor.BLACK);
+    Cell kingCell = board.findKingCell(FigureColor.BLACK);
     List<Cell> availableCells = board.availableCellsWithoutCheckMoves(kingCell);
     assertThat(availableCells).hasSize(1);
 
@@ -361,7 +355,7 @@ class BoardTest {
     String initialStatus = "rn1qkbnr/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/RNBQK1NR b KQkq - 2 5";
     FenNotation.parseFEN(board, initialStatus);
 
-    Cell cellKingBlack = board.findKing(FigureColor.BLACK);
+    Cell cellKingBlack = board.findKingCell(FigureColor.BLACK);
     Cell cellQueenBlack = board.findCell("d8");
     Cell cellPawnBlack = board.findCell("c7");
     Cell cellBishopBlack = board.findCell("a8");
@@ -540,42 +534,5 @@ class BoardTest {
     FenNotation.parseFEN(board, fen);
     assertThat(board.isDeadPosition()).isFalse();
     assertThat(board.endType(FigureColor.WHITE)).isEqualTo(EndType.NOT_END);
-  }
-
-  @Test
-  void testThreeFoldRepetitionFalse() {
-    List<String> testFenHistory =
-        Arrays.asList(
-            "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR w KQkq a6 0 2",
-            "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR w KQkq b6 0 2",
-            "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR w KQkq c6 0 2");
-
-    board = new Board(false);
-    assertThat(board.isThreeFoldRepetition(testFenHistory)).isFalse();
-  }
-
-  @Test
-  void testThreeFoldRepetitionTrue() {
-    List<String> testFenHistory =
-        Arrays.asList(
-            "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR w KQkq a6 0 2",
-            "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR w KQkq a6 0 2",
-            "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR w KQkq a6 0 2");
-
-    board = new Board(false);
-    assertThat(board.isThreeFoldRepetition(testFenHistory)).isTrue();
-  }
-
-  @Test
-  void testEndtypeThreeFoldRepetition() {
-    List<String> testFenHistory =
-        Arrays.asList(
-            "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR w KQkq a6 0 2",
-            "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR w KQkq a6 0 2",
-            "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR w KQkq a6 0 2");
-
-    board = new Board(true);
-    assertThat(board.endType(FigureColor.WHITE, testFenHistory))
-        .isEqualTo(EndType.THREE_FOLD_REPETITION);
   }
 }

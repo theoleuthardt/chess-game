@@ -40,9 +40,8 @@ public record Knight(FigureColor color) implements Figure {
   }
 
   @Override
-  public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    List<Cell> availableCell = availableCells(prevCell);
-    return availableCell.contains(nextCell);
+  public boolean canMoveTo(Cell startCell, Cell endCell) {
+    return availableCells(startCell).contains(endCell);
   }
 
   @Override

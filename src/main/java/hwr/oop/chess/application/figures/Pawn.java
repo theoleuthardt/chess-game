@@ -64,9 +64,8 @@ public record Pawn(FigureColor color) implements Figure {
   }
 
   @Override
-  public boolean canMoveTo(Cell prevCell, Cell nextCell) {
-    List<Cell> availableCell = availableCells(prevCell);
-    return availableCell.contains(nextCell);
+  public boolean canMoveTo(Cell startCell, Cell endCell) {
+    return availableCells(startCell).contains(endCell);
   }
 
   public boolean isAbleToPromote(Cell currentCell) {
@@ -117,6 +116,6 @@ public record Pawn(FigureColor color) implements Figure {
     }
 
     Cell opponentPawnCell = startCell.cellInDirection(direction);
-    return opponentPawnCell.isOccupiedBy(color().opposite(), FigureType.PAWN);
+    return opponentPawnCell.isOccupiedBy(color().ofOpponent(), FigureType.PAWN);
   }
 }

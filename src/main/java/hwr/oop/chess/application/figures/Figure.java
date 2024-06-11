@@ -5,9 +5,9 @@ import hwr.oop.chess.application.Cell;
 import java.util.List;
 
 public interface Figure {
-  List<Cell> availableCells(Cell currentRook);
+  List<Cell> availableCells(Cell currentCell);
 
-  boolean canMoveTo(Cell prevCell, Cell nextCell);
+  boolean canMoveTo(Cell startCell, Cell endCell);
 
   char symbol();
 

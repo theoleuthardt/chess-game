@@ -8,5 +8,5 @@ public enum CellDirection {
   TOP_RIGHT,
   BOTTOM,
   BOTTOM_LEFT,
-  BOTTOM_RIGHT
+  BOTTOM_RIGHT,
 }

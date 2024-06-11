@@ -10,10 +10,10 @@ import java.util.*;
 public class ChessGame implements Game {
   private final Persistence persistence;
   private final Board board;
-  private boolean isDrawOffered;
   private final Map<FigureColor, Player> players = new EnumMap<>(FigureColor.class);
   private final List<String> fenHistory = new ArrayList<>();
   private final List<String> pgnHistory = new ArrayList<>();
+  private boolean isDrawOffered;
   private EndType endType = EndType.NOT_END;
   private final AlgebraicNotation algebraicNotation = new AlgebraicNotation();
 
@@ -45,6 +45,9 @@ public class ChessGame implements Game {
     }
     endType = EndType.valueOf(persistence.loadState(State.END_TYPE));
     isDrawOffered = "1".equals(persistence.loadState(State.IS_DRAW_OFFERED));
+    parseIntoList(fenHistory, persistence.loadState(State.FEN_HISTORY));
+    parseIntoList(pgnHistory, persistence.loadState(State.PGN_HISTORY));
+
     players.put(
         FigureColor.WHITE,
         new Player(
@@ -58,10 +61,7 @@ public class ChessGame implements Game {
             persistence.loadState(State.BLACK_ELO),
             persistence.loadState(State.BLACK_GAME_COUNT)));
 
-    parseIntoList(fenHistory, persistence.loadState(State.FEN_HISTORY));
     FenNotation.parseFEN(board, fenHistory.getLast());
-
-    parseIntoList(pgnHistory, persistence.loadState(State.PGN_HISTORY));
   }
 
   private List<State> missingStatesInPersistence() {
@@ -97,15 +97,18 @@ public class ChessGame implements Game {
     return String.join(",", fenHistory);
   }
 
+  @Override
   public String pgnHistoryOfMoves() {
     return String.join(",", pgnHistory);
   }
 
+  @Override
   public void saveGame() {
     persistence.storeState(State.END_TYPE, endType.name());
     persistence.storeState(State.IS_DRAW_OFFERED, isDrawOffered ? "1" : "0");
     persistence.storeState(State.FEN_HISTORY, fenHistoryOfBoard());
     persistence.storeState(State.PGN_HISTORY, pgnHistoryOfMoves());
+
     Player whitePlayer = players.get(FigureColor.WHITE);
     persistence.storeState(State.WHITE_SCORE, String.valueOf(whitePlayer.score()));
     persistence.storeState(State.WHITE_ELO, String.valueOf(whitePlayer.elo()));
@@ -115,20 +118,23 @@ public class ChessGame implements Game {
     persistence.storeState(State.BLACK_SCORE, String.valueOf(blackPlayer.score()));
     persistence.storeState(State.BLACK_ELO, String.valueOf(blackPlayer.elo()));
     persistence.storeState(State.BLACK_GAME_COUNT, String.valueOf(blackPlayer.gameCount()));
+
     persistence.saveGame();
   }
 
+  @Override
   public Board board() {
     return board;
   }
 
+  @Override
   public void playerHasWon(EndType type, FigureColor color) {
     endType = type;
     persistence.storeState(State.WINNER, color.name());
     pgnHistory.add(color == FigureColor.WHITE ? "1-0" : "0-1");
 
     Player winner = players.get(color);
-    Player looser = players.get(color.opposite());
+    Player looser = players.get(color.ofOpponent());
     double winnerElo = winner.elo();
     double looserElo = looser.elo();
     winner.adjustScoreOnGameEnd(1, looserElo);
@@ -151,13 +157,10 @@ public class ChessGame implements Game {
   }
 
   @Override
-  public Map<FigureColor, Player> players() {
-    return players;
-  }
-
-  @Override
   public boolean isOver() {
-    return board.endType(board.turn()) != EndType.NOT_END || endType != EndType.NOT_END;
+    return isThreeFoldRepetition()
+        || board.endType(board.turn()) != EndType.NOT_END
+        || endType != EndType.NOT_END;
   }
 
   @Override
@@ -176,10 +179,15 @@ public class ChessGame implements Game {
   }
 
   @Override
-  public Game keepPlayersOf(Game game) {
-    players.put(FigureColor.WHITE, game.players().get(FigureColor.WHITE));
-    players.put(FigureColor.BLACK, game.players().get(FigureColor.BLACK));
+  public Game keepPlayersOf(Game oldGame) {
+    players.put(FigureColor.WHITE, oldGame.player(FigureColor.WHITE));
+    players.put(FigureColor.BLACK, oldGame.player(FigureColor.BLACK));
     return this;
+  }
+
+  @Override
+  public Player player(FigureColor color) {
+    return players.get(color);
   }
 
   @Override
@@ -190,10 +198,6 @@ public class ChessGame implements Game {
   @Override
   public List<String> pgnHistory() {
     return this.pgnHistory;
-  }
-
-  public AlgebraicNotation algebraicNotation() {
-    return algebraicNotation;
   }
 
   @Override

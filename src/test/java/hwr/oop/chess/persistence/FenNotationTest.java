@@ -163,7 +163,7 @@ class FenNotationTest {
     String kingIsNotStartPosition = "r2k3r/1pp1pppp/8/pB3b2/5P2/4p3/PPP3PP/R2K3R w - - 2 10";
     parseFEN(board, kingIsNotStartPosition);
     for (FigureColor color : List.of(FigureColor.WHITE, FigureColor.BLACK)) {
-      assertThat(((King) board.findKing(color).figure()).hasMoved()).isTrue();
+      assertThat(((King) board.findKingCell(color).figure()).hasMoved()).isTrue();
     }
     assertThat(generateFen(board)).isEqualTo(kingIsNotStartPosition);
   }
@@ -228,12 +228,12 @@ class FenNotationTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-          "rnbqkbnr/p1pppppp/8/1p6/4P3/8/PPP2PPP/RNBQKBNR w KQkq b6 0 2",
-          "rnbqkbnr/p2ppppp/8/2p5/4P3/8/PPP2PPP/RNBQKBNR w KQkq c6 0 2",
-          "rnbqkbnr/pp2pppp/8/3p4/4P3/8/PPP2PPP/RNBQKBNR w KQkq d6 0 2",
-          "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2",
-          "rnbqkbnr/ppp1pppp/8/8/3p1P2/8/PPPP2PP/RNBQKBNR b KQkq f3 0 2",
-          "rnbqkbnr/ppp1pppp/8/8/3p2P1/8/PPP2PPP/RNBQKBNR b KQkq g3 0 2",
+        "rnbqkbnr/p1pppppp/8/1p6/4P3/8/PPP2PPP/RNBQKBNR w KQkq b6 0 2",
+        "rnbqkbnr/p2ppppp/8/2p5/4P3/8/PPP2PPP/RNBQKBNR w KQkq c6 0 2",
+        "rnbqkbnr/pp2pppp/8/3p4/4P3/8/PPP2PPP/RNBQKBNR w KQkq d6 0 2",
+        "rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2",
+        "rnbqkbnr/ppp1pppp/8/8/3p1P2/8/PPPP2PP/RNBQKBNR b KQkq f3 0 2",
+        "rnbqkbnr/ppp1pppp/8/8/3p2P1/8/PPP2PPP/RNBQKBNR b KQkq g3 0 2",
       })
   void testValidEnPassantFEN(String fen) {
     assertThat(isValidFEN(fen)).isTrue();

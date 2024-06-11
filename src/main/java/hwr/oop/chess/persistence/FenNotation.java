@@ -56,14 +56,13 @@ public class FenNotation {
 
     // Validate castling availability
     String castling = parts.get(2);
-    if(!isValidCastling(castling, rows)){
+    if (!isValidCastling(castling, rows)) {
       return false;
     }
 
     String enPassant = parts.get(3);
     char activeColor = parts.get(1).charAt(0);
     return isValidEnPassant(enPassant, activeColor, rows);
-
   }
 
   private static boolean isValidRow(String row) {
@@ -115,10 +114,12 @@ public class FenNotation {
     char y = enPassant.charAt(1);
 
     if (activeColor == 'w') {
-      // White's turn to move: en passant target must be on the 6th rank and a black pawn must be on the 5th rank
+      // White's turn to move: en passant target must be on the 6th rank and a black pawn must be on
+      // the 5th rank
       return y == '6' && checkPieceAtPosition(rows.get(3), 'p', x);
     } else {
-      // Black's turn to move: en passant target must be on the 3rd rank and a white pawn must be on the 4th rank
+      // Black's turn to move: en passant target must be on the 3rd rank and a white pawn must be on
+      // the 4th rank
       return y == '3' && checkPieceAtPosition(rows.get(4), 'P', x);
     }
   }
@@ -240,12 +241,12 @@ public class FenNotation {
 
   private void parseCastlingForKing(String castling) {
     if (!castling.contains("Q") && !castling.contains("K")) {
-      Cell kingCell = board.findKing(FigureColor.WHITE);
+      Cell kingCell = board.findKingCell(FigureColor.WHITE);
       ((King) kingCell.figure()).figureMoved();
     }
 
     if (!castling.contains("q") && !castling.contains("k")) {
-      Cell kingCell = board.findKing(FigureColor.BLACK);
+      Cell kingCell = board.findKingCell(FigureColor.BLACK);
       ((King) kingCell.figure()).figureMoved();
     }
   }
@@ -254,7 +255,7 @@ public class FenNotation {
     StringBuilder castling = new StringBuilder();
     for (char c : List.of('K', 'Q', 'k', 'q')) {
       FigureColor color = Character.isUpperCase(c) ? FigureColor.WHITE : FigureColor.BLACK;
-      Cell kingCell = board.findKing(color);
+      Cell kingCell = board.findKingCell(color);
       King king = (King) kingCell.figure();
       if (king.hasMoved()) {
         continue;

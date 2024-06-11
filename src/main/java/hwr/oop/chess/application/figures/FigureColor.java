@@ -2,15 +2,15 @@ package hwr.oop.chess.application.figures;
 
 public enum FigureColor {
   WHITE {
-    public FigureColor opposite() {
+    public FigureColor ofOpponent() {
       return BLACK;
     }
   },
   BLACK {
-    public FigureColor opposite() {
+    public FigureColor ofOpponent() {
       return WHITE;
     }
   };
 
-  public abstract FigureColor opposite();
+  public abstract FigureColor ofOpponent();
 }

@@ -66,9 +66,9 @@ public class AlgebraicNotation {
 
     if (isFileAmbiguous && isRankAmbiguous) {
       notationString.append(disambiguation);
-    } else if (isFileAmbiguous || isPawnCapture) {
+    } else if (isRankAmbiguous || isPawnCapture) {
       notationString.append(disambiguation.charAt(0));
-    } else if (isRankAmbiguous) {
+    } else if (isFileAmbiguous) {
       notationString.append(disambiguation.charAt(1));
     }
   }
@@ -94,7 +94,7 @@ public class AlgebraicNotation {
   }
 
   private void addCheckOrCheckmateModifier() {
-    FigureColor opponent = movingFigure.color().opposite();
+    FigureColor opponent = movingFigure.color().ofOpponent();
     if (board.isCheckmate(opponent)) {
       notationString.append("#");
     } else if (board.isCheck(opponent)) {

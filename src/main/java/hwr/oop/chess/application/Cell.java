@@ -40,20 +40,20 @@ public class Cell {
     return isOccupied() && figure.color() == color;
   }
 
-  public boolean isOccupiedByOpponentOf(FigureColor color) {
-    return isOccupied() && figure.color() != color;
-  }
-
-  public boolean isOccupiedByOpponentOf(Figure figure) {
-    return isOccupiedByOpponentOf(figure.color());
-  }
-
   public boolean isOccupiedBy(FigureType type) {
     return isOccupied() && figure.type() == type;
   }
 
   public boolean isOccupiedBy(FigureColor color, FigureType type) {
     return isOccupiedBy(color) && isOccupiedBy(type);
+  }
+
+  public boolean isOccupiedByOpponentOf(FigureColor color) {
+    return isOccupied() && figure.color() != color;
+  }
+
+  public boolean isOccupiedByOpponentOf(Figure figure) {
+    return isOccupiedByOpponentOf(figure.color());
   }
 
   public boolean isFree() {
@@ -219,12 +219,13 @@ public class Cell {
     }
   }
 
+  @Override
   public String toString() {
     return "Cell_" + toCoordinates() + "(" + (isFree() ? "-" : figure.symbol()) + ")";
   }
 
   public String toCoordinates() {
-    return (char) (x.toInt() + 64) + String.valueOf(y.toInt());
+    return (char) (x.toInt() + 'A' - 1) + String.valueOf(y.toInt());
   }
 
   public List<Cell> allCellsInDirection(CellDirection direction) {
@@ -267,7 +268,7 @@ public class Cell {
     isEnPassant = enPassant;
   }
 
-  public boolean isWhiteCell() {
+  public boolean isCellBackgroundColorWhite() {
     return (x.toInt() + y.toInt()) % 2 == 1;
   }
 }

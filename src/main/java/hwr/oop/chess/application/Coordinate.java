@@ -59,6 +59,6 @@ public enum Coordinate {
   }
 
   public static Coordinate fromChar(char c) {
-    return Coordinate.fromInt(c - 96);
+    return Coordinate.fromInt(c - 'a' + 1);
   }
 }

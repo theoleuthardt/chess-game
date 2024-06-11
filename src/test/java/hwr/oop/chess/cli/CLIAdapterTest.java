@@ -47,25 +47,4 @@ class CLIAdapterTest {
             "________________",
             "A B C D E F G H");
   }
-
-  @Test
-  void canShowBoardByParameter() {
-    cli.forGameId("123");
-    cli.initializeGame(true);
-    cli.printBoard(cli.game().board());
-    assertThat(outputStream.toString())
-        .contains(
-            "8 | ",
-            "7 | ",
-            "6 | ",
-            "5 | ",
-            "4 | ",
-            "3 | ",
-            "2 | ",
-            "1 | ",
-            "- - - - - - - -",
-            "p p p p p p p p",
-            "________________",
-            "A B C D E F G H");
-  }
 }

@@ -117,7 +117,7 @@ public class NoPersistence implements Persistence {
 
   @Override
   public void loadGame() {
-    // Some tests need a NoPersistence adapter which does nothing
+    // Some tests need a NoPersistence adapter which only returns the predefined state
   }
 
   @Override

@@ -2,11 +2,8 @@ package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
-import hwr.oop.chess.persistence.AlgebraicNotation;
 import hwr.oop.chess.persistence.Player;
 import java.util.List;
-
-import java.util.Map;
 
 public interface Game {
 
@@ -18,7 +15,7 @@ public interface Game {
 
   void endsWithDraw(EndType endType);
 
-  Map<FigureColor, Player> players();
+  Player player(FigureColor color);
 
   boolean isOver();
 
@@ -33,8 +30,6 @@ public interface Game {
   List<String> fenHistory();
 
   List<String> pgnHistory();
-
-  AlgebraicNotation algebraicNotation();
 
   String pgnHistoryOfMoves();
 

@@ -134,7 +134,8 @@ public class CLIMenu {
 
     printImportantGameStatus();
     if (cli.game().isOver()
-        && !List.of("rematch", "show-stats", "show-board", "show-fen").contains(command)) {
+        && !List.of("rematch", "show-stats", "show-board", "show-fen", "show-pgn")
+            .contains(command)) {
       return;
     }
 
@@ -228,7 +229,7 @@ public class CLIMenu {
             + " on "
             + from.toCoordinates()
             + " can move to.");
-    cli.printer().setHighlightOnBoard(board.availableCellsWithoutCheckMoves(from));
+    printer.setHighlightOnBoard(board.availableCellsWithoutCheckMoves(from));
     cli.printBoard();
   }
 
@@ -239,7 +240,7 @@ public class CLIMenu {
         "Showing the figures which can be moved by the " + board.turn().name() + " player.");
     for (Cell cell : board.cellsWithColor(board.turn())) {
       if (!board.availableCellsWithoutCheckMoves(cell).isEmpty()) {
-        cli.printer().alsoHighlightOnBoard(cell);
+        printer.alsoHighlightOnBoard(cell);
       }
     }
     cli.printBoard();
@@ -248,31 +249,32 @@ public class CLIMenu {
   private void performDraw() {
     countOfRemainingArgumentsIs(1);
     String command = remainingArguments.removeFirst();
+    final Game game = cli.game();
     switch (command) {
       case "offer" -> {
-        if (cli.game().isDrawOffered()) {
+        if (game.isDrawOffered()) {
           throw new InvalidUserInputException("There is already a draw request.");
         }
-        cli.game().offerDraw();
-        cli.game().saveGame();
+        game.offerDraw();
+        game.saveGame();
         printer.printlnAction("You offered a draw. Your opponent can accept or decline this.");
       }
       case "accept" -> {
-        if (!cli.game().isDrawOffered()) {
+        if (!game.isDrawOffered()) {
           throw new InvalidUserInputException("There is no draw offer to accept.");
         }
         printer.printlnAction("The draw offer has been accepted.");
-        cli.game().endsWithDraw(EndType.MUTUAL_DRAW);
-        cli.game().saveGame();
+        game.endsWithDraw(EndType.MUTUAL_DRAW);
+        game.saveGame();
       }
 
       case "decline" -> {
-        if (!cli.game().isDrawOffered()) {
+        if (!game.isDrawOffered()) {
           throw new InvalidUserInputException("There is no draw offer to decline.");
         }
         printer.printlnAction("The draw offer has been declined.");
-        cli.game().denyDrawOffer();
-        cli.game().saveGame();
+        game.denyDrawOffer();
+        game.saveGame();
       }
       default ->
           throw new InvalidUserInputException(
@@ -283,20 +285,23 @@ public class CLIMenu {
   private void performResign() {
     countOfRemainingArgumentsIs(0);
     printer.printlnAction("You resigned the game. Your opponent has won.");
-    cli.game().playerHasWon(EndType.RESIGNATION, cli.game().board().turn().opposite());
+    cli.game().playerHasWon(EndType.RESIGNATION, cli.game().board().turn().ofOpponent());
     cli.game().saveGame();
   }
 
   private void handleAutomaticGameEnd() {
     Game game = cli.game();
-    Board board = game.board();
+    if (game.isThreeFoldRepetition()) {
+      game.endsWithDraw(EndType.THREE_FOLD_REPETITION);
+      return;
+    }
 
+    Board board = game.board();
     for (FigureColor color : FigureColor.values()) {
       EndType endType = board.endType(color);
       switch (endType) {
-        case EndType.STALEMATE, EndType.DEAD_POSITION, EndType.THREE_FOLD_REPETITION ->
-            game.endsWithDraw(endType);
-        case EndType.CHECKMATE -> game.playerHasWon(endType, color.opposite());
+        case EndType.STALEMATE, EndType.DEAD_POSITION -> game.endsWithDraw(endType);
+        case EndType.CHECKMATE -> game.playerHasWon(endType, color.ofOpponent());
         default -> {
           // The game continues
         }
@@ -305,7 +310,8 @@ public class CLIMenu {
   }
 
   private void printImportantGameStatus() {
-    Board board = cli.game().board();
+    Game game = cli.game();
+    Board board = game.board();
     for (FigureColor color : FigureColor.values()) {
       if (board.isStalemate(color)) {
         printer.printlnError("The " + color.name() + " king is in stalemate. The game is over.");
@@ -323,12 +329,12 @@ public class CLIMenu {
     } else if (board.isDeadPosition()) {
       printer.printlnError(
           "There are too few figures to result in a checkmate. The game ended with a draw.");
-    } else if (cli.game().isThreeFoldRepetition()) {
+    } else if (game.isThreeFoldRepetition()) {
       printer.printlnError("The game ended in a draw by threefold repetition.");
-    } else if (cli.game().board().isPawnPromotionPossible()) {
+    } else if (board.isPawnPromotionPossible()) {
       printer.printlnError(
           "Please promote your pawn to a different figure. You can choose QUEEN, ROOK, BISHOP or KNIGHT.");
-    } else if (cli.game().isOver()) {
+    } else if (game.isOver()) {
       String winner = cli.persistence().loadState(State.WINNER);
       if (winner == null || winner.equals("draw")) {
         printer.printlnError("The game ended with a draw. Both players got half a point.");
@@ -364,8 +370,8 @@ public class CLIMenu {
     }
     stats.put("Status", gameStatus);
 
-    Player whitePlayer = game.players().get(FigureColor.WHITE);
-    Player blackPlayer = game.players().get(FigureColor.BLACK);
+    Player whitePlayer = game.player(FigureColor.WHITE);
+    Player blackPlayer = game.player(FigureColor.BLACK);
     stats.put("Score > White", whitePlayer.score() + " points (Elo: " + whitePlayer.elo() + ")");
     stats.put("Score > Black", blackPlayer.score() + " points (Elo: " + blackPlayer.elo() + ")");
 
@@ -460,6 +466,6 @@ public class CLIMenu {
   private void exportAsPgnNotation() {
     countOfRemainingArgumentsIs(0);
     printer.printlnAction("This is the current game as a PGN-String:");
-    printer.println((new PortableGameNotation()).pgnFile(cli.game()));
+    printer.println(PortableGameNotation.generatePgn(cli.game()));
   }
 }

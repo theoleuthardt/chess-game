@@ -31,21 +31,25 @@ public class PortableGameNotation {
     for (String move : pgnHistory) {
       if (moveCount % 2 == 0) {
         moves.add(moveCount / 2 + ". " + move);
-        moveCount++;
       } else {
         moves.add(move);
-        moveCount++;
       }
+      moveCount++;
     }
     return moves;
   }
 
-  public String pgnFile(Game game) {
+  private String pgnString(Game game) {
     List<String> pgnHistory = game.pgnHistory();
     pgnHistory = addCounter(pgnHistory);
     if (!game.isOver()) {
       pgnHistory.add("*");
     }
     return wrapLongLines(String.join(" ", pgnHistory));
+  }
+
+  public static String generatePgn(Game game) {
+    PortableGameNotation pgn = new PortableGameNotation();
+    return pgn.pgnString(game);
   }
 }

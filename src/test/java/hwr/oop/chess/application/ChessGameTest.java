@@ -87,7 +87,7 @@ class ChessGameTest {
     assertThat(cli.game().pgnHistoryOfMoves())
         .isEqualTo(
             "d4,Nf6,c4,e6,Nc3,Bb4,Nf3,c5,e3,Nc6,Bd3,Bxc3+,bxc3,d6,e4,e5,d5,Ne7,Nh4,h6,f4,Ng6,Nxg6,fxg6,fxe5,dxe5,Be3,b6,O-O,O-O");
-    assertThat((new PortableGameNotation()).pgnFile(cli.game()))
+    assertThat(PortableGameNotation.generatePgn(cli.game()))
         .isEqualTo(
             "1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. Nf3 c5 5. e3 Nc6 6. Bd3 Bxc3+ 7. bxc3 d6 8. e4\ne5 9. d5 Ne7 10. Nh4 h6 11. f4 Ng6 12. Nxg6 fxg6 13. fxe5 dxe5 14. Be3 b6 15. O-O\nO-O *");
   }
@@ -107,7 +107,7 @@ class ChessGameTest {
     Cell currentCell = board.findCell('a', 8);
     currentCell.setFigure(pawn);
     cli.game().rememberAndPerformPawnPromotion(currentCell, FigureType.QUEEN);
-    assertThat(cli.game().algebraicNotation().toString()).hasToString("a8=Q");
+    assertThat(cli.game().pgnHistory().getLast()).isEqualTo("a8=Q");
   }
 
   @Test
@@ -135,7 +135,7 @@ class ChessGameTest {
     FenNotation.parseFEN(board, queenCastling);
     moveFigureAndSave("a7", "a6");
     moveFigureAndSave("e1", "c1");
-    assertThat(cli.game().algebraicNotation().toString()).contains("O-O-O");
+    assertThat(cli.game().pgnHistory().getLast()).isEqualTo("O-O-O");
   }
 
   @Test
@@ -143,11 +143,10 @@ class ChessGameTest {
     cli.forGameId("1");
     cli.initializeGame(true);
     Board board = cli.game().board();
-    String file_disambiguation = "r1bqkbnr/pp1ppppp/8/2n5/4P3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 3";
+    String file_disambiguation = "1R5K/8/1R6/8/8/8/8/6rk w - - 0 1";
     FenNotation.parseFEN(board, file_disambiguation);
-    moveFigureAndSave("b1", "c3");
-    assertThat(cli.game().algebraicNotation().toString())
-        .hasToString("Nc3"); // TODO Nbc3 funktioniert nicht
+    moveFigureAndSave("b8", "b7");
+    assertThat(cli.game().pgnHistory().getLast()).isEqualTo("R8b7");
   }
 
   @Test
@@ -155,11 +154,10 @@ class ChessGameTest {
     cli.forGameId("1");
     cli.initializeGame(true);
     Board board = cli.game().board();
-    String rank_disambiguation = "rnbqk2r/ppppppbp/6p1/8/8/5N2/PPPPPPRP/RNBQKB1R w KQkq - 0 1";
+    String rank_disambiguation = "7K/R1R5/8/8/8/8/8/6rk w - - 1 1";
     FenNotation.parseFEN(board, rank_disambiguation);
-    moveFigureAndSave("g2", "g1");
-    assertThat(cli.game().algebraicNotation().toString())
-        .hasToString("Rg1"); // TODO Rgg1 funktioniert auch nicht
+    moveFigureAndSave("a7", "b7");
+    assertThat(cli.game().pgnHistory().getLast()).isEqualTo("Rab7");
   }
 
   @Test
@@ -167,9 +165,9 @@ class ChessGameTest {
     cli.forGameId("1");
     cli.initializeGame(true);
     Board board = cli.game().board();
-    String full_disambiguation = "7k/8/8/3R4/2R1R3/3R4/8/3K4 w - - 0 1";
+    String full_disambiguation = "B1B4K/8/B1B5/8/8/8/8/kr6 w - - 0 1";
     FenNotation.parseFEN(board, full_disambiguation);
-    moveFigureAndSave("d3", "d4");
-    assertThat(cli.game().algebraicNotation().toString()).hasToString("Rdd4");
+    moveFigureAndSave("a8", "b7");
+    assertThat(cli.game().pgnHistory().getLast()).isEqualTo("Ba8b7");
   }
 }
