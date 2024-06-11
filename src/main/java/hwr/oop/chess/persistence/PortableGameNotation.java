@@ -27,13 +27,14 @@ public class PortableGameNotation {
 
   private List<String> addCounter(List<String> pgnHistory) {
     List<String> moves = new ArrayList<>();
-    int moveCount = 0;
-    int i = 0;
+    int moveCount = 2;
     for (String move : pgnHistory) {
-      if (i++ % 2 == 0) {
-        moves.add(++moveCount + ". " + move);
+      if (moveCount % 2 == 0) {
+        moves.add(moveCount / 2 + ". " + move);
+        moveCount++;
       } else {
         moves.add(move);
+        moveCount++;
       }
     }
     return moves;
