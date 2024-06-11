@@ -2,6 +2,7 @@ package hwr.oop.chess.application;
 
 import hwr.oop.chess.application.figures.FigureColor;
 import hwr.oop.chess.application.figures.FigureType;
+import hwr.oop.chess.persistence.AlgebraicNotation;
 import hwr.oop.chess.persistence.Player;
 import java.util.List;
 
@@ -32,6 +33,10 @@ public interface Game {
   List<String> fenHistory();
 
   List<String> pgnHistory();
+
+  AlgebraicNotation algebraicNotation();
+
+  String pgnHistoryOfMoves();
 
   boolean isThreeFoldRepetition();
 

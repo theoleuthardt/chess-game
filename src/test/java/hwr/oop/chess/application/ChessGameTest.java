@@ -4,7 +4,9 @@ import static hwr.oop.chess.persistence.FenNotation.extractFenKeyParts;
 import static hwr.oop.chess.persistence.FenNotation.generateFen;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hwr.oop.chess.application.figures.*;
 import hwr.oop.chess.cli.CLIAdapter;
+import hwr.oop.chess.persistence.FenNotation;
 import hwr.oop.chess.persistence.NoPersistence;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -81,7 +83,8 @@ class ChessGameTest {
     moveFigureAndSave("b7", "b6"); // 14... b6
     moveFigureAndSave("e1", "g1"); // 15. O-O White King Castling
     moveFigureAndSave("e8", "g8"); // 15. O-O Black King Castling
-    assertThat(String.join(",", cli.game().pgnHistory()))
+
+    assertThat(cli.game().pgnHistoryOfMoves())
         .isEqualTo(
             "d4,Nf6,c4,e6,Nc3,Bb4,Nf3,c5,e3,Nc6,Bd3,Bxc3+,bxc3,d6,e4,e5,d5,Ne7,Nh4,h6,f4,Ng6,Nxg6,fxg6,fxe5,dxe5,Be3,b6,O-O,O-O");
     assertThat((new PortableGameNotation()).pgnFile(cli.game()))
@@ -93,5 +96,78 @@ class ChessGameTest {
     Board board = cli.game().board();
     cli.game().rememberAndPerformMove(board.findCell(from), board.findCell(to));
     cli.game().saveGame();
+  }
+
+  @Test
+  void testPossibleRememberAndPerformPawnPromotion() {
+    cli.forGameId("1");
+    cli.initializeGame(true);
+    Board board = cli.game().board();
+    Pawn pawn = new Pawn(FigureColor.WHITE);
+    Cell currentCell = board.findCell('a', 8);
+    currentCell.setFigure(pawn);
+    cli.game().rememberAndPerformPawnPromotion(currentCell, FigureType.QUEEN);
+    assertThat(cli.game().algebraicNotation().toString()).hasToString("a8=Q");
+  }
+
+  @Test
+  void testStoreWinnerWhitePGNHistory() {
+    cli.forGameId("1");
+    cli.initializeGame(true);
+    cli.game().playerHasWon(EndType.CHECKMATE, FigureColor.WHITE);
+    assertThat(cli.game().pgnHistory()).contains("1-0");
+  }
+
+  @Test
+  void testStoreWinnerBlackPGNHistory() {
+    cli.forGameId("1");
+    cli.initializeGame(true);
+    cli.game().playerHasWon(EndType.CHECKMATE, FigureColor.BLACK);
+    assertThat(cli.game().pgnHistory()).contains("0-1");
+  }
+
+  @Test
+  void testQueenCastlingAlgebraicNotation() {
+    cli.forGameId("1");
+    cli.initializeGame(true);
+    Board board = cli.game().board();
+    String queenCastling = "rnbqk1nr/pppp1ppp/8/4p3/8/8/PPPPPPPP/R3KBNR b KQkq - 1 1";
+    FenNotation.parseFEN(board, queenCastling);
+    moveFigureAndSave("a7", "a6");
+    moveFigureAndSave("e1", "c1");
+    assertThat(cli.game().algebraicNotation().toString()).contains("O-O-O");
+  }
+
+  @Test
+  void testFileDisambiguation() {
+    cli.forGameId("1");
+    cli.initializeGame(true);
+    Board board = cli.game().board();
+    String file_disambiguation = "rnbqk2r/ppppppbp/6p1/8/8/5N2/PPPPPPRP/RNBQKB1R w KQkq - 0 1";
+    FenNotation.parseFEN(board, file_disambiguation);
+    moveFigureAndSave("h1", "g1");
+    assertThat(cli.game().algebraicNotation().toString()).hasToString("Rhg1");
+  }
+
+  @Test
+  void testRankDisambiguation() {
+    cli.forGameId("1");
+    cli.initializeGame(true);
+    Board board = cli.game().board();
+    String rank_disambiguation = "rnbqk2r/ppppppbp/6p1/8/8/5N2/PPPPPPRP/RNBQKB1R w KQkq - 0 1";
+    FenNotation.parseFEN(board, rank_disambiguation);
+    moveFigureAndSave("g2", "g1");
+    assertThat(cli.game().algebraicNotation().toString()).hasToString("Rgg1");
+  }
+
+  @Test
+  void testRankAndFileDisambiguation() {
+    cli.forGameId("1");
+    cli.initializeGame(true);
+    Board board = cli.game().board();
+    String full_disambiguation = "7k/8/8/3R4/2R1R3/3R4/8/3K4 w - - 0 1";
+    FenNotation.parseFEN(board, full_disambiguation);
+    moveFigureAndSave("d3", "d4");
+    assertThat(cli.game().algebraicNotation().toString()).hasToString("Rdd4");
   }
 }

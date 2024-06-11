@@ -97,7 +97,7 @@ public class ChessGame implements Game {
     return String.join(",", fenHistory);
   }
 
-  private String pgnHistoryOfMoves() {
+  public String pgnHistoryOfMoves() {
     return String.join(",", pgnHistory);
   }
 
@@ -192,6 +192,10 @@ public class ChessGame implements Game {
     return this.pgnHistory;
   }
 
+  public AlgebraicNotation algebraicNotation() {
+    return algebraicNotation;
+  }
+
   @Override
   public boolean isThreeFoldRepetition() {
     String currentFen = FenNotation.generateFen(board);
@@ -214,9 +218,7 @@ public class ChessGame implements Game {
   public void rememberAndPerformPawnPromotion(Cell startCell, FigureType toFigure) {
     algebraicNotation.recordPawnPromotion(board, startCell, toFigure);
     board.promotePawn(startCell, toFigure);
-    if (!startCell.isOccupiedBy(FigureType.PAWN)) {
-      pgnHistory.add(algebraicNotation.toString());
-    }
+    pgnHistory.add(algebraicNotation.toString());
   }
 
   @Override

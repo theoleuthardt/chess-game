@@ -10,7 +10,7 @@ class PlayerTest {
     Player player = new Player(60, 1200, 0);
     assertThat(player.score()).isEqualTo(60.0);
     assertThat(player.elo()).isEqualTo(1200);
-    assertThat(player.gameCount()).isEqualTo(0);
+    assertThat(player.gameCount()).isZero();
   }
 
   @Test
