@@ -96,36 +96,4 @@ class PortableGameNotationTest {
         Arrays.asList("1. e4", "e5", "2. Nf3", "Nc6", "3. Bb5", "a6", "4. Ba4", "Nf6", "5. O-O"),
         result);
   }
-
-  private List<String> addCounterWithLogging(
-      List<String> pgnHistory, List<Integer> iStates, List<Integer> moveCounts) {
-    List<String> moves = new ArrayList<>();
-    int moveCount = 0;
-    int i = 0;
-    for (String move : pgnHistory) {
-      iStates.add(i);
-      moveCounts.add(moveCount);
-      if (i++ % 2 == 0) {
-        moves.add(++moveCount + ". " + move);
-      } else {
-        moves.add(move);
-      }
-    }
-    return moves;
-  }
-
-  @Test
-  void testAddCounterWithDetailedAssertions() {
-    List<String> pgnHistory = Arrays.asList("e4", "e5", "Nf3");
-    List<Integer> iStates = new ArrayList<>();
-    List<Integer> moveCounts = new ArrayList<>();
-    List<String> result = addCounterWithLogging(pgnHistory, iStates, moveCounts);
-
-    // Check intermediate states
-    assertEquals(Arrays.asList(0, 1, 2), iStates); // expected i states
-    assertEquals(Arrays.asList(0, 1, 1), moveCounts); // expected moveCounts states
-
-    // Check final output
-    assertEquals(Arrays.asList("1. e4", "e5", "2. Nf3"), result);
-  }
 }
